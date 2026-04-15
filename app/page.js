@@ -1244,11 +1244,17 @@ export default function Home() {
 
   // ──────────── HUB VIEW ────────────
   const renderHub = () => (
-    <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 20px 60px" }}>
       <Hero />
       <div style={{ fontSize: 11, fontWeight: 800, color: C.textSoft, letterSpacing: 1, textTransform: "uppercase", marginBottom: 14, paddingLeft: 4 }}>
         카드별 기회 맵
       </div>
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+        gap: 16,
+        alignItems: "stretch",
+      }}>
       {Object.values(CATEGORIES).map(cat => {
         const count = OPPS.filter(o => o.category === cat.key).length;
         const annual = OPPS.filter(o => o.category === cat.key).reduce((s, o) => s + (o.annualVol || 0), 0);
@@ -1261,9 +1267,10 @@ export default function Home() {
             style={{
               background: "#FFFFFF", borderRadius: 20,
               border: `1px solid ${cat.color}25`,
-              marginBottom: 16, cursor: "pointer", overflow: "hidden",
+              cursor: "pointer", overflow: "hidden",
               boxShadow: "0 2px 10px rgba(0,0,0,0.04)",
               transition: "all 0.2s",
+              display: "flex", flexDirection: "column",
             }}
           >
             <div style={{
@@ -1272,11 +1279,11 @@ export default function Home() {
                 ? `linear-gradient(90deg, ${cat.multiColor[0]}, ${cat.multiColor[1]}, ${cat.multiColor[2]})`
                 : `linear-gradient(90deg, ${cat.color}, ${cat.color}80)`,
             }} />
-            <div style={{ padding: "24px 22px", position: "relative" }}>
+            <div style={{ padding: "24px 22px", position: "relative", flex: 1, display: "flex", flexDirection: "column" }}>
               {!isMulti && (
                 <div style={{ position: "absolute", top: -40, left: -40, width: 160, height: 160, borderRadius: "50%", background: `radial-gradient(circle, ${cat.color}14, transparent 70%)`, pointerEvents: "none" }} />
               )}
-              <div style={{ position: "relative" }}>
+              <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column" }}>
                 <div style={{ fontSize: 24, marginBottom: 14, letterSpacing: 3 }}>{cat.icons.join(" ")}</div>
                 <div style={{ fontSize: 11, fontWeight: 800, color: cat.color, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>{cat.label}</div>
                 <div style={{ fontSize: 13, color: C.textSoft, marginBottom: 14, lineHeight: 1.5 }}>{cat.tagline}</div>
@@ -1284,7 +1291,7 @@ export default function Home() {
                   <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: cat.color + "15", color: cat.color }}>{count}개 기회</span>
                   <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(annual)}회</span>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16, flex: 1 }}>
                   {previews.map((p, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", borderRadius: 10, background: "#F9FAFB", border: "1px solid #F3F4F6" }}>
                       <span style={{ fontSize: 16, flexShrink: 0 }}>{p.icon}</span>
@@ -1292,12 +1299,13 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: cat.color, display: "flex", alignItems: "center", gap: 6 }}>기회 보기 →</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: cat.color, display: "flex", alignItems: "center", gap: 6, marginTop: "auto" }}>기회 보기 →</div>
               </div>
             </div>
           </div>
         );
       })}
+      </div>
     </div>
   );
 
