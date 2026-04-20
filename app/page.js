@@ -12,6 +12,7 @@ import {
   getTotalAnnualVolume,
   getOpportunityCount,
 } from "./data/allCardData";
+import * as autoslim from "./data/needAutoSlimData";
 
 // ══════════════════════════════════════════════════════════════
 // KB ALL·YOU·NEED AI Brandformance Engine v3.0
@@ -1142,20 +1143,25 @@ export default function Home() {
   const [currentView, setCurrentView] = useState("hub");
   const [currentCategory, setCurrentCategory] = useState(null);
   const [selectedOpp, setSelectedOpp] = useState(null);
+  const [needSubCard, setNeedSubCard] = useState(null); // "edu" | "pay" | "autoslim"
 
   const activeStep = VIEW_STEP[currentView] ?? 0;
   const showStepIndicator = currentView !== "hub";
 
-  const goToCategory  = (cat) => { setCurrentCategory(cat); setCurrentView("category"); };
+  const goToCategory  = (cat) => { setCurrentCategory(cat); setNeedSubCard(null); setCurrentView("category"); };
   const goToAnalysis  = (opp) => { setSelectedOpp(opp); setCurrentView("analysis"); };
   const goToIdeas     = () => setCurrentView("ideas");
+  const goToNeedSub   = (sub) => { setNeedSubCard(sub); };
   const goBack = () => {
     if (currentView === "storyboard") setCurrentView("ideas");
     else if (currentView === "ideas") setCurrentView("analysis");
     else if (currentView === "analysis") { setCurrentView("category"); setSelectedOpp(null); }
-    else if (currentView === "category") { setCurrentView("hub"); setCurrentCategory(null); }
+    else if (currentView === "category") {
+      if (currentCategory === "need" && needSubCard) { setNeedSubCard(null); }
+      else { setCurrentView("hub"); setCurrentCategory(null); }
+    }
   };
-  const goHome = () => { setCurrentView("hub"); setCurrentCategory(null); setSelectedOpp(null); };
+  const goHome = () => { setCurrentView("hub"); setCurrentCategory(null); setSelectedOpp(null); setNeedSubCard(null); };
 
   const pill = (bg, color) => ({
     fontSize: 10, fontWeight: 600, color, background: bg,
@@ -1267,17 +1273,30 @@ export default function Home() {
         alignItems: "stretch",
       }}>
       {Object.values(CATEGORIES).map(cat => {
-        // ALL 카드는 새 데이터, 나머지는 기존 OPPS
+        // ALL 카드는 새 v2 데이터 기반
         const isAll = cat.key === "all";
-        const count = isAll
-          ? getOpportunityCount() + ALL_CARD_CROSS_INSIGHTS.length
-          : OPPS.filter(o => o.category === cat.key).length;
-        const annual = isAll
-          ? getTotalAnnualVolume()
-          : OPPS.filter(o => o.category === cat.key).reduce((s, o) => s + (o.annualVol || 0), 0);
-        const previews = isAll
-          ? ALL_CARD_PERSONAS.slice(0, 3).map(p => ({ icon: p.icon, title: p.title }))
-          : OPPS.filter(o => o.category === cat.key && !o.isInsight).slice(0, 3);
+        const isNeed = cat.key === "need";
+        let count, annual, previews;
+        if (isAll) {
+          count = getOpportunityCount() + ALL_CARD_CROSS_INSIGHTS.length;
+          annual = getTotalAnnualVolume();
+          previews = ALL_CARD_PERSONAS.slice(0, 3).map(p => ({ icon: p.icon, title: p.title }));
+        } else if (isNeed) {
+          // NEED = AutoSlim(v2) + 아직 교체 안된 Edu/Pay(OPPS 임시 사용)
+          const autoCount = autoslim.getOpportunityCount() + autoslim.NEED_AUTOSLIM_CROSS_INSIGHTS.length;
+          const oldNeed = OPPS.filter(o => o.category === "need");
+          count = autoCount + oldNeed.length;
+          annual = autoslim.getTotalAnnualVolume() + oldNeed.reduce((s, o) => s + (o.annualVol || 0), 0);
+          previews = [
+            { icon: "🚗", title: "NEED AutoSlim — 자동차 카드 (신차·주유·보험·정비)" },
+            { icon: "📱", title: "NEED Pay — 간편결제·OTT·패션 (Phase 3 예정)" },
+            { icon: "📚", title: "NEED Edu — 교육·생활 (Phase 4 예정)" },
+          ];
+        } else {
+          count = OPPS.filter(o => o.category === cat.key).length;
+          annual = OPPS.filter(o => o.category === cat.key).reduce((s, o) => s + (o.annualVol || 0), 0);
+          previews = OPPS.filter(o => o.category === cat.key && !o.isInsight).slice(0, 3);
+        }
         const isMulti = Array.isArray(cat.multiColor);
         return (
           <div
@@ -1327,6 +1346,237 @@ export default function Home() {
       </div>
     </div>
   );
+
+  // ──────────── NEED CATEGORY VIEW (하위카드 선택 + AutoSlim v2) ────────────
+  const NEED_SUBCARDS = [
+    {
+      id: "autoslim", label: "NEED AutoSlim", icon: "🚗", color: "#D97706",
+      tagline: "자동차 집중 혜택",
+      desc: "신차 할부 + 주유 5% + 보험 2만원 + 스피드메이트 · 연 최대 41만원",
+      ready: true,
+    },
+    {
+      id: "pay", label: "NEED Pay", icon: "📱", color: "#059669",
+      tagline: "간편결제 집중 혜택",
+      desc: "간편결제 15%/10% + 디지털콘텐츠 30% + 온라인패션몰 5%",
+      ready: false,
+    },
+    {
+      id: "edu", label: "NEED Edu", icon: "📚", color: "#DC2626",
+      tagline: "교육 집중 혜택",
+      desc: "교육업종 5~10% + 생활영역 5% (병원·약국·커피)",
+      ready: false,
+    },
+  ];
+
+  const renderNeedCategory = () => {
+    // 하위카드 선택 안 됨 → 선택 페이지
+    if (!needSubCard) {
+      return (
+        <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+          <BackNav label="← 전체 기회로 돌아가기" />
+
+          {/* Header */}
+          <div style={{ background: "#FFFFFF", borderRadius: 18, border: "1px solid #DC262625", marginBottom: 22, overflow: "hidden" }}>
+            <div style={{ height: 5, background: "linear-gradient(90deg, #059669, #D97706, #DC2626)" }} />
+            <div style={{ padding: "24px" }}>
+              <div style={{ fontSize: 22, marginBottom: 12, letterSpacing: 3 }}>📱 🔋 🛡️ 📚 💊</div>
+              <div style={{ color: "#DC2626", fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>C. NEED</div>
+              <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>NEED 카드</div>
+              <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>3개 세부 카드 중 하나를 선택하세요</div>
+            </div>
+          </div>
+
+          <div style={{ fontSize: 11, fontWeight: 800, color: C.textSoft, letterSpacing: 1, textTransform: "uppercase", marginBottom: 14, paddingLeft: 4 }}>
+            세부 카드 선택
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {NEED_SUBCARDS.map(sub => (
+              <div
+                key={sub.id}
+                onClick={() => sub.ready && goToNeedSub(sub.id)}
+                style={{
+                  background: "#FFFFFF", borderRadius: 16,
+                  border: `1px solid ${sub.color}30`,
+                  borderLeft: `4px solid ${sub.color}`,
+                  padding: "20px 22px",
+                  cursor: sub.ready ? "pointer" : "not-allowed",
+                  opacity: sub.ready ? 1 : 0.6,
+                  display: "flex", alignItems: "center", gap: 16,
+                  transition: "all 0.2s",
+                }}
+              >
+                <div style={{
+                  width: 52, height: 52, borderRadius: 14,
+                  background: `linear-gradient(135deg, ${sub.color}, ${sub.color}CC)`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 26, flexShrink: 0,
+                }}>{sub.icon}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", gap: 8, marginBottom: 4, alignItems: "center", flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 16, fontWeight: 900, color: C.text }}>{sub.label}</span>
+                    {!sub.ready && (
+                      <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4, background: "#F3F4F6", color: "#9CA3AF" }}>준비 중</span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 12, color: sub.color, fontWeight: 700, marginBottom: 6 }}>{sub.tagline}</div>
+                  <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.6 }}>{sub.desc}</div>
+                </div>
+                {sub.ready && <div style={{ color: sub.color, fontSize: 20, flexShrink: 0 }}>→</div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // 하위카드 선택됨 → AutoSlim 렌더
+    if (needSubCard === "autoslim") return renderAutoslimCategory();
+    return null;
+  };
+
+  // ──────────── NEED AutoSlim — COVER 4 + ACCENT 5 + 교차 인사이트 ────────────
+  const renderAutoslimCategory = () => {
+    const color = "#D97706";
+    const cover = autoslim.getCoverOpportunities();
+    const accent = autoslim.getAccentOpportunities();
+    const personas = autoslim.NEED_AUTOSLIM_PERSONAS;
+    const crossIns = autoslim.NEED_AUTOSLIM_CROSS_INSIGHTS;
+    const totalAnnual = autoslim.getTotalAnnualVolume();
+    const oppCount = autoslim.getOpportunityCount();
+
+    return (
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+        <BackNav label="← NEED 카드 선택으로" />
+
+        {/* Header */}
+        <div style={{ background: "#FFFFFF", borderRadius: 18, border: `1px solid ${color}30`, marginBottom: 22, overflow: "hidden" }}>
+          <div style={{ height: 5, background: `linear-gradient(90deg, ${color}, ${color}80)` }} />
+          <div style={{ padding: "24px" }}>
+            <div style={{ fontSize: 22, marginBottom: 12 }}>🚗 ⛽ 🔧 🔵</div>
+            <div style={{ color: color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>C. NEED › AutoSlim</div>
+            <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>NEED AutoSlim</div>
+            <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>자동차 집중 혜택 — 신차부터 유지까지</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: color + "15", color: color }}>{oppCount}개 기회</span>
+              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
+              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>COVER {cover.length} + ACCENT {accent.length}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* COVER 페르소나 섹션 */}
+        <SectionDivider label="🔵 COVER 페르소나" color={color} count={cover.length} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
+          {cover.map(opp => {
+            const persona = personas.find(p => p.id === opp.personaId);
+            const pColor = persona?.color || color;
+            return (
+              <div
+                key={opp.id}
+                onClick={() => goToAnalysis({ ...opp, _isAllV2: true, _persona: persona })}
+                style={{
+                  background: "#FFFFFF", borderRadius: 12,
+                  border: "1px solid #E5E7EB",
+                  borderLeft: `3px solid ${pColor}`,
+                  padding: "14px 16px",
+                  cursor: "pointer",
+                  display: "flex", alignItems: "center", gap: 12,
+                  transition: "all 0.2s",
+                }}
+              >
+                <div style={{ fontSize: 24, flexShrink: 0 }}>{opp.icon}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", gap: 6, marginBottom: 4, flexWrap: "wrap" }}>
+                    {opp.tier && (
+                      <span style={{ fontSize: 9, fontWeight: 800, color: "#fff", background: LEVEL_COLORS[opp.tier] || "#6B7280", padding: "2px 7px", borderRadius: 4 }}>{opp.tier}</span>
+                    )}
+                    <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#DBEAFE", color: "#1D4ED8", fontWeight: 700 }}>🔵 COVER</span>
+                    {persona && <span style={{ fontSize: 10, color: pColor, fontWeight: 600 }}>{persona.icon} {persona.title}</span>}
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>{opp.title}</div>
+                  {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{opp.subtitle}</div>}
+                </div>
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <div style={{ color: pColor, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
+                  <div style={{ color: C.textSoft, fontSize: 9 }}>월 {fmt(opp.monthlyVolume)}</div>
+                  <div style={{ color: pColor, fontSize: 14, marginTop: 2 }}>→</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ACCENT 기회 섹션 */}
+        <SectionDivider label="🟠 ACCENT 기회" color={color} count={accent.length} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
+          {accent.map(opp => (
+            <div
+              key={opp.id}
+              onClick={() => goToAnalysis({ ...opp, _isAllV2: true })}
+              style={{
+                background: "#FFFFFF", borderRadius: 12,
+                border: "1px solid #E5E7EB",
+                borderLeft: `3px solid ${color}`,
+                padding: "14px 16px",
+                cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 12,
+                transition: "all 0.2s",
+              }}
+            >
+              <div style={{ fontSize: 24, flexShrink: 0 }}>{opp.icon}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", gap: 6, marginBottom: 4, flexWrap: "wrap" }}>
+                  {opp.tier && (
+                    <span style={{ fontSize: 9, fontWeight: 800, color: "#fff", background: LEVEL_COLORS[opp.tier] || "#6B7280", padding: "2px 7px", borderRadius: 4 }}>{opp.tier}</span>
+                  )}
+                  <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#FED7AA", color: "#9A3412", fontWeight: 700 }}>🟠 ACCENT</span>
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>{opp.title}</div>
+                {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{opp.subtitle}</div>}
+              </div>
+              <div style={{ textAlign: "right", flexShrink: 0 }}>
+                <div style={{ color: color, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
+                <div style={{ color: C.textSoft, fontSize: 9 }}>월 {fmt(opp.monthlyVolume)}</div>
+                <div style={{ color: color, fontSize: 14, marginTop: 2 }}>→</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 교차 인사이트 */}
+        <SectionDivider label="⚡ 교차 인사이트" color="#DC2626" count={crossIns.length} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {crossIns.map(ins => (
+            <div key={ins.id} style={{
+              background: "#FFFFFF", borderRadius: 12,
+              border: "1px solid #FECACA",
+              borderLeft: "3px solid #DC2626",
+              padding: "14px 16px",
+            }}>
+              <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap", alignItems: "center" }}>
+                <span style={{ fontSize: 14 }}>{ins.icon}</span>
+                <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "#FEE2E2", color: "#B91C1C", fontWeight: 800 }}>{ins.hookType}</span>
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 6 }}>{ins.title}</div>
+              <div style={{ fontSize: 12, color: "#4B5563", lineHeight: 1.6, marginBottom: 8 }}>{ins.description}</div>
+              {ins.implication && (
+                <div style={{
+                  padding: "8px 12px", borderRadius: 8,
+                  background: "linear-gradient(135deg, #FEF2F208, transparent)",
+                  border: "1px solid #FECACA40",
+                  fontSize: 11, color: "#7F1D1D", lineHeight: 1.6,
+                }}>
+                  <strong>💡 시사점:</strong> {ins.implication}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   // ──────────── ALL CARD CATEGORY VIEW (v2 — 5 페르소나 + 28 기회) ────────────
   const renderAllCategory = () => {
@@ -1514,6 +1764,7 @@ export default function Home() {
   const renderCategory = () => {
     if (!currentCategory) return null;
     if (currentCategory === "all") return renderAllCategory();
+    if (currentCategory === "need") return renderNeedCategory();
     const cat = CATEGORIES[currentCategory];
     const opps = OPPS.filter(o => o.category === currentCategory);
     const subgroups = [...new Set(opps.map(o => o.subgroup))];
