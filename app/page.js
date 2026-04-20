@@ -2324,6 +2324,103 @@ export default function Home() {
           </div>
         </div>
 
+        {/* 페르소나 Preview 그리드 */}
+        <div style={{
+          padding: "18px 20px", marginBottom: 20,
+          borderRadius: 16,
+          background: "linear-gradient(135deg, #F9FAFB, #F3F4F6)",
+          border: "1px solid #E5E7EB",
+        }}>
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: C.text, marginBottom: 3 }}>
+              이 카드가 연결하는 기회
+            </div>
+            <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>
+              페르소나별로 검색 데이터에서 발견한 구체적인 소비자 맥락 · 카드 클릭 시 해당 섹션으로 이동
+            </div>
+          </div>
+
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+            gap: 10,
+          }}>
+            {ALL_CARD_PERSONAS.map(persona => {
+              const opps = getOpportunitiesByPersona(persona.id);
+              const isActive = openPersona === persona.id;
+              return (
+                <div
+                  key={persona.id}
+                  onClick={() => {
+                    setOpenPersona(persona.id);
+                    setTimeout(() => {
+                      const el = document.getElementById(`persona-${persona.id}`);
+                      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }, 50);
+                  }}
+                  style={{
+                    background: "#FFFFFF",
+                    borderRadius: 12,
+                    padding: "12px 12px 14px",
+                    border: isActive ? `2px solid ${persona.color}` : "1px solid #E5E7EB",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    boxShadow: isActive ? `0 4px 12px ${persona.color}25` : "0 1px 2px rgba(0,0,0,0.03)",
+                    display: "flex", flexDirection: "column", minHeight: 130,
+                  }}
+                >
+                  <div style={{
+                    width: 32, height: 32, borderRadius: 9,
+                    background: `linear-gradient(135deg, ${persona.color}22, ${persona.color}08)`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 17, marginBottom: 8,
+                    border: `1px solid ${persona.color}20`,
+                  }}>
+                    {persona.icon}
+                  </div>
+                  <div style={{
+                    fontSize: 9, fontWeight: 800, color: persona.color,
+                    letterSpacing: 0.5, marginBottom: 2,
+                  }}>{persona.id}</div>
+                  <div style={{
+                    fontSize: 12, fontWeight: 800, color: C.text,
+                    lineHeight: 1.35, marginBottom: 4,
+                    overflow: "hidden",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                  }}>
+                    {persona.title}
+                  </div>
+                  <div style={{
+                    fontSize: 10, color: C.textSoft, lineHeight: 1.4,
+                    overflow: "hidden",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    marginBottom: "auto",
+                    paddingBottom: 8,
+                  }}>
+                    {persona.subtitle}
+                  </div>
+                  <div style={{
+                    paddingTop: 8,
+                    borderTop: "1px solid #F3F4F6",
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                  }}>
+                    <span style={{ fontSize: 10, color: C.textSoft, fontWeight: 600 }}>
+                      {opps.length}개 기회
+                    </span>
+                    <span style={{ fontSize: 10, fontWeight: 800, color: persona.color }}>
+                      연 {persona.annualSearchVolume >= 10000 ? `${(persona.annualSearchVolume / 10000).toFixed(0)}만` : fmt(persona.annualSearchVolume)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* 5개 페르소나 섹션 */}
         {/* 안내 */}
         <div style={{
