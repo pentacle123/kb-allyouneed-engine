@@ -1150,6 +1150,7 @@ export default function Home() {
   const [selectedOpp, setSelectedOpp] = useState(null);
   const [needSubCard, setNeedSubCard] = useState(null); // "edu" | "pay" | "autoslim"
   const [youSubCard, setYouSubCard] = useState(null);   // "daily" | "family"
+  const [openPersona, setOpenPersona] = useState("P1");  // ALL 카드 첫 페르소나만 기본 펼침
 
   const activeStep = VIEW_STEP[currentView] ?? 0;
   const showStepIndicator = currentView !== "hub";
@@ -2324,101 +2325,159 @@ export default function Home() {
         </div>
 
         {/* 5개 페르소나 섹션 */}
+        {/* 안내 */}
+        <div style={{
+          fontSize: 11, color: C.textSoft, marginBottom: 12, paddingLeft: 4,
+          display: "flex", alignItems: "center", gap: 6,
+        }}>
+          <span>💡</span>
+          <span>페르소나를 클릭하면 해당 기회들이 펼쳐집니다. 한 번에 하나씩.</span>
+        </div>
+
         {ALL_CARD_PERSONAS.map(persona => {
           const opps = getOpportunitiesByPersona(persona.id);
+          const isOpen = openPersona === persona.id;
+          const totalVolume = opps.reduce((s, o) => s + (o.annualVolume || 0), 0);
           return (
-            <div key={persona.id} style={{ marginBottom: 28 }}>
-              {/* 페르소나 헤더 */}
-              <div style={{
+            <div
+              key={persona.id}
+              id={`persona-${persona.id}`}
+              style={{
+                marginBottom: 10,
                 background: "#FFFFFF", borderRadius: 14,
-                border: `1px solid ${persona.color}30`,
+                border: `1px solid ${persona.color}${isOpen ? "50" : "25"}`,
                 borderLeft: `4px solid ${persona.color}`,
-                padding: "16px 20px", marginBottom: 10,
-              }}>
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+                overflow: "hidden",
+                transition: "all 0.2s",
+                boxShadow: isOpen ? `0 4px 12px ${persona.color}15` : "none",
+              }}
+            >
+              {/* 페르소나 헤더 (클릭 가능) */}
+              <div
+                onClick={() => setOpenPersona(isOpen ? null : persona.id)}
+                style={{
+                  padding: "16px 20px",
+                  cursor: "pointer",
+                  display: "flex", alignItems: "flex-start", gap: 14,
+                  transition: "background 0.15s",
+                }}
+              >
+                <div style={{
+                  width: 44, height: 44, borderRadius: 12,
+                  background: `linear-gradient(135deg, ${persona.color}20, ${persona.color}08)`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 22, flexShrink: 0, border: `1px solid ${persona.color}20`,
+                }}>{persona.icon}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 4, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 10, fontWeight: 800, color: persona.color, letterSpacing: 0.5 }}>{persona.id}</span>
+                    <span style={{ fontSize: 15, fontWeight: 900, color: C.text }}>{persona.title}</span>
+                    <span style={{
+                      fontSize: 10, padding: "2px 8px", borderRadius: 10,
+                      background: persona.color + "15", color: persona.color, fontWeight: 800,
+                    }}>{opps.length}개 기회</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: C.textSoft, lineHeight: 1.5, marginBottom: isOpen ? 0 : 4 }}>
+                    {persona.subtitle}
+                  </div>
+                  {!isOpen && (
+                    <div style={{ fontSize: 10, color: C.textSoft, fontWeight: 600, marginTop: 4 }}>
+                      연간 {fmt(totalVolume)}회 · {persona.demoTags.slice(0, 2).join(" · ")}
+                    </div>
+                  )}
+                </div>
+                <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                  {!isOpen && (
+                    <div style={{ color: persona.color, fontSize: 12, fontWeight: 800 }}>
+                      연 {fmt(totalVolume)}회
+                    </div>
+                  )}
                   <div style={{
-                    width: 44, height: 44, borderRadius: 12,
-                    background: `linear-gradient(135deg, ${persona.color}20, ${persona.color}08)`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 22, flexShrink: 0, border: `1px solid ${persona.color}20`,
-                  }}>{persona.icon}</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 4, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, color: persona.color, letterSpacing: 0.5 }}>{persona.id}</span>
-                      <span style={{ fontSize: 14, fontWeight: 900, color: C.text }}>{persona.title}</span>
-                    </div>
-                    <div style={{ fontSize: 12, color: C.textSoft, marginBottom: 6, lineHeight: 1.5 }}>
-                      {persona.subtitle}
-                    </div>
-                    <div style={{ fontSize: 11, color: "#4B5563", lineHeight: 1.6, marginBottom: 8 }}>
+                    fontSize: 14, color: persona.color,
+                    transform: isOpen ? "rotate(180deg)" : "rotate(0)",
+                    transition: "transform 0.25s",
+                  }}>▼</div>
+                </div>
+              </div>
+
+              {/* 펼친 상태 */}
+              {isOpen && (
+                <div style={{
+                  padding: "0 20px 20px 20px",
+                  borderTop: `1px dashed ${persona.color}25`,
+                  animation: "fadeIn 0.25s ease",
+                }}>
+                  {/* 페르소나 상세 설명 */}
+                  <div style={{
+                    padding: "12px 14px", marginTop: 14, marginBottom: 14,
+                    background: `${persona.color}06`, borderRadius: 10,
+                    border: `1px solid ${persona.color}15`,
+                  }}>
+                    <div style={{ fontSize: 11, color: "#4B5563", lineHeight: 1.7, marginBottom: 8 }}>
                       {persona.description}
                     </div>
-                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                       <span style={{
                         fontSize: 10, padding: "3px 9px", borderRadius: 6,
                         background: persona.color + "12", color: persona.color, fontWeight: 700,
                       }}>연 {fmt(persona.annualSearchVolume)}회</span>
-                      <span style={{
-                        fontSize: 10, padding: "3px 9px", borderRadius: 6,
-                        background: "#F3F4F6", color: "#374151", fontWeight: 600,
-                      }}>{opps.length}개 기회</span>
-                      {persona.demoTags.slice(0, 3).map((t, i) => (
+                      {persona.demoTags.map((t, i) => (
                         <span key={i} style={{
                           fontSize: 10, padding: "3px 9px", borderRadius: 6,
-                          background: "#F9FAFB", color: "#6B7280", fontWeight: 500,
+                          background: "#FFFFFF", color: "#6B7280", fontWeight: 500,
                           border: "1px solid #E5E7EB",
                         }}>{t}</span>
                       ))}
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* 기회 카드 */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {opps.map(opp => (
-                  <div
-                    key={opp.id}
-                    onClick={() => goToAnalysis({ ...opp, _isAllV2: true, _persona: persona })}
-                    style={{
-                      background: "#FFFFFF", borderRadius: 12,
-                      border: "1px solid #E5E7EB",
-                      borderLeft: `3px solid ${persona.color}`,
-                      padding: "14px 16px",
-                      cursor: "pointer",
-                      display: "flex", alignItems: "center", gap: 12,
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    <div style={{ fontSize: 22, flexShrink: 0 }}>{opp.icon}</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", gap: 6, marginBottom: 4, flexWrap: "wrap" }}>
-                        {opp.tier && (
-                          <span style={{ fontSize: 9, fontWeight: 800, color: "#fff", background: LEVEL_COLORS[opp.tier] || "#6B7280", padding: "2px 7px", borderRadius: 4 }}>{opp.tier}</span>
-                        )}
-                        <span style={{
-                          fontSize: 10, padding: "2px 8px", borderRadius: 10,
-                          background: `${persona.color}15`, color: persona.color, fontWeight: 700,
-                        }}>{opp.hookType}</span>
-                        <span style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 600 }}>{opp.id}</span>
-                      </div>
-                      <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>
-                        {opp.title}
-                      </div>
-                      {opp.subtitle && (
-                        <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>
-                          {opp.subtitle}
+                  {/* 기회 카드 */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {opps.map(opp => (
+                      <div
+                        key={opp.id}
+                        onClick={(e) => { e.stopPropagation(); goToAnalysis({ ...opp, _isAllV2: true, _persona: persona }); }}
+                        style={{
+                          background: "#FFFFFF", borderRadius: 10,
+                          border: "1px solid #E5E7EB",
+                          borderLeft: `3px solid ${persona.color}`,
+                          padding: "12px 14px",
+                          cursor: "pointer",
+                          display: "flex", alignItems: "center", gap: 12,
+                          transition: "all 0.15s",
+                        }}
+                      >
+                        <div style={{ fontSize: 20, flexShrink: 0 }}>{opp.icon}</div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: "flex", gap: 5, marginBottom: 3, flexWrap: "wrap" }}>
+                            {opp.tier && (
+                              <span style={{ fontSize: 9, fontWeight: 800, color: "#fff", background: LEVEL_COLORS[opp.tier] || "#6B7280", padding: "2px 6px", borderRadius: 4 }}>{opp.tier}</span>
+                            )}
+                            <span style={{
+                              fontSize: 9, padding: "2px 7px", borderRadius: 10,
+                              background: `${persona.color}15`, color: persona.color, fontWeight: 700,
+                            }}>{opp.hookType}</span>
+                            <span style={{ fontSize: 9, color: "#9CA3AF", fontWeight: 600 }}>{opp.id}</span>
+                          </div>
+                          <div style={{ fontSize: 12.5, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>
+                            {opp.title}
+                          </div>
+                          {opp.subtitle && (
+                            <div style={{ fontSize: 10.5, color: C.textSoft, lineHeight: 1.5 }}>
+                              {opp.subtitle}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    <div style={{ textAlign: "right", flexShrink: 0 }}>
-                      <div style={{ color: persona.color, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
-                      <div style={{ color: C.textSoft, fontSize: 9 }}>월 {fmt(opp.monthlyVolume)}</div>
-                      <div style={{ color: persona.color, fontSize: 14, marginTop: 2 }}>→</div>
-                    </div>
+                        <div style={{ textAlign: "right", flexShrink: 0 }}>
+                          <div style={{ color: persona.color, fontSize: 10.5, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
+                          <div style={{ color: C.textSoft, fontSize: 9 }}>월 {fmt(opp.monthlyVolume)}</div>
+                          <div style={{ color: persona.color, fontSize: 13, marginTop: 2 }}>→</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
             </div>
           );
         })}
