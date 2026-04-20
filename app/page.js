@@ -1246,6 +1246,22 @@ export default function Home() {
     </div>
   );
 
+  // ──────────── SectionDivider ────────────
+  const SectionDivider = ({ label, color, count }) => (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12, marginTop: 8 }}>
+      <div style={{ flex: 1, height: 1, background: `${color}25` }} />
+      <span style={{
+        color: color, fontSize: 11, fontWeight: 800,
+        padding: "4px 12px", borderRadius: 12,
+        background: `${color}10`,
+        whiteSpace: "nowrap",
+      }}>
+        {label}{count != null && ` (${count})`}
+      </span>
+      <div style={{ flex: 1, height: 1, background: `${color}25` }} />
+    </div>
+  );
+
   // ──────────── MiniHeatmap ────────────
   const MiniHeatmap = ({ data, color }) => {
     const max = Math.max(...data);
