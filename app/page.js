@@ -1,6 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
+import {
+  ALL_CARD_USPS,
+  ALL_CARD_PERSONAS,
+  ALL_CARD_OPPORTUNITIES,
+  ALL_CARD_CROSS_INSIGHTS,
+  getOpportunitiesByPersona,
+  getOpportunityById,
+  getPersonaById,
+  getTotalAnnualVolume,
+  getOpportunityCount,
+} from "./data/allCardData";
 
 // ══════════════════════════════════════════════════════════════
 // KB ALL·YOU·NEED AI Brandformance Engine v3.0
@@ -1256,9 +1267,17 @@ export default function Home() {
         alignItems: "stretch",
       }}>
       {Object.values(CATEGORIES).map(cat => {
-        const count = OPPS.filter(o => o.category === cat.key).length;
-        const annual = OPPS.filter(o => o.category === cat.key).reduce((s, o) => s + (o.annualVol || 0), 0);
-        const previews = OPPS.filter(o => o.category === cat.key && !o.isInsight).slice(0, 3);
+        // ALL 카드는 새 데이터, 나머지는 기존 OPPS
+        const isAll = cat.key === "all";
+        const count = isAll
+          ? getOpportunityCount() + ALL_CARD_CROSS_INSIGHTS.length
+          : OPPS.filter(o => o.category === cat.key).length;
+        const annual = isAll
+          ? getTotalAnnualVolume()
+          : OPPS.filter(o => o.category === cat.key).reduce((s, o) => s + (o.annualVol || 0), 0);
+        const previews = isAll
+          ? ALL_CARD_PERSONAS.slice(0, 3).map(p => ({ icon: p.icon, title: p.title }))
+          : OPPS.filter(o => o.category === cat.key && !o.isInsight).slice(0, 3);
         const isMulti = Array.isArray(cat.multiColor);
         return (
           <div
@@ -1309,9 +1328,192 @@ export default function Home() {
     </div>
   );
 
+  // ──────────── ALL CARD CATEGORY VIEW (v2 — 5 페르소나 + 28 기회) ────────────
+  const renderAllCategory = () => {
+    const cat = CATEGORIES.all;
+    const totalAnnual = getTotalAnnualVolume();
+    const oppCount = getOpportunityCount();
+
+    return (
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+        <BackNav label="← 전체 기회로 돌아가기" />
+
+        {/* Category Header */}
+        <div style={{ background: "#FFFFFF", borderRadius: 18, border: `1px solid ${cat.color}25`, marginBottom: 22, overflow: "hidden" }}>
+          <div style={{ height: 5, background: `linear-gradient(90deg, ${cat.color}, ${cat.color}80)` }} />
+          <div style={{ padding: "24px" }}>
+            <div style={{ fontSize: 22, marginBottom: 12, letterSpacing: 3 }}>{cat.icons.join(" ")}</div>
+            <div style={{ color: cat.color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>{cat.label}</div>
+            <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>{cat.title}</div>
+            <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>{cat.tagline}</div>
+            <div style={{ color: C.textSoft, fontSize: 11, marginBottom: 12, fontWeight: 600 }}>{cat.headerMeta}</div>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
+              {cat.uspPills.map((p, i) => (
+                <span key={i} style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 20, background: `${cat.color}12`, color: cat.color, border: `1px solid ${cat.color}30` }}>{p}</span>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: cat.color + "15", color: cat.color }}>{oppCount}개 기회</span>
+              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
+              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>5 페르소나</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 5개 페르소나 섹션 */}
+        {ALL_CARD_PERSONAS.map(persona => {
+          const opps = getOpportunitiesByPersona(persona.id);
+          return (
+            <div key={persona.id} style={{ marginBottom: 28 }}>
+              {/* 페르소나 헤더 */}
+              <div style={{
+                background: "#FFFFFF", borderRadius: 14,
+                border: `1px solid ${persona.color}30`,
+                borderLeft: `4px solid ${persona.color}`,
+                padding: "16px 20px", marginBottom: 10,
+              }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 12,
+                    background: `linear-gradient(135deg, ${persona.color}20, ${persona.color}08)`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 22, flexShrink: 0, border: `1px solid ${persona.color}20`,
+                  }}>{persona.icon}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 4, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, color: persona.color, letterSpacing: 0.5 }}>{persona.id}</span>
+                      <span style={{ fontSize: 14, fontWeight: 900, color: C.text }}>{persona.title}</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: C.textSoft, marginBottom: 6, lineHeight: 1.5 }}>
+                      {persona.subtitle}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#4B5563", lineHeight: 1.6, marginBottom: 8 }}>
+                      {persona.description}
+                    </div>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                      <span style={{
+                        fontSize: 10, padding: "3px 9px", borderRadius: 6,
+                        background: persona.color + "12", color: persona.color, fontWeight: 700,
+                      }}>연 {fmt(persona.annualSearchVolume)}회</span>
+                      <span style={{
+                        fontSize: 10, padding: "3px 9px", borderRadius: 6,
+                        background: "#F3F4F6", color: "#374151", fontWeight: 600,
+                      }}>{opps.length}개 기회</span>
+                      {persona.demoTags.slice(0, 3).map((t, i) => (
+                        <span key={i} style={{
+                          fontSize: 10, padding: "3px 9px", borderRadius: 6,
+                          background: "#F9FAFB", color: "#6B7280", fontWeight: 500,
+                          border: "1px solid #E5E7EB",
+                        }}>{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 기회 카드 */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {opps.map(opp => (
+                  <div
+                    key={opp.id}
+                    onClick={() => goToAnalysis({ ...opp, _isAllV2: true, _persona: persona })}
+                    style={{
+                      background: "#FFFFFF", borderRadius: 12,
+                      border: "1px solid #E5E7EB",
+                      borderLeft: `3px solid ${persona.color}`,
+                      padding: "14px 16px",
+                      cursor: "pointer",
+                      display: "flex", alignItems: "center", gap: 12,
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    <div style={{ fontSize: 22, flexShrink: 0 }}>{opp.icon}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", gap: 6, marginBottom: 4, flexWrap: "wrap" }}>
+                        {opp.tier && (
+                          <span style={{ fontSize: 9, fontWeight: 800, color: "#fff", background: LEVEL_COLORS[opp.tier] || "#6B7280", padding: "2px 7px", borderRadius: 4 }}>{opp.tier}</span>
+                        )}
+                        <span style={{
+                          fontSize: 10, padding: "2px 8px", borderRadius: 10,
+                          background: `${persona.color}15`, color: persona.color, fontWeight: 700,
+                        }}>{opp.hookType}</span>
+                        <span style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 600 }}>{opp.id}</span>
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>
+                        {opp.title}
+                      </div>
+                      {opp.subtitle && (
+                        <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>
+                          {opp.subtitle}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ textAlign: "right", flexShrink: 0 }}>
+                      <div style={{ color: persona.color, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
+                      <div style={{ color: C.textSoft, fontSize: 9 }}>월 {fmt(opp.monthlyVolume)}</div>
+                      <div style={{ color: persona.color, fontSize: 14, marginTop: 2 }}>→</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+
+        {/* 교차 인사이트 섹션 */}
+        <div style={{ marginTop: 16, marginBottom: 20 }}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 10, marginBottom: 12,
+          }}>
+            <div style={{ flex: 1, height: 1, background: "#DC262625" }} />
+            <span style={{ color: "#DC2626", fontSize: 11, fontWeight: 800, padding: "4px 12px", background: "#DC262610", borderRadius: 12 }}>
+              ⚡ 교차 인사이트 ({ALL_CARD_CROSS_INSIGHTS.length})
+            </span>
+            <div style={{ flex: 1, height: 1, background: "#DC262625" }} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {ALL_CARD_CROSS_INSIGHTS.map(ins => (
+              <div key={ins.id} style={{
+                background: "#FFFFFF", borderRadius: 12,
+                border: "1px solid #FECACA",
+                borderLeft: "3px solid #DC2626",
+                padding: "14px 16px",
+              }}>
+                <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap", alignItems: "center" }}>
+                  <span style={{ fontSize: 14 }}>{ins.icon}</span>
+                  <span style={{
+                    fontSize: 10, padding: "2px 8px", borderRadius: 4,
+                    background: "#FEE2E2", color: "#B91C1C", fontWeight: 800,
+                  }}>{ins.hookType}</span>
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 6 }}>
+                  {ins.title}
+                </div>
+                <div style={{ fontSize: 12, color: "#4B5563", lineHeight: 1.6, marginBottom: 8 }}>
+                  {ins.description}
+                </div>
+                {ins.implication && (
+                  <div style={{
+                    padding: "8px 12px", borderRadius: 8,
+                    background: "linear-gradient(135deg, #FEF2F208, transparent)",
+                    border: "1px solid #FECACA40",
+                    fontSize: 11, color: "#7F1D1D", lineHeight: 1.6,
+                  }}>
+                    <strong>💡 시사점:</strong> {ins.implication}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // ──────────── CATEGORY VIEW ────────────
   const renderCategory = () => {
     if (!currentCategory) return null;
+    if (currentCategory === "all") return renderAllCategory();
     const cat = CATEGORIES[currentCategory];
     const opps = OPPS.filter(o => o.category === currentCategory);
     const subgroups = [...new Set(opps.map(o => o.subgroup))];
@@ -1414,7 +1616,38 @@ export default function Home() {
   // ──────────── ANALYSIS VIEW ────────────
   const renderAnalysis = () => {
     if (!selectedOpp) return null;
-    const opp = selectedOpp;
+    let opp = selectedOpp;
+
+    // ── v2 ALL 카드 스키마 어댑터 ──
+    if (opp._isAllV2) {
+      const persona = opp._persona;
+      const axisAdapter = (axis) => axis ? { tags: axis.tags || [], evidence: axis.dataEvidence || "" } : null;
+      opp = {
+        ...opp,
+        card: "ALL",
+        level: opp.tier,
+        strategyCopy: opp.description,
+        hookLabel: persona ? persona.title : "",
+        usp: opp.uspConnection,
+        monthlyVol: opp.monthlyVolume,
+        annualVol: opp.annualVolume,
+        peakMonths: opp.peakMonths || [70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70],
+        peakSeason: opp.peakSeason,
+        context: {
+          who: axisAdapter(opp.who),
+          what: axisAdapter(opp.what),
+          when: axisAdapter(opp.when),
+          where: axisAdapter(opp.where),
+          why: axisAdapter(opp.why),
+          how: axisAdapter(opp.how),
+        },
+        pathJourney: opp.pathFinder || [],
+        pathInsight: opp.cluster ? `핵심 클러스터: ${opp.cluster.join(" · ")}` : "",
+        clusterInsight: opp.cluster ? opp.cluster.join(" · ") : "",
+        topKeywords: (opp.relatedKeywords || []).map(k => ({ keyword: k.term, vol: k.volume })),
+      };
+    }
+
     const cardColor = CARDS[opp.card]?.color || "#2563EB";
     const cardName = CARDS[opp.card]?.name || opp.card;
 
@@ -1438,7 +1671,7 @@ export default function Home() {
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             {opp.level && <span style={{ fontSize: 10, fontWeight: 800, color: "#fff", background: LEVEL_COLORS[opp.level], padding: "3px 10px", borderRadius: 8 }}>{opp.level}</span>}
             <span style={pill(`${cardColor}15`, cardColor)}>{cardName} · {opp.usp}</span>
-            <span style={pill("#F8FAFC", C.textSoft)}>{opp.hookType} · {opp.hookLabel}</span>
+            <span style={pill("#F8FAFC", C.textSoft)}>{opp.hookType} {opp.hookLabel ? `· ${opp.hookLabel}` : ""}</span>
             {opp.annualVol > 0 && <span style={pill(`${cardColor}15`, cardColor)}>연간 {fmt(opp.annualVol)}회</span>}
             {opp.monthlyVol > 0 && <span style={pill(`${cardColor}15`, cardColor)}>월 {fmt(opp.monthlyVol)}회</span>}
           </div>
