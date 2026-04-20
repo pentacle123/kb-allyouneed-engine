@@ -1178,34 +1178,203 @@ export default function Home() {
   });
 
   // ──────────── Hero (hub only) ────────────
-  const Hero = () => (
-    <div style={{
-      background: "linear-gradient(135deg, #0F172A 0%, #1E3A5F 100%)",
-      borderRadius: 20, padding: "36px 28px", marginBottom: 24,
-      position: "relative", overflow: "hidden",
-    }}>
-      <div style={{ position: "absolute", top: -60, right: -60, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, #2563EB20, transparent)" }} />
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10, position: "relative" }}>
-        <div style={{ background: "linear-gradient(135deg, #FFD700, #FFA500)", color: "#1E293B", fontWeight: 900, fontSize: 12, padding: "5px 10px", borderRadius: 7 }}>KB</div>
-        <div style={{ color: "rgba(255,255,255,0.7)", fontSize: 11, letterSpacing: 2, fontWeight: 700 }}>KB국민카드 × PENTACLE</div>
-      </div>
-      <div style={{ color: "#fff", fontSize: 28, fontWeight: 900, marginBottom: 4, position: "relative" }}>ALL·YOU·NEED</div>
-      <div style={{ color: "#60A5FA", fontSize: 15, fontWeight: 700, marginBottom: 14, position: "relative" }}>AI Brandformance Engine</div>
-      <div style={{ color: "rgba(255,255,255,0.75)", fontSize: 12, lineHeight: 1.7, marginBottom: 20, position: "relative" }}>
-        소비자 검색 데이터에서 발견한 기회를 카드 자산과 연결하고,<br />숏폼 콘텐츠 전략으로 전환합니다
-      </div>
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", position: "relative" }}>
-        <div style={{ background: "rgba(96,165,250,0.15)", border: "1px solid rgba(96,165,250,0.3)", borderRadius: 12, padding: "12px 18px" }}>
-          <div style={{ fontSize: 22, fontWeight: 900, color: "#60A5FA", lineHeight: 1 }}>32개</div>
-          <div style={{ fontSize: 11, color: "#CBD5E1", fontWeight: 600, marginTop: 4 }}>발견된 기회</div>
+  const Hero = () => {
+    const totalOpps = getOpportunityCount() + autoslim.getOpportunityCount() + needpay.getOpportunityCount() + neededu.getOpportunityCount()
+      + (youfamily.getOpportunityCount ? youfamily.getOpportunityCount() : youfamily.YOU_PRIME_FAMILY_OPPORTUNITIES.length)
+      + (youdaily.getOpportunityCount ? youdaily.getOpportunityCount() : youdaily.YOU_PRIME_DAILY_OPPORTUNITIES.length);
+    const totalAnnual = getTotalAnnualVolume()
+      + autoslim.getTotalAnnualVolume() + needpay.getTotalAnnualVolume() + neededu.getTotalAnnualVolume()
+      + (youfamily.getTotalAnnualVolume ? youfamily.getTotalAnnualVolume() : youfamily.YOU_PRIME_FAMILY_OPPORTUNITIES.reduce((s, o) => s + (o.annualVolume || 0), 0))
+      + (youdaily.getTotalAnnualVolume ? youdaily.getTotalAnnualVolume() : youdaily.YOU_PRIME_DAILY_OPPORTUNITIES.reduce((s, o) => s + (o.annualVolume || 0), 0));
+    const annualEok = (totalAnnual / 100000000).toFixed(1);
+
+    return (
+      <div style={{ marginBottom: 20 }}>
+        {/* 상단 브랜드 스트립 */}
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "14px 20px", marginBottom: 16,
+          background: "#FFFFFF", borderRadius: 12,
+          border: "1px solid #E5E7EB",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{
+              width: 40, height: 40, borderRadius: 10,
+              background: "linear-gradient(135deg, #FFD700, #FFA500)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 16, fontWeight: 900, color: "#1E293B",
+              boxShadow: "0 2px 6px rgba(255, 165, 0, 0.25)",
+            }}>KB</div>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: C.text, lineHeight: 1.2 }}>
+                KB <span style={{ color: "#F97316" }}>AI Brandformance</span> Engine
+              </div>
+              <div style={{ fontSize: 9, color: C.textSoft, letterSpacing: 2, fontWeight: 700, marginTop: 2 }}>
+                ALGORITHM PERFORMANCE PLATFORM
+              </div>
+            </div>
+          </div>
+          <div style={{ fontSize: 11, color: C.textSoft, fontWeight: 600 }}>Pentacle × AI</div>
         </div>
-        <div style={{ background: "rgba(52,211,153,0.15)", border: "1px solid rgba(52,211,153,0.3)", borderRadius: 12, padding: "12px 18px" }}>
-          <div style={{ fontSize: 22, fontWeight: 900, color: "#34D399", lineHeight: 1 }}>4.2억+</div>
-          <div style={{ fontSize: 11, color: "#CBD5E1", fontWeight: 600, marginTop: 4 }}>연간 검색량</div>
+
+        {/* 메인 히어로 — 2단 그리드 */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: 16,
+        }}>
+          {/* 좌측: 오렌지 그라디언트 브랜드 박스 */}
+          <div style={{
+            position: "relative", overflow: "hidden",
+            borderRadius: 18, padding: "28px 26px",
+            background: "linear-gradient(135deg, #FB923C 0%, #EA580C 100%)",
+            color: "#FFFFFF",
+            boxShadow: "0 8px 24px rgba(234, 88, 12, 0.25)",
+          }}>
+            <div style={{ position: "absolute", top: -60, right: -60, width: 200, height: 200, borderRadius: "50%", background: "rgba(255,255,255,0.1)" }} />
+            <div style={{ position: "absolute", bottom: -40, left: -40, width: 150, height: 150, borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
+            <div style={{ position: "relative" }}>
+              <div style={{ fontSize: 10, letterSpacing: 2, fontWeight: 700, opacity: 0.9, marginBottom: 10 }}>
+                KB × PENTACLE
+              </div>
+              <div style={{ fontSize: 26, fontWeight: 900, lineHeight: 1.2, marginBottom: 8, letterSpacing: -0.5 }}>
+                ALL·YOU·NEED
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}>
+                AI Brandformance Engine
+              </div>
+              <div style={{ fontSize: 12, opacity: 0.92, lineHeight: 1.6, marginBottom: 18 }}>
+                알고리즘을 타는 카드 숏폼전략
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                <span style={{
+                  display: "inline-flex", alignItems: "center", gap: 4,
+                  padding: "5px 11px", borderRadius: 20,
+                  background: "rgba(255,255,255,0.2)",
+                  fontSize: 11, fontWeight: 700,
+                  backdropFilter: "blur(8px)",
+                }}>
+                  🎯 BRAND
+                </span>
+                <span style={{ opacity: 0.7, fontSize: 12 }}>×</span>
+                <span style={{
+                  display: "inline-flex", alignItems: "center", gap: 4,
+                  padding: "5px 11px", borderRadius: 20,
+                  background: "rgba(255,255,255,0.2)",
+                  fontSize: 11, fontWeight: 700,
+                  backdropFilter: "blur(8px)",
+                }}>
+                  🛒 PERFORMANCE
+                </span>
+                <span style={{ opacity: 0.7, fontSize: 12 }}>=</span>
+                <span style={{
+                  display: "inline-flex", alignItems: "center", gap: 4,
+                  padding: "5px 12px", borderRadius: 20,
+                  background: "rgba(255,255,255,0.3)",
+                  fontSize: 11, fontWeight: 800,
+                  backdropFilter: "blur(8px)",
+                }}>
+                  🚀 BRANDFORMANCE
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 우측: 화이트 설명 박스 */}
+          <div style={{
+            borderRadius: 18, padding: "28px 26px",
+            background: "#FFFFFF",
+            border: "1px solid #E5E7EB",
+          }}>
+            <div style={{ fontSize: 10, letterSpacing: 2, fontWeight: 700, color: C.textSoft, marginBottom: 10 }}>
+              BRANDFORMANCE
+            </div>
+            <div style={{ fontSize: 18, fontWeight: 900, color: C.text, lineHeight: 1.35, marginBottom: 4 }}>
+              숏폼을 이용한 브랜드 퍼포먼스 전략으로
+            </div>
+            <div style={{ fontSize: 18, fontWeight: 900, color: "#F97316", lineHeight: 1.35, marginBottom: 18 }}>
+              소비자의 발견과 구매를 연결합니다
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+              {[
+                { icon: "🎯", label: "브랜드 가치 전달" },
+                { icon: "🔍", label: "검색 데이터 기반 발견" },
+                { icon: "🛒", label: "발견→고려→구매 전환" },
+              ].map((p, i) => (
+                <div key={i} style={{
+                  display: "flex", flexDirection: "column", alignItems: "center",
+                  gap: 6, padding: "10px 4px",
+                  background: "#FFF7ED",
+                  borderRadius: 10,
+                  border: "1px solid #FED7AA",
+                }}>
+                  <span style={{ fontSize: 20 }}>{p.icon}</span>
+                  <span style={{ fontSize: 10, color: "#9A3412", fontWeight: 600, textAlign: "center", lineHeight: 1.3 }}>{p.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 하단 스탯 배지 */}
+        <div style={{
+          display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap",
+        }}>
+          <div style={{
+            flex: 1, minWidth: 140, padding: "12px 16px",
+            background: "#FFFFFF", borderRadius: 12,
+            border: "1px solid #E5E7EB",
+            display: "flex", alignItems: "center", gap: 12,
+          }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: 9,
+              background: "linear-gradient(135deg, #DBEAFE, #BFDBFE)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 16,
+            }}>🎯</div>
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: "#2563EB", lineHeight: 1 }}>{totalOpps}개</div>
+              <div style={{ fontSize: 10, color: C.textSoft, fontWeight: 600, marginTop: 2 }}>발견된 기회</div>
+            </div>
+          </div>
+          <div style={{
+            flex: 1, minWidth: 140, padding: "12px 16px",
+            background: "#FFFFFF", borderRadius: 12,
+            border: "1px solid #E5E7EB",
+            display: "flex", alignItems: "center", gap: 12,
+          }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: 9,
+              background: "linear-gradient(135deg, #D1FAE5, #A7F3D0)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 16,
+            }}>🔍</div>
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: "#059669", lineHeight: 1 }}>{annualEok}억+</div>
+              <div style={{ fontSize: 10, color: C.textSoft, fontWeight: 600, marginTop: 2 }}>연간 검색량</div>
+            </div>
+          </div>
+          <div style={{
+            flex: 1, minWidth: 140, padding: "12px 16px",
+            background: "#FFFFFF", borderRadius: 12,
+            border: "1px solid #E5E7EB",
+            display: "flex", alignItems: "center", gap: 12,
+          }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: 9,
+              background: "linear-gradient(135deg, #FEF3C7, #FDE68A)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 16,
+            }}>💳</div>
+            <div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: "#D97706", lineHeight: 1 }}>5개</div>
+              <div style={{ fontSize: 10, color: C.textSoft, fontWeight: 600, marginTop: 2 }}>카드 라인</div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // ──────────── Step Indicator ────────────
   const StepIndicator = () => (
