@@ -17,6 +17,7 @@ import * as needpay from "./data/needPayData";
 import * as neededu from "./data/needEduData";
 import * as youfamily from "./data/youPrimeFamilyData";
 import * as youdaily from "./data/youPrimeDailyData";
+import { generateMonthlyTrend } from "../lib/generateMonthlyTrend";
 
 // ══════════════════════════════════════════════════════════════
 // KB ALL·YOU·NEED AI Brandformance Engine v3.0
@@ -1263,21 +1264,34 @@ export default function Home() {
   );
 
   // ──────────── MiniHeatmap ────────────
-  const MiniHeatmap = ({ data, color }) => {
+  const MiniHeatmap = ({ data, color, showValues = true }) => {
     const max = Math.max(...data);
+    const isRawValues = max > 100; // 지수(0-100)인지 실제 검색량인지 구분
     return (
-      <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: 56 }}>
-        {data.map((v, i) => (
-          <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-            <div style={{
-              width: "100%",
-              height: Math.max(4, (v / max) * 44),
-              borderRadius: "3px 3px 0 0",
-              background: v >= max * 0.9 ? color : v >= max * 0.7 ? `${color}90` : `${color}40`,
-            }} />
-            <span style={{ fontSize: 9, color: C.textSoft }}>{i + 1}월</span>
-          </div>
-        ))}
+      <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: 80 }}>
+        {data.map((v, i) => {
+          const heightPct = max > 0 ? (v / max) * 100 : 0;
+          const isPeak = v >= max * 0.9;
+          return (
+            <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, position: "relative" }}
+              title={isRawValues ? `${i + 1}월: ${v.toLocaleString()}회` : `${i + 1}월: 지수 ${v}`}
+            >
+              {showValues && isRawValues && isPeak && (
+                <span style={{ fontSize: 8, color: color, fontWeight: 700, marginBottom: 1 }}>
+                  {v >= 10000 ? `${(v / 10000).toFixed(1)}만` : v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v}
+                </span>
+              )}
+              <div style={{
+                width: "100%",
+                height: Math.max(4, (heightPct / 100) * 56),
+                borderRadius: "3px 3px 0 0",
+                background: isPeak ? color : v >= max * 0.7 ? `${color}90` : v >= max * 0.4 ? `${color}60` : `${color}30`,
+                transition: "all 0.2s",
+              }} />
+              <span style={{ fontSize: 9, color: isPeak ? color : C.textSoft, fontWeight: isPeak ? 700 : 500 }}>{i + 1}월</span>
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -2582,8 +2596,8 @@ export default function Home() {
         usp: opp.uspConnection,
         monthlyVol: opp.monthlyVolume,
         annualVol: opp.annualVolume,
-        peakMonths: opp.peakMonths || [70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70, 70],
-        peakSeason: opp.peakSeason,
+        peakMonths: opp.monthlyTrend || opp.peakMonths || generateMonthlyTrend(opp.annualVolume || 0, opp.seasonality || { type: "flat" }),
+        peakSeason: opp.peakSeason || (opp.seasonality?.description) || "연중 안정",
         context: {
           who: axisAdapter(opp.who),
           what: axisAdapter(opp.what),
@@ -2630,9 +2644,19 @@ export default function Home() {
 
         {/* Monthly Trend */}
         <div style={{ background: "#FFFFFF", borderRadius: 14, border: `1px solid ${C.border}`, padding: 20, marginBottom: 16 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
             <span style={{ color: C.text, fontSize: 13, fontWeight: 800 }}>📈 월별 검색 트렌드</span>
             {opp.peakSeason && <span style={{ color: cardColor, fontSize: 11, fontWeight: 700 }}>피크: {opp.peakSeason}</span>}
+          </div>
+          <div style={{ fontSize: 10, color: C.textSoft, marginBottom: 14 }}>
+            {(() => {
+              const trend = opp.peakMonths || [];
+              const isRaw = Math.max(...trend, 0) > 100;
+              const sum = trend.reduce((a, b) => a + b, 0);
+              return isRaw
+                ? `연간 ${fmt(sum)}회 · 월 평균 ${fmt(Math.round(sum / 12))}회`
+                : (opp.annualVol > 0 ? `연간 ${fmt(opp.annualVol)}회 · 월 평균 ${fmt(Math.round(opp.annualVol / 12))}회` : "검색량 정보 제한적");
+            })()}
           </div>
           <MiniHeatmap data={opp.peakMonths} color={cardColor} />
         </div>
