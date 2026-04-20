@@ -14,6 +14,7 @@ import {
 } from "./data/allCardData";
 import * as autoslim from "./data/needAutoSlimData";
 import * as needpay from "./data/needPayData";
+import * as neededu from "./data/needEduData";
 
 // ══════════════════════════════════════════════════════════════
 // KB ALL·YOU·NEED AI Brandformance Engine v3.0
@@ -1283,16 +1284,16 @@ export default function Home() {
           annual = getTotalAnnualVolume();
           previews = ALL_CARD_PERSONAS.slice(0, 3).map(p => ({ icon: p.icon, title: p.title }));
         } else if (isNeed) {
-          // NEED = AutoSlim(v2) + Pay(v2) + 아직 교체 안된 Edu
+          // NEED = AutoSlim + Pay + Edu (모두 v2)
           const autoCount = autoslim.getOpportunityCount() + autoslim.NEED_AUTOSLIM_CROSS_INSIGHTS.length;
           const payCount = needpay.getOpportunityCount() + needpay.NEED_PAY_CROSS_INSIGHTS.length;
-          const oldNeedEdu = OPPS.filter(o => o.category === "need"); // Edu 자리 대체용
-          count = autoCount + payCount + oldNeedEdu.length;
-          annual = autoslim.getTotalAnnualVolume() + needpay.getTotalAnnualVolume() + oldNeedEdu.reduce((s, o) => s + (o.annualVol || 0), 0);
+          const eduCount = neededu.getOpportunityCount() + neededu.NEED_EDU_CROSS_INSIGHTS.length;
+          count = autoCount + payCount + eduCount;
+          annual = autoslim.getTotalAnnualVolume() + needpay.getTotalAnnualVolume() + neededu.getTotalAnnualVolume();
           previews = [
             { icon: "🚗", title: "NEED AutoSlim — 자동차 카드 (신차·주유·보험·정비)" },
             { icon: "📱", title: "NEED Pay — 간편결제·OTT·디지털콘텐츠·패션" },
-            { icon: "📚", title: "NEED Edu — 교육·생활 (Phase 4 예정)" },
+            { icon: "📚", title: "NEED Edu — 교육·생활 (자녀 교육·자기계발)" },
           ];
         } else {
           count = OPPS.filter(o => o.category === cat.key).length;
@@ -1366,8 +1367,8 @@ export default function Home() {
     {
       id: "edu", label: "NEED Edu", icon: "📚", color: "#DC2626",
       tagline: "교육 집중 혜택",
-      desc: "교육업종 5~10% + 생활영역 5% (병원·약국·커피)",
-      ready: false,
+      desc: "교육업종 5~10% + 생활영역 5% (자녀 교육·평생 학습자)",
+      ready: true,
     },
   ];
 
@@ -1436,6 +1437,7 @@ export default function Home() {
     // 하위카드 선택됨
     if (needSubCard === "autoslim") return renderAutoslimCategory();
     if (needSubCard === "pay") return renderPayCategory();
+    if (needSubCard === "edu") return renderEduCategory();
     return null;
   };
 
@@ -1603,6 +1605,148 @@ export default function Home() {
             <div style={{ color: color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>C. NEED › Pay</div>
             <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>NEED Pay</div>
             <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>간편결제 집중 혜택 — KB Pay 중심 디지털 생활</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: color + "15", color: color }}>{oppCount}개 기회</span>
+              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
+              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>COVER {cover.length} + ACCENT {accent.length}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* COVER 페르소나 섹션 */}
+        <SectionDivider label="🔵 COVER 페르소나" color={color} count={cover.length} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
+          {cover.map(opp => {
+            const persona = personas.find(p => p.id === opp.personaId);
+            const pColor = persona?.color || color;
+            return (
+              <div
+                key={opp.id}
+                onClick={() => goToAnalysis({ ...opp, _isAllV2: true, _persona: persona })}
+                style={{
+                  background: "#FFFFFF", borderRadius: 12,
+                  border: "1px solid #E5E7EB",
+                  borderLeft: `3px solid ${pColor}`,
+                  padding: "14px 16px",
+                  cursor: "pointer",
+                  display: "flex", alignItems: "center", gap: 12,
+                  transition: "all 0.2s",
+                }}
+              >
+                <div style={{ fontSize: 24, flexShrink: 0 }}>{opp.icon}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", gap: 6, marginBottom: 4, flexWrap: "wrap" }}>
+                    {opp.tier && (
+                      <span style={{ fontSize: 9, fontWeight: 800, color: "#fff", background: LEVEL_COLORS[opp.tier] || "#6B7280", padding: "2px 7px", borderRadius: 4 }}>{opp.tier}</span>
+                    )}
+                    <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#DBEAFE", color: "#1D4ED8", fontWeight: 700 }}>🔵 COVER</span>
+                    {persona && <span style={{ fontSize: 10, color: pColor, fontWeight: 600 }}>{persona.icon} {persona.title}</span>}
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>{opp.title}</div>
+                  {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{opp.subtitle}</div>}
+                </div>
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <div style={{ color: pColor, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
+                  <div style={{ color: C.textSoft, fontSize: 9 }}>월 {fmt(opp.monthlyVolume)}</div>
+                  <div style={{ color: pColor, fontSize: 14, marginTop: 2 }}>→</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ACCENT 기회 섹션 */}
+        <SectionDivider label="🟠 ACCENT 기회" color={color} count={accent.length} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
+          {accent.map(opp => (
+            <div
+              key={opp.id}
+              onClick={() => goToAnalysis({ ...opp, _isAllV2: true })}
+              style={{
+                background: "#FFFFFF", borderRadius: 12,
+                border: "1px solid #E5E7EB",
+                borderLeft: `3px solid ${color}`,
+                padding: "14px 16px",
+                cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 12,
+                transition: "all 0.2s",
+              }}
+            >
+              <div style={{ fontSize: 24, flexShrink: 0 }}>{opp.icon}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", gap: 6, marginBottom: 4, flexWrap: "wrap" }}>
+                  {opp.tier && (
+                    <span style={{ fontSize: 9, fontWeight: 800, color: "#fff", background: LEVEL_COLORS[opp.tier] || "#6B7280", padding: "2px 7px", borderRadius: 4 }}>{opp.tier}</span>
+                  )}
+                  <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#FED7AA", color: "#9A3412", fontWeight: 700 }}>🟠 ACCENT</span>
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>{opp.title}</div>
+                {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{opp.subtitle}</div>}
+              </div>
+              <div style={{ textAlign: "right", flexShrink: 0 }}>
+                <div style={{ color: color, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
+                <div style={{ color: C.textSoft, fontSize: 9 }}>월 {fmt(opp.monthlyVolume)}</div>
+                <div style={{ color: color, fontSize: 14, marginTop: 2 }}>→</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 교차 인사이트 */}
+        <SectionDivider label="⚡ 교차 인사이트" color="#DC2626" count={crossIns.length} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {crossIns.map(ins => (
+            <div key={ins.id} style={{
+              background: "#FFFFFF", borderRadius: 12,
+              border: "1px solid #FECACA",
+              borderLeft: "3px solid #DC2626",
+              padding: "14px 16px",
+            }}>
+              <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap", alignItems: "center" }}>
+                <span style={{ fontSize: 14 }}>{ins.icon}</span>
+                <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "#FEE2E2", color: "#B91C1C", fontWeight: 800 }}>{ins.hookType}</span>
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 6 }}>{ins.title}</div>
+              <div style={{ fontSize: 12, color: "#4B5563", lineHeight: 1.6, marginBottom: 8 }}>{ins.description}</div>
+              {ins.implication && (
+                <div style={{
+                  padding: "8px 12px", borderRadius: 8,
+                  background: "linear-gradient(135deg, #FEF2F208, transparent)",
+                  border: "1px solid #FECACA40",
+                  fontSize: 11, color: "#7F1D1D", lineHeight: 1.6,
+                }}>
+                  <strong>💡 시사점:</strong> {ins.implication}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // ──────────── NEED Edu — COVER + ACCENT + 교차 인사이트 ────────────
+  const renderEduCategory = () => {
+    const color = "#DC2626";
+    const cover = neededu.getCoverOpportunities ? neededu.getCoverOpportunities() : neededu.NEED_EDU_OPPORTUNITIES.filter(o => o.hookType === "COVER");
+    const accent = neededu.getAccentOpportunities ? neededu.getAccentOpportunities() : neededu.NEED_EDU_OPPORTUNITIES.filter(o => o.hookType === "ACCENT");
+    const personas = neededu.NEED_EDU_PERSONAS;
+    const crossIns = neededu.NEED_EDU_CROSS_INSIGHTS;
+    const totalAnnual = neededu.getTotalAnnualVolume();
+    const oppCount = neededu.getOpportunityCount();
+
+    return (
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+        <BackNav label="← NEED 카드 선택으로" />
+
+        {/* Header */}
+        <div style={{ background: "#FFFFFF", borderRadius: 18, border: `1px solid ${color}30`, marginBottom: 22, overflow: "hidden" }}>
+          <div style={{ height: 5, background: `linear-gradient(90deg, ${color}, ${color}80)` }} />
+          <div style={{ padding: "24px" }}>
+            <div style={{ fontSize: 22, marginBottom: 12 }}>📚 🎓 💊 ☕</div>
+            <div style={{ color: color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>C. NEED › Edu</div>
+            <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>NEED Edu</div>
+            <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>교육 집중 혜택 — 학부모부터 평생 학습자까지</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: color + "15", color: color }}>{oppCount}개 기회</span>
               <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
