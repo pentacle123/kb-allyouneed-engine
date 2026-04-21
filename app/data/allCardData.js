@@ -64,7 +64,7 @@ export const ALL_CARD_PERSONAS = [
     description: "체리피커·상테크 7년 차, 매달 40만 채웠나 계산하는 피로 누적. ALL 카드 국내 1% 무실적·무한도가 종착지.",
     linkedUSP: ["usp-domestic-1pct"],
     annualSearchVolume: 2280000,
-    opportunityCount: 7,
+    opportunityCount: 4,
     color: "#3B82F6",
     demoTags: ["25-45세", "남녀 혼합", "신용카드 2장+", "연 2,500만+ 카드 지출"]
   },
@@ -100,7 +100,7 @@ export const ALL_CARD_PERSONAS = [
     description: "ChatGPT·Claude·Midjourney + 테무·알리·아마존 직구. 트래블카드와 다른 '일상 해외 결제' 카드 수요.",
     linkedUSP: ["usp-overseas-2pct"],
     annualSearchVolume: 1647000,
-    opportunityCount: 6,
+    opportunityCount: 5,
     color: "#10B981",
     demoTags: ["20-40대", "남성 60%", "직구·AI 유저", "월 해외결제 20만+"]
   },
@@ -112,7 +112,7 @@ export const ALL_CARD_PERSONAS = [
     description: "연말정산 실적 합산, 자녀 첫 체크카드, 아이 용돈 카드(+88%). 가족 단위로 혜택을 확장하려는 가장·배우자.",
     linkedUSP: ["usp-domestic-1pct", "usp-shopping-membership"],
     annualSearchVolume: 86000,
-    opportunityCount: 6,
+    opportunityCount: 3,
     color: "#8B5CF6",
     demoTags: ["35-55세", "남녀 혼합", "기혼·자녀 있음", "가족카드 기발급"]
   }
@@ -228,52 +228,6 @@ export const ALL_CARD_OPPORTUNITIES = [
     uspConnection: "전월실적 없음 조항"
   },
   {
-    id: "P1-3",
-    personaId: "P1",
-    icon: "🎫",
-    tier: "NICHE",
-    card: "ALL",
-    hookType: "Retire-hook",
-    title: "상테크 졸업 — 상품권 쌓아두는 시대의 끝",
-    subtitle: "편법 없이도 1%는 그대로",
-    description: "상테크(12,540) + 상테크 카드(6,390). 상품권 편법으로 실적 채우던 시절의 종언. 조건 없는 1% 카드가 상테크를 '필요 없게' 만든다.",
-    annualVolume: 21000,
-    monthlyVolume: 1750,
-    who: {
-      tags: ["상테크 3년+ 실행자", "상품권 카드 2장 이상", "30-40대"],
-      dataEvidence: "상테크 연 12,540 + 상품권 관련 연 25만+"
-    },
-    what: {
-      tags: ["상품권 편법 없이 1% 유지", "편법 피로 해소"],
-      dataEvidence: "국내 1% 무실적 조항 = 상테크 불필요"
-    },
-    when: {
-      tags: ["상품권 결제 카드 단종·혜택 축소 시점", "상테크 번거로움 임계점"],
-      dataEvidence: "상품권 카드 혜택 축소 공지 시 상테크 졸업 검색 급증"
-    },
-    where: {
-      tags: ["뽐뿌 상테크 게시판", "디시 카드갤"],
-      dataEvidence: "상테크 정보 공유 커뮤니티 활성"
-    },
-    why: {
-      tags: ["편법 피로", "세금 리스크 인지"],
-      dataEvidence: "상품권 실적 차단 이슈 관련 검색 폭증"
-    },
-    how: {
-      tags: ["'상테크 졸업' 브랜디드 콘텐츠", "단순함의 가치 강조"],
-      dataEvidence: "상테크 졸업 관련 콘텐츠 수요 검증됨"
-    },
-    pathFinder: ["상테크", "상테크 카드", "상품권 편법 끝", "ALL 카드"],
-    cluster: ["상테크", "상품권", "실적 꼼수", "세금 리스크", "편법 피로"],
-    relatedKeywords: [
-      { term: "상테크", volume: 12540 },
-      { term: "상테크 카드", volume: 6390 }
-    ],
-    contentHook: "상테크 없이도 1%는 그대로",
-    painPoints: ["상품권 쌓아두는 번거로움", "세금 리스크 걱정", "편법 중독 자기혐오"],
-    uspConnection: "국내 1% 무실적 조항"
-  },
-  {
     id: "P1-4",
     personaId: "P1",
     icon: "🔁",
@@ -366,101 +320,6 @@ export const ALL_CARD_OPPORTUNITIES = [
     contentHook: "2026, 카드 고민을 끝낼 한 가지 기준",
     painPoints: ["매년 바뀌는 카드 혜택 피로", "비교 정보 과잉", "결국 뭘 골라야 할지 모름"],
     uspConnection: "전 USP 종합 포지셔닝"
-  },
-  {
-    id: "P1-6",
-    personaId: "P1",
-    icon: "💰",
-    tier: "NICHE",
-    card: "ALL",
-    hookType: "Value-hook",
-    title: "월 200만원 쓰는 고소비자 전용 계산법",
-    subtitle: "월 300만 쓰면 연 36만 돌려받는 유일한 구조",
-    description: "무제한 적립 카드(1,960) + 적립 한도 없는 신용카드(1,440) + 할인 한도 없는 카드(928). 월 고액 지출자에게 '한도 없음'이 실제 의미 있는 차이.",
-    annualVolume: 20000,
-    monthlyVolume: 1667,
-    who: {
-      tags: ["월 200만+ 카드 고소비자", "고소득 전문직·자영업자"],
-      dataEvidence: "무제한 적립 카드 검색 소득 상위 20% 편중"
-    },
-    what: {
-      tags: ["월 할인 한도 없음", "무제한 1% 적립"],
-      dataEvidence: "월 3백만 × 1% = 월 3만, 연 36만"
-    },
-    when: {
-      tags: ["세금·아파트 관리비·의료비 등 고액 결제 시점", "사업자 경비 집중"],
-      dataEvidence: "고액 결제 월 중순~말 집중"
-    },
-    where: {
-      tags: ["블로그 고소비자 카드 비교", "세무사·재테크 커뮤니티"],
-      dataEvidence: "재테크 커뮤니티 카드 비교글 인게이지먼트 높음"
-    },
-    why: {
-      tags: ["한도에 막혀서 혜택 손실", "고액 결제 시 실질 혜택 0"],
-      dataEvidence: "한도 초과 경험 시 카드 교체 검색 40% 증가"
-    },
-    how: {
-      tags: ["월 300만 시뮬레이터", "고소비자 후기 영상"],
-      dataEvidence: "카드 시뮬레이터 콘텐츠 평균 체류 3분+"
-    },
-    pathFinder: ["무제한 적립 카드", "적립 한도 없는 신용카드", "고액 결제 카드", "ALL 카드"],
-    cluster: ["무제한 적립", "적립 한도", "할인 한도 없음", "고소비자 카드"],
-    relatedKeywords: [
-      { term: "무제한 적립 카드", volume: 1960 },
-      { term: "적립 한도 없는 신용카드", volume: 1440 },
-      { term: "할인 한도 없는 카드", volume: 928 }
-    ],
-    contentHook: "월 300만 쓰면 연 36만 돌려받는 유일한 구조",
-    painPoints: ["한도 초과 후 혜택 0원", "카드사 캡 정책 실망", "고소비자용 카드 부재"],
-    uspConnection: "월 할인 한도 없음 조항"
-  },
-  {
-    id: "P1-7",
-    personaId: "P1",
-    icon: "📦",
-    tier: "MEDIUM",
-    card: "ALL",
-    hookType: "Reset-hook",
-    title: "새 주소, 새 카드로 고정비 한번에 리셋",
-    subtitle: "이사·신학기에 카드 교체가 가장 쉬운 이유",
-    description: "이사 인터넷 이전, 공과금 정산, 신학기 준비물 등 '전환 비용이 큰 순간'은 카드 교체의 골든 윈도우. 기존 자동납부 리셋 타이밍에 ALL 카드로 이관 유도.",
-    annualVolume: 60000,
-    monthlyVolume: 5000,
-    seasonality: { type: "school_semester", peakMonths: [2, 3, 9], description: "2-3월·9월 이사·신학기 피크" },
-    who: {
-      tags: ["이사 예정자", "신학기 부모", "20-40대 가족·1인가구"],
-      dataEvidence: "이사 인터넷 이전 설치 키워드 클러스터 + 신학기 준비물 2월 3,900회 피크"
-    },
-    what: {
-      tags: ["전체 자동납부 통합 리셋", "ALL 카드 1% 무실적"],
-      dataEvidence: "전환 비용 큰 시점에 한 번에 정리 가능 = 카드 이관 전환율 3배+"
-    },
-    when: {
-      tags: ["2-3월 이사 성수기", "3월·9월 신학기", "이사 D-30 준비기"],
-      dataEvidence: "신학기 준비물 트렌드 +112%, 이사 인터넷 트렌드 +26%"
-    },
-    where: {
-      tags: ["이사 후기 블로그", "아파트 커뮤니티", "맘카페 신학기 게시판"],
-      dataEvidence: "이사 정보 커뮤니티 월 수백만 PV"
-    },
-    why: {
-      tags: ["한 번에 정리하고 싶은 충동", "기존 카드 혜택 축소 체감"],
-      dataEvidence: "이사시 결제 수단 통합 검색 증가 패턴"
-    },
-    how: {
-      tags: ["'새 주소 = 새 카드' 캠페인", "이사 체크리스트 콘텐츠 제휴"],
-      dataEvidence: "시즌 캠페인 CPA 평월 대비 40% 낮음"
-    },
-    pathFinder: ["이사 인터넷 이전", "공과금 자동이체", "신학기 카드 추천", "ALL 카드"],
-    cluster: ["이사 인터넷", "공과금 정산", "신학기 준비물", "자동납부 리셋"],
-    relatedKeywords: [
-      { term: "이사 인터넷", volume: 6017, trend: 0.26 },
-      { term: "신학기 준비물", volume: 4065, trend: 1.12 },
-      { term: "이사 공과금 정산", volume: 2000 }
-    ],
-    contentHook: "새 주소, 새 카드로 한번에",
-    painPoints: ["이사 후 카드·자동납부 이전 번거로움", "신학기 고정비 급증", "혜택 비교 없이 기존 카드 그대로"],
-    uspConnection: "국내 1% 무실적 + 자동납부 다중 통합 구조"
   },
 
   // ========== P2. 쿠팡·네이버 멤버십 반값 유지형 (5개) ==========
@@ -1269,54 +1128,8 @@ export const ALL_CARD_OPPORTUNITIES = [
     painPoints: ["트래블카드 실적 미적립", "일상 해외 결제 카드 부재"],
     uspConnection: "해외 2% 포지셔닝 차별화 (트래블과 충돌 아닌 보완)"
   },
-  {
-    id: "P4-6",
-    personaId: "P4",
-    icon: "👨‍💻",
-    tier: "NICHE",
-    card: "ALL",
-    hookType: "Niche-hook",
-    title: "Cursor·Perplexity 개발자 AI 구독 스택",
-    subtitle: "개발자 월 50-80달러 AI 구독의 최적 카드",
-    description: "Cursor 할인(1,099, +62%) + Perplexity 구독(1,150, +162%). 개발자·지식노동자의 AI 스택 확산.",
-    annualVolume: 6000,
-    monthlyVolume: 500,
-    who: {
-      tags: ["개발자·지식노동자", "AI 스택 유저", "20-30대 남성"],
-      dataEvidence: "Cursor/Perplexity 유저 20-30대 남성 편중"
-    },
-    what: {
-      tags: ["개발자 AI 3-5종 환급", "월 50-80달러 구독 관리"],
-      dataEvidence: "해외 2% + 월 4만 캡"
-    },
-    when: {
-      tags: ["개발자 신규 AI 구독 시점", "AI 툴 업그레이드"],
-      dataEvidence: "개발자 AI 툴 연 신규 도입 +150%"
-    },
-    where: {
-      tags: ["Cursor·Perplexity 결제", "개발자 커뮤니티 GeekNews"],
-      dataEvidence: "개발자 커뮤니티 AI 스택 공유 활성"
-    },
-    why: {
-      tags: ["AI 스택 누적 비용", "해외 결제 수수료"],
-      dataEvidence: "개발자 AI 구독 비용 월 평균 60달러"
-    },
-    how: {
-      tags: ["개발자 AI 스택 관리법", "카드 환급 계산"],
-      dataEvidence: "개발자 AI 콘텐츠 체류 5분+"
-    },
-    pathFinder: ["Cursor 할인", "Perplexity 구독", "개발자 AI 카드", "ALL 카드"],
-    cluster: ["Cursor", "Perplexity", "개발자 AI"],
-    relatedKeywords: [
-      { term: "Cursor 할인", volume: 1099, trend: 0.62 },
-      { term: "Perplexity 구독", volume: 1150, trend: 1.62 }
-    ],
-    contentHook: "개발자 AI 스택, 카드로 월 1달러 되찾기",
-    painPoints: ["AI 스택 비용 누적", "수수료 부담", "회사 카드 vs 개인 카드 갈등"],
-    uspConnection: "해외 2% (개발자 타깃 세분화)"
-  },
 
-  // ========== P5. 가족 혜택 확장형 (5개) ==========
+  // ========== P5. 가족 혜택 확장형 ==========
   {
     id: "P5-1",
     personaId: "P5",
@@ -1453,51 +1266,6 @@ export const ALL_CARD_OPPORTUNITIES = [
     uspConnection: "가족카드 (자녀 금융교육 + 본인 실적 합산)"
   },
   {
-    id: "P5-4",
-    personaId: "P5",
-    icon: "💑",
-    tier: "NICHE",
-    card: "ALL",
-    hookType: "Couple-hook",
-    title: "신혼부부 생활비 카드, 1%가 가족으로 확장되는 법",
-    subtitle: "부부 월 400만 지출이면 연 48만 돌려받는 구조",
-    description: "신혼부부 생활비 카드(3,050, +29%). 결혼 1-3년 차 생활비 통합 관리 수요.",
-    annualVolume: 3000,
-    monthlyVolume: 250,
-    who: {
-      tags: ["결혼 1-3년 차 부부", "30-40대 맞벌이"],
-      dataEvidence: "신혼부부 재테크 검색 +29%"
-    },
-    what: {
-      tags: ["부부 합산 연 48만 환급", "생활비 통합 1%"],
-      dataEvidence: "월 400만 × 1% = 월 4만, 연 48만"
-    },
-    when: {
-      tags: ["결혼 직후 가계 구축기", "가계부 앱 설치 시점"],
-      dataEvidence: "결혼 1년차 가계부 검색 피크"
-    },
-    where: {
-      tags: ["맘카페 신혼 게시판", "뱅크샐러드 앱"],
-      dataEvidence: "신혼 생활비 블로그 월 100만 PV"
-    },
-    why: {
-      tags: ["부부 지출 통합 욕구", "혜택 극대화"],
-      dataEvidence: "신혼 재테크 관심 증가"
-    },
-    how: {
-      tags: ["신혼 재테크 가이드", "부부 카드 시나리오"],
-      dataEvidence: "신혼 재테크 콘텐츠 저장률 28%"
-    },
-    pathFinder: ["신혼부부 생활비 카드", "신혼 재테크", "부부 카드", "ALL 카드"],
-    cluster: ["신혼부부", "생활비 카드", "부부 재테크"],
-    relatedKeywords: [
-      { term: "신혼부부 생활비 카드", volume: 3050, trend: 0.29 }
-    ],
-    contentHook: "부부 월 400만 = 연 48만 돌려받기",
-    painPoints: ["부부 지출 분산", "가계 통합 혼란"],
-    uspConnection: "가족카드 + 국내 1% 무한도 결합 (월 할인 한도 없음 × 가족 확장)"
-  },
-  {
     id: "P5-5",
     personaId: "P5",
     icon: "👨‍👩‍👧‍👦",
@@ -1541,53 +1309,6 @@ export const ALL_CARD_OPPORTUNITIES = [
     contentHook: "가족 4인 전원 1%, 연회비 0원",
     painPoints: ["가족 카드 분산 관리", "연회비 누적 부담"],
     uspConnection: "가족카드 무료·무제한 + 국내 1% 풀 결합"
-  },
-  {
-    id: "P5-6",
-    personaId: "P5",
-    icon: "🏥",
-    tier: "LARGE",
-    card: "ALL",
-    hookType: "Care-hook",
-    title: "부모의 시간을 관리하는 카드",
-    subtitle: "요양·간병·건강검진, 부모 돌봄비를 한 카드로",
-    description: "요양병원 연 37만 검색 시장. 40-50대가 부모 세대의 의료·요양 비용을 관리하는 구조. 가족카드 무료 + 1% 적립으로 부모 돌봄비를 가계 합산 관리.",
-    annualVolume: 375000,
-    monthlyVolume: 31250,
-    seasonality: { type: "flat", description: "연중 안정적, 부모 건강 이슈 시 급증" },
-    who: {
-      tags: ["40-50대 자녀", "부모 돌봄 의사결정자", "기혼·부모 부양 세대"],
-      dataEvidence: "요양병원 검색 40-50대 주도 추정"
-    },
-    what: {
-      tags: ["가족카드로 부모 의료비 합산", "1% 적립 + 실적 합산"],
-      dataEvidence: "가족카드 무료·무제한 + 국내 1% 무실적"
-    },
-    when: {
-      tags: ["부모 건강 이슈 발생 시", "건강검진 예약 시", "요양원 결정기"],
-      dataEvidence: "요양병원 검색 연 37만 지속"
-    },
-    where: {
-      tags: ["맘카페 부모 돌봄 게시판", "요양병원 비교 사이트", "건강검진 예약 플랫폼"],
-      dataEvidence: "부모 돌봄 정보 블로그 지속 증가"
-    },
-    why: {
-      tags: ["부모 돌봄 비용 급증", "가계 통합 관리 욕구", "'내 소비와 분리되는 돈' 관리"],
-      dataEvidence: "부모 의료비 관련 검색 지속 상승"
-    },
-    how: {
-      tags: ["40-50대 자녀 타깃 광고", "부모 돌봄 가이드 콘텐츠"],
-      dataEvidence: "부모 돌봄 관련 콘텐츠 체류 5분+"
-    },
-    pathFinder: ["요양병원 비교", "간병인 비용", "건강검진 패키지", "ALL 카드"],
-    cluster: ["요양병원", "간병", "건강검진", "부모 돌봄"],
-    relatedKeywords: [
-      { term: "요양병원", volume: 369770 },
-      { term: "건강검진 패키지", volume: 4260, trend: 0.21 }
-    ],
-    contentHook: "부모의 시간을 관리하는 카드",
-    painPoints: ["부모 돌봄비 급증 부담", "가계 통합 관리 어려움", "카드 혜택 사각지대"],
-    uspConnection: "가족카드 무료·무제한 + 국내 1% 무실적 (가족 확장 극단)"
   }
 ];
 

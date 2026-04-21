@@ -125,16 +125,15 @@ export default function WorkbenchPage() {
             textDecoration: "none",
           }}>
             <div style={{
-              width: 36, height: 36, borderRadius: 9,
-              background: "#000000",
+              width: 40, height: 40,
               display: "flex", alignItems: "center", justifyContent: "center",
-              overflow: "hidden",
+              background: "#FFFFFF",
             }}>
               <img src="/kb-symbol.png" alt="KB" style={{ width: 36, height: 36, objectFit: "contain" }} />
             </div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 800, color: "#1E293B" }}>
-                KB <span style={{ color: "#F97316" }}>AI Brandformance</span> Engine
+                KB <span style={{ color: "#FFB71B" }}>AI Brandformance</span> Engine
               </div>
               <div style={{ fontSize: 9, color: "#64748B", letterSpacing: 2, fontWeight: 700 }}>
                 ALGORITHM PERFORMANCE PLATFORM

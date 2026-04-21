@@ -6,7 +6,6 @@ import {
   ALL_CARD_USPS,
   ALL_CARD_PERSONAS,
   ALL_CARD_OPPORTUNITIES,
-  ALL_CARD_CROSS_INSIGHTS,
   getOpportunitiesByPersona,
   getOpportunityById,
   getPersonaById,
@@ -1316,17 +1315,15 @@ export default function Home() {
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{
-              width: 40, height: 40, borderRadius: 10,
-              background: "#000000",
+              width: 44, height: 44,
               display: "flex", alignItems: "center", justifyContent: "center",
-              overflow: "hidden",
-              boxShadow: "0 2px 6px rgba(0, 0, 0, 0.15)",
+              background: "#FFFFFF",
             }}>
               <img src="/kb-symbol.png" alt="KB" style={{ width: 40, height: 40, objectFit: "contain" }} />
             </div>
             <div>
               <div style={{ fontSize: 15, fontWeight: 800, color: C.text, lineHeight: 1.2 }}>
-                KB <span style={{ color: "#F97316" }}>AI Brandformance</span> Engine
+                KB <span style={{ color: "#FFB71B" }}>AI Brandformance</span> Engine
               </div>
               <div style={{ fontSize: 9, color: C.textSoft, letterSpacing: 2, fontWeight: 700, marginTop: 2 }}>
                 ALGORITHM PERFORMANCE PLATFORM
@@ -1349,9 +1346,9 @@ export default function Home() {
           <div style={{
             position: "relative", overflow: "hidden",
             borderRadius: 18, padding: "28px 26px",
-            background: "linear-gradient(135deg, #FB923C 0%, #EA580C 100%)",
-            color: "#FFFFFF",
-            boxShadow: "0 8px 24px rgba(234, 88, 12, 0.25)",
+            background: "linear-gradient(135deg, #FFB71B 0%, #F59E0B 100%)",
+            color: "#1F2937",
+            boxShadow: "0 8px 24px rgba(255, 183, 27, 0.35)",
           }}>
             <div style={{ position: "absolute", top: -60, right: -60, width: 200, height: 200, borderRadius: "50%", background: "rgba(255,255,255,0.1)" }} />
             <div style={{ position: "absolute", bottom: -40, left: -40, width: 150, height: 150, borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
@@ -1414,7 +1411,7 @@ export default function Home() {
             <div style={{ fontSize: 18, fontWeight: 900, color: C.text, lineHeight: 1.35, marginBottom: 4 }}>
               숏폼을 이용한 브랜드 퍼포먼스 전략으로
             </div>
-            <div style={{ fontSize: 18, fontWeight: 900, color: "#F97316", lineHeight: 1.35, marginBottom: 18 }}>
+            <div style={{ fontSize: 18, fontWeight: 900, color: "#B45309", lineHeight: 1.35, marginBottom: 18 }}>
               소비자의 발견과 구매를 연결합니다
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
@@ -1596,7 +1593,7 @@ export default function Home() {
     };
     const hs = hookStyle[idea.hookType] || { bg: "#F3F4F6", fg: "#374151", label: idea.hookType || "숏폼" };
     const score = typeof idea.score === "number" ? idea.score : 85;
-    const scoreColor = score >= 90 ? "#047857" : score >= 80 ? "#2563EB" : score >= 70 ? "#EA580C" : "#6B7280";
+    const scoreColor = score >= 90 ? "#047857" : score >= 80 ? "#2563EB" : score >= 70 ? "#CA8A04" : "#6B7280";
     const funnelLabel = funnelLabels[idea.funnelStage] || "Dream";
     const rank = idea.id || (index + 1);
 
@@ -2070,6 +2067,98 @@ export default function Home() {
   );
 
   // ──────────── NEED CATEGORY VIEW (하위카드 선택 + AutoSlim v2) ────────────
+  // Phase 12-13: 서브카드별 WHY 블록 데이터
+  const SUB_CARD_WHY = {
+    autoslim: {
+      cardId: "AUTOSLIM",
+      color: "#D97706",
+      whyTitle: "자동차 생애주기 5% 카드",
+      whyDescription: "신차 구매·주유·정비·보험까지 자동차 관련 모든 지출 최적. 주유 5% + 신차 할부·정비·보험을 통합한 유일한 카드.",
+      coreValueProps: [
+        { title: "주유·충전소 5%", description: "SK·GS·S-Oil·현대오일뱅크 + 전기차 충전" },
+        { title: "신차·정비 특화", description: "신차 할부 최대 2만원 + 스피드메이트 할인" },
+        { title: "자동차보험 2만원", description: "KB 보험다모아 청구할인 자동 적용" },
+      ],
+    },
+    pay: {
+      cardId: "PAY",
+      color: "#059669",
+      whyTitle: "간편결제 시대의 페이 카드",
+      whyDescription: "네이버페이·카카오페이·삼성페이를 한 카드에 묶어 간편결제 영역 전체 15% 환급. 구독·OTT·해외 직구까지 커버하는 페이 특화 카드.",
+      coreValueProps: [
+        { title: "간편결제 15%/10%", description: "네이버·카카오·삼성·페이코 전 플랫폼" },
+        { title: "디지털콘텐츠 30%", description: "넷플릭스·유튜브·티빙·쿠팡플레이 집중" },
+        { title: "해외 크로스보더", description: "여행자보험·글로벌 OTT·해외 직구 통합" },
+      ],
+    },
+    edu: {
+      cardId: "EDU",
+      color: "#DC2626",
+      whyTitle: "배움의 전 세대 카드",
+      whyDescription: "자녀 학원부터 성인 자격증·리스킬링까지. 교육비 최대 10% 환급으로 가계의 교육 지출을 압축. 생활 영역 5% 보너스.",
+      coreValueProps: [
+        { title: "교육업종 5~10%", description: "학원·과외·온라인 교육 + KB Pay 교육 추가" },
+        { title: "생활영역 5%", description: "병원·약국·커피·대형마트" },
+        { title: "학부모 타깃", description: "여 80% · 40대 53% 학원비 관리층" },
+      ],
+    },
+    daily: {
+      cardId: "YOU DAILY",
+      color: "#A78BFA",
+      whyTitle: "나의 루틴을 아는 카드",
+      whyDescription: "'어떤 카드가 좋지?'가 아니라 '내가 어떻게 쓰지?' 관점. 주유·배달·자기관리·고정비 + 하이퍼로컬 '반경 500m'까지 통합.",
+      coreValueProps: [
+        { title: "일상팩 4축 + 하이퍼로컬", description: "주유·배달·자기관리·고정비 + 반경 500m" },
+        { title: "진단형 혜택", description: "내 소비 패턴 기반 맞춤 추천" },
+        { title: "1인가구 최적화", description: "혼밥·셀프케어·동네 단골 구조" },
+      ],
+    },
+    family: {
+      cardId: "YOU FAMILY",
+      color: "#7C3AED",
+      whyTitle: "3세대를 잇는 가족 재무 관리",
+      whyDescription: "부모 돌봄 + 자녀 교육 + 반려동물까지. '우리 집 한 장'으로 가족 전체 혜택 통합. 맞벌이 '시간 압축' 니즈와 반려동물 '또 다른 가족' 축 포함.",
+      coreValueProps: [
+        { title: "가족팩 4축", description: "장보기·돌봄·학원·유틸리티 통합" },
+        { title: "맞벌이 압축 혜택", description: "유치원·반찬배달·새벽배송·가사도우미" },
+        { title: "또 다른 가족", description: "반려동물 사료·병원·펫보험 포함" },
+      ],
+    },
+  };
+
+  // WHY 블록 렌더 헬퍼
+  const WhyBlock = ({ why }) => {
+    if (!why?.whyTitle) return null;
+    return (
+      <div style={{
+        background: `linear-gradient(135deg, ${why.color}08, ${why.color}14)`,
+        border: `1px solid ${why.color}30`,
+        borderRadius: 12, padding: 18,
+      }}>
+        <div style={{ fontSize: 10, fontWeight: 800, color: why.color, letterSpacing: 1, marginBottom: 8 }}>
+          WHY {why.cardId} CARD?
+        </div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: C.text, marginBottom: 8, lineHeight: 1.4 }}>
+          {why.whyTitle}
+        </div>
+        <div style={{ fontSize: 11, color: "#374151", lineHeight: 1.7, marginBottom: 12 }}>
+          {why.whyDescription}
+        </div>
+        <div style={{ paddingTop: 10, borderTop: `1px solid ${why.color}22`, display: "flex", flexDirection: "column", gap: 7 }}>
+          {why.coreValueProps?.map((prop, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+              <span style={{ color: why.color, flexShrink: 0, fontWeight: 800, fontSize: 12, marginTop: 1 }}>✓</span>
+              <div>
+                <div style={{ fontSize: 11.5, fontWeight: 800, color: C.text }}>{prop.title}</div>
+                <div style={{ fontSize: 10.5, color: C.textSoft, marginTop: 1 }}>{prop.description}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   const NEED_SUBCARDS = [
     {
       id: "autoslim", label: "NEED AutoSlim", icon: "🚗", color: "#D97706",
@@ -2198,19 +2287,22 @@ export default function Home() {
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← NEED 카드 선택으로" />
 
-        {/* Header */}
+        {/* Header — Phase 12-13: 2열 WHY 블록 */}
         <div style={{ background: "#FFFFFF", borderRadius: 18, border: `1px solid ${color}30`, marginBottom: 22, overflow: "hidden" }}>
           <div style={{ height: 5, background: `linear-gradient(90deg, ${color}, ${color}80)` }} />
-          <div style={{ padding: "24px" }}>
-            <div style={{ fontSize: 22, marginBottom: 12 }}>🚗 ⛽ 🔧 🔵</div>
-            <div style={{ color: color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>C. NEED › AutoSlim</div>
-            <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>NEED AutoSlim</div>
-            <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>자동차 집중 혜택 — 신차부터 유지까지</div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: color + "15", color: color }}>{oppCount}개 기회</span>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>COVER {cover.length} + ACCENT {accent.length}</span>
+          <div style={{ padding: "24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
+            <div>
+              <div style={{ fontSize: 22, marginBottom: 12 }}>🚗 ⛽ 🔧 🔵</div>
+              <div style={{ color: color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>C. NEED › AutoSlim</div>
+              <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>NEED AutoSlim</div>
+              <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>자동차 집중 혜택 — 신차부터 유지까지</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: color + "15", color: color }}>{oppCount}개 기회</span>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>COVER {cover.length} + ACCENT {accent.length}</span>
+              </div>
             </div>
+            <WhyBlock why={SUB_CARD_WHY.autoslim} />
           </div>
         </div>
 
@@ -2305,35 +2397,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* 교차 인사이트 */}
-        <SectionDivider label="⚡ 교차 인사이트" color="#DC2626" count={crossIns.length} />
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {crossIns.map(ins => (
-            <div key={ins.id} style={{
-              background: "#FFFFFF", borderRadius: 12,
-              border: "1px solid #FECACA",
-              borderLeft: "3px solid #DC2626",
-              padding: "14px 16px",
-            }}>
-              <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap", alignItems: "center" }}>
-                <span style={{ fontSize: 14 }}>{ins.icon}</span>
-                <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "#FEE2E2", color: "#B91C1C", fontWeight: 800 }}>{ins.hookType}</span>
-              </div>
-              <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 6 }}>{ins.title}</div>
-              <div style={{ fontSize: 12, color: "#4B5563", lineHeight: 1.6, marginBottom: 8 }}>{ins.description}</div>
-              {ins.implication && (
-                <div style={{
-                  padding: "8px 12px", borderRadius: 8,
-                  background: "linear-gradient(135deg, #FEF2F208, transparent)",
-                  border: "1px solid #FECACA40",
-                  fontSize: 11, color: "#7F1D1D", lineHeight: 1.6,
-                }}>
-                  <strong>💡 시사점:</strong> {ins.implication}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        {/* 교차 인사이트 섹션 제거됨 (Phase 12-15) */}
       </div>
     );
   };
@@ -2352,19 +2416,22 @@ export default function Home() {
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← NEED 카드 선택으로" />
 
-        {/* Header */}
+        {/* Header — Phase 12-13 */}
         <div style={{ background: "#FFFFFF", borderRadius: 18, border: `1px solid ${color}30`, marginBottom: 22, overflow: "hidden" }}>
           <div style={{ height: 5, background: `linear-gradient(90deg, ${color}, ${color}80)` }} />
-          <div style={{ padding: "24px" }}>
-            <div style={{ fontSize: 22, marginBottom: 12 }}>📱 💳 🎬 👗</div>
-            <div style={{ color: color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>C. NEED › Pay</div>
-            <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>NEED Pay</div>
-            <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>간편결제 집중 혜택 — KB Pay 중심 디지털 생활</div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: color + "15", color: color }}>{oppCount}개 기회</span>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>COVER {cover.length} + ACCENT {accent.length}</span>
+          <div style={{ padding: "24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
+            <div>
+              <div style={{ fontSize: 22, marginBottom: 12 }}>📱 💳 🎬 👗</div>
+              <div style={{ color: color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>C. NEED › Pay</div>
+              <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>NEED Pay</div>
+              <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>간편결제 집중 혜택 — KB Pay 중심 디지털 생활</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: color + "15", color: color }}>{oppCount}개 기회</span>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>COVER {cover.length} + ACCENT {accent.length}</span>
+              </div>
             </div>
+            <WhyBlock why={SUB_CARD_WHY.pay} />
           </div>
         </div>
 
@@ -2459,35 +2526,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* 교차 인사이트 */}
-        <SectionDivider label="⚡ 교차 인사이트" color="#DC2626" count={crossIns.length} />
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {crossIns.map(ins => (
-            <div key={ins.id} style={{
-              background: "#FFFFFF", borderRadius: 12,
-              border: "1px solid #FECACA",
-              borderLeft: "3px solid #DC2626",
-              padding: "14px 16px",
-            }}>
-              <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap", alignItems: "center" }}>
-                <span style={{ fontSize: 14 }}>{ins.icon}</span>
-                <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "#FEE2E2", color: "#B91C1C", fontWeight: 800 }}>{ins.hookType}</span>
-              </div>
-              <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 6 }}>{ins.title}</div>
-              <div style={{ fontSize: 12, color: "#4B5563", lineHeight: 1.6, marginBottom: 8 }}>{ins.description}</div>
-              {ins.implication && (
-                <div style={{
-                  padding: "8px 12px", borderRadius: 8,
-                  background: "linear-gradient(135deg, #FEF2F208, transparent)",
-                  border: "1px solid #FECACA40",
-                  fontSize: 11, color: "#7F1D1D", lineHeight: 1.6,
-                }}>
-                  <strong>💡 시사점:</strong> {ins.implication}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        {/* 교차 인사이트 섹션 제거됨 (Phase 12-15) */}
       </div>
     );
   };
@@ -2506,19 +2545,22 @@ export default function Home() {
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← NEED 카드 선택으로" />
 
-        {/* Header */}
+        {/* Header — Phase 12-13 */}
         <div style={{ background: "#FFFFFF", borderRadius: 18, border: `1px solid ${color}30`, marginBottom: 22, overflow: "hidden" }}>
           <div style={{ height: 5, background: `linear-gradient(90deg, ${color}, ${color}80)` }} />
-          <div style={{ padding: "24px" }}>
-            <div style={{ fontSize: 22, marginBottom: 12 }}>📚 🎓 💊 ☕</div>
-            <div style={{ color: color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>C. NEED › Edu</div>
-            <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>NEED Edu</div>
-            <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>교육 집중 혜택 — 학부모부터 평생 학습자까지</div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: color + "15", color: color }}>{oppCount}개 기회</span>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>COVER {cover.length} + ACCENT {accent.length}</span>
+          <div style={{ padding: "24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
+            <div>
+              <div style={{ fontSize: 22, marginBottom: 12 }}>📚 🎓 💊 ☕</div>
+              <div style={{ color: color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>C. NEED › Edu</div>
+              <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>NEED Edu</div>
+              <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>교육 집중 혜택 — 학부모부터 평생 학습자까지</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: color + "15", color: color }}>{oppCount}개 기회</span>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>COVER {cover.length} + ACCENT {accent.length}</span>
+              </div>
             </div>
+            <WhyBlock why={SUB_CARD_WHY.edu} />
           </div>
         </div>
 
@@ -2613,35 +2655,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* 교차 인사이트 */}
-        <SectionDivider label="⚡ 교차 인사이트" color="#DC2626" count={crossIns.length} />
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {crossIns.map(ins => (
-            <div key={ins.id} style={{
-              background: "#FFFFFF", borderRadius: 12,
-              border: "1px solid #FECACA",
-              borderLeft: "3px solid #DC2626",
-              padding: "14px 16px",
-            }}>
-              <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap", alignItems: "center" }}>
-                <span style={{ fontSize: 14 }}>{ins.icon}</span>
-                <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "#FEE2E2", color: "#B91C1C", fontWeight: 800 }}>{ins.hookType}</span>
-              </div>
-              <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 6 }}>{ins.title}</div>
-              <div style={{ fontSize: 12, color: "#4B5563", lineHeight: 1.6, marginBottom: 8 }}>{ins.description}</div>
-              {ins.implication && (
-                <div style={{
-                  padding: "8px 12px", borderRadius: 8,
-                  background: "linear-gradient(135deg, #FEF2F208, transparent)",
-                  border: "1px solid #FECACA40",
-                  fontSize: 11, color: "#7F1D1D", lineHeight: 1.6,
-                }}>
-                  <strong>💡 시사점:</strong> {ins.implication}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        {/* 교차 인사이트 섹션 제거됨 (Phase 12-15) */}
       </div>
     );
   };
@@ -2771,19 +2785,22 @@ export default function Home() {
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← YOU Prime 팩 선택으로" />
 
-        {/* Header */}
+        {/* Header — Phase 12-13 */}
         <div style={{ background: "#FFFFFF", borderRadius: 18, border: `1px solid ${color}30`, marginBottom: 22, overflow: "hidden" }}>
           <div style={{ height: 5, background: `linear-gradient(90deg, ${color}, ${color}80)` }} />
-          <div style={{ padding: "24px" }}>
-            <div style={{ fontSize: 22, marginBottom: 12 }}>🏠 🛒 ☕ 👨‍👩‍👧</div>
-            <div style={{ color: color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>B. YOU Prime › 가족팩</div>
-            <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>YOU Prime 가족팩</div>
-            <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>가족 전체 지원 — 3세대 재무 통합 관리</div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: color + "15", color: color }}>{oppCount}개 기회</span>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>COVER {cover.length} + ACCENT {accent.length}</span>
+          <div style={{ padding: "24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
+            <div>
+              <div style={{ fontSize: 22, marginBottom: 12 }}>🏠 🛒 ☕ 👨‍👩‍👧</div>
+              <div style={{ color: color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>B. YOU Prime › 가족팩</div>
+              <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>YOU Prime 가족팩</div>
+              <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>가족 전체 지원 — 3세대 재무 통합 관리</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: color + "15", color: color }}>{oppCount}개 기회</span>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>COVER {cover.length} + ACCENT {accent.length}</span>
+              </div>
             </div>
+            <WhyBlock why={SUB_CARD_WHY.family} />
           </div>
         </div>
 
@@ -2878,35 +2895,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* 교차 인사이트 */}
-        <SectionDivider label="⚡ 교차 인사이트" color="#DC2626" count={crossIns.length} />
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {crossIns.map(ins => (
-            <div key={ins.id} style={{
-              background: "#FFFFFF", borderRadius: 12,
-              border: "1px solid #FECACA",
-              borderLeft: "3px solid #DC2626",
-              padding: "14px 16px",
-            }}>
-              <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap", alignItems: "center" }}>
-                <span style={{ fontSize: 14 }}>{ins.icon}</span>
-                <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "#FEE2E2", color: "#B91C1C", fontWeight: 800 }}>{ins.hookType}</span>
-              </div>
-              <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 6 }}>{ins.title}</div>
-              <div style={{ fontSize: 12, color: "#4B5563", lineHeight: 1.6, marginBottom: 8 }}>{ins.description}</div>
-              {ins.implication && (
-                <div style={{
-                  padding: "8px 12px", borderRadius: 8,
-                  background: "linear-gradient(135deg, #FEF2F208, transparent)",
-                  border: "1px solid #FECACA40",
-                  fontSize: 11, color: "#7F1D1D", lineHeight: 1.6,
-                }}>
-                  <strong>💡 시사점:</strong> {ins.implication}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        {/* 교차 인사이트 섹션 제거됨 (Phase 12-15) */}
       </div>
     );
   };
@@ -2930,19 +2919,22 @@ export default function Home() {
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← YOU Prime 팩 선택으로" />
 
-        {/* Header */}
+        {/* Header — Phase 12-13 */}
         <div style={{ background: "#FFFFFF", borderRadius: 18, border: `1px solid ${color}30`, marginBottom: 22, overflow: "hidden" }}>
           <div style={{ height: 5, background: `linear-gradient(90deg, ${color}, ${color}80)` }} />
-          <div style={{ padding: "24px" }}>
-            <div style={{ fontSize: 22, marginBottom: 12 }}>⛽ 🛵 💪 📱</div>
-            <div style={{ color: color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>B. YOU Prime › 일상팩</div>
-            <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>YOU Prime 일상팩</div>
-            <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>개인 일상 혜택 — 출퇴근·배달·자기관리·고정비</div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: color + "15", color: color }}>{oppCount}개 기회</span>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>COVER {cover.length} + ACCENT {accent.length}</span>
+          <div style={{ padding: "24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
+            <div>
+              <div style={{ fontSize: 22, marginBottom: 12 }}>⛽ 🛵 💪 📱</div>
+              <div style={{ color: color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>B. YOU Prime › 일상팩</div>
+              <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>YOU Prime 일상팩</div>
+              <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>개인 일상 혜택 — 출퇴근·배달·자기관리·고정비</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: color + "15", color: color }}>{oppCount}개 기회</span>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>COVER {cover.length} + ACCENT {accent.length}</span>
+              </div>
             </div>
+            <WhyBlock why={SUB_CARD_WHY.daily} />
           </div>
         </div>
 
@@ -3037,35 +3029,7 @@ export default function Home() {
           ))}
         </div>
 
-        {/* 교차 인사이트 */}
-        <SectionDivider label="⚡ 교차 인사이트" color="#DC2626" count={crossIns.length} />
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {crossIns.map(ins => (
-            <div key={ins.id} style={{
-              background: "#FFFFFF", borderRadius: 12,
-              border: "1px solid #FECACA",
-              borderLeft: "3px solid #DC2626",
-              padding: "14px 16px",
-            }}>
-              <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap", alignItems: "center" }}>
-                <span style={{ fontSize: 14 }}>{ins.icon}</span>
-                <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 4, background: "#FEE2E2", color: "#B91C1C", fontWeight: 800 }}>{ins.hookType}</span>
-              </div>
-              <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 6 }}>{ins.title}</div>
-              <div style={{ fontSize: 12, color: "#4B5563", lineHeight: 1.6, marginBottom: 8 }}>{ins.description}</div>
-              {ins.implication && (
-                <div style={{
-                  padding: "8px 12px", borderRadius: 8,
-                  background: "linear-gradient(135deg, #FEF2F208, transparent)",
-                  border: "1px solid #FECACA40",
-                  fontSize: 11, color: "#7F1D1D", lineHeight: 1.6,
-                }}>
-                  <strong>💡 시사점:</strong> {ins.implication}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        {/* 교차 인사이트 섹션 제거됨 (Phase 12-15) */}
       </div>
     );
   };
@@ -3708,19 +3672,19 @@ export default function Home() {
                   <React.Fragment key={i}>
                     {i > 0 && (
                       <span style={{
-                        color: isLast ? "#F97316" : "#6B7280",
+                        color: isLast ? "#CA8A04" : "#6B7280",
                         fontWeight: 800, fontSize: 14,
                       }}>→</span>
                     )}
                     <span style={{
                       background: isLast
-                        ? "linear-gradient(135deg, #F97316, #EA580C)"
+                        ? "linear-gradient(135deg, #FFB71B, #F59E0B)"
                         : "linear-gradient(135deg, #F0FDF4, #DCFCE7)",
-                      color: isLast ? "#FFFFFF" : "#166534",
+                      color: isLast ? "#1F2937" : "#166534",
                       padding: "6px 13px", borderRadius: 10,
                       fontSize: 11, fontWeight: isLast ? 800 : 700,
-                      border: `1px solid ${isLast ? "#EA580C" : "#BBF7D0"}`,
-                      boxShadow: isLast ? "0 0 0 3px #FDBA7440, 0 2px 6px rgba(234, 88, 12, 0.2)" : "none",
+                      border: `1px solid ${isLast ? "#F59E0B" : "#BBF7D0"}`,
+                      boxShadow: isLast ? "0 0 0 3px #FDE68A80, 0 2px 6px rgba(245, 158, 11, 0.2)" : "none",
                       display: "inline-flex", alignItems: "center", gap: 4,
                     }}>
                       {isLast && <span>🎯</span>}
