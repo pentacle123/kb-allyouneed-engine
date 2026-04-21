@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { addBookmark, removeBookmark, isBookmarked, getBookmarks } from "../lib/bookmarks";
 import {
   ALL_CARD_USPS,
   ALL_CARD_PERSONAS,
@@ -1243,7 +1244,10 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div style={{ fontSize: 11, color: C.textSoft, fontWeight: 600 }}>Pentacle × AI</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <WorkbenchLink />
+            <div style={{ fontSize: 11, color: C.textSoft, fontWeight: 600 }}>Pentacle × AI</div>
+          </div>
         </div>
 
         {/* 메인 히어로 — 2단 그리드 */}
@@ -1585,6 +1589,77 @@ export default function Home() {
           )}
         </div>
       </div>
+    );
+  };
+
+  // ──────────── WorkbenchLink (Phase 9-2) ────────────
+  const WorkbenchLink = () => {
+    const [count, setCount] = useState(0);
+    useEffect(() => {
+      const update = () => setCount(getBookmarks().length);
+      update();
+      window.addEventListener("bookmarks-updated", update);
+      return () => window.removeEventListener("bookmarks-updated", update);
+    }, []);
+    return (
+      <a
+        href="/workbench"
+        style={{
+          display: "inline-flex", alignItems: "center", gap: 6,
+          padding: "6px 12px", borderRadius: 8,
+          background: count > 0 ? "#FFF7ED" : "#F9FAFB",
+          border: `1px solid ${count > 0 ? "#FDBA74" : "#E5E7EB"}`,
+          fontSize: 12, fontWeight: 700,
+          color: count > 0 ? "#C2410C" : C.textSoft,
+          textDecoration: "none",
+          transition: "all 0.15s",
+        }}
+      >
+        <span>{count > 0 ? "⭐" : "☆"}</span>
+        <span>내 워크벤치</span>
+        {count > 0 && (
+          <span style={{
+            padding: "1px 7px", borderRadius: 10,
+            background: "#EA580C", color: "#FFFFFF",
+            fontSize: 10, fontWeight: 800,
+          }}>{count}</span>
+        )}
+      </a>
+    );
+  };
+
+  // ──────────── BookmarkButton (Phase 9-2) ────────────
+  const BookmarkButton = ({ opportunity }) => {
+    const [saved, setSaved] = useState(false);
+    useEffect(() => {
+      setSaved(isBookmarked(opportunity.id));
+      const handler = () => setSaved(isBookmarked(opportunity.id));
+      window.addEventListener("bookmarks-updated", handler);
+      return () => window.removeEventListener("bookmarks-updated", handler);
+    }, [opportunity.id]);
+
+    const toggle = () => {
+      if (saved) removeBookmark(opportunity.id);
+      else addBookmark(opportunity);
+    };
+
+    return (
+      <button
+        onClick={toggle}
+        style={{
+          padding: "8px 14px", borderRadius: 10,
+          border: `1px solid ${saved ? "#F59E0B" : "#E5E7EB"}`,
+          background: saved ? "#FEF3C7" : "#FFFFFF",
+          color: saved ? "#92400E" : C.textSoft,
+          fontSize: 12, fontWeight: 700, cursor: "pointer",
+          display: "inline-flex", alignItems: "center", gap: 5,
+          whiteSpace: "nowrap",
+          transition: "all 0.15s",
+        }}
+      >
+        <span>{saved ? "⭐" : "☆"}</span>
+        <span>{saved ? "저장됨" : "북마크"}</span>
+      </button>
     );
   };
 
@@ -3260,9 +3335,12 @@ export default function Home() {
         }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 16, marginBottom: 14 }}>
             <span style={{ fontSize: 44 }}>{opp.icon}</span>
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 20, fontWeight: 900, color: C.text, lineHeight: 1.3, marginBottom: 6 }}>{opp.title}</div>
               <div style={{ fontSize: 12, color: C.textSoft, lineHeight: 1.6 }}>{opp.strategyCopy}</div>
+            </div>
+            <div style={{ flexShrink: 0 }}>
+              <BookmarkButton opportunity={opp} />
             </div>
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
