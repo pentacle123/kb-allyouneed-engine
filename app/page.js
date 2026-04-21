@@ -1210,7 +1210,14 @@ export default function Home() {
           persona: opp._persona || {},
         }),
       });
-      const result = await res.json();
+      const text = await res.text();
+      let result;
+      try { result = JSON.parse(text); }
+      catch {
+        if (res.status === 504 || /timeout|timed out/i.test(text)) throw new Error("생성 시간 초과 (Vercel 60초 제한). 다시 시도해주세요.");
+        if (res.status >= 500) throw new Error(`서버 오류 (${res.status})`);
+        throw new Error(`응답 파싱 실패: ${text.substring(0, 120)}`);
+      }
       if (!result.success) throw new Error(result.error || "생성 실패");
       setStoryboards(prev => ({ ...prev, [key]: { loading: false, error: null, data: result.data } }));
     } catch (e) {
@@ -1247,7 +1254,21 @@ export default function Home() {
           perspective,
         }),
       });
-      const result = await res.json();
+      // 응답이 JSON이 아닐 수 있음 (Vercel 타임아웃 등)
+      const text = await res.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        // 비-JSON 응답 — 상태코드와 본문으로 에러 판정
+        if (res.status === 504 || /timeout|timed out/i.test(text)) {
+          throw new Error("생성 시간 초과 (Vercel 60초 제한). 잠시 후 다시 시도해주세요.");
+        }
+        if (res.status >= 500) {
+          throw new Error(`서버 오류 (${res.status}). 환경변수 또는 API 키를 확인해주세요.`);
+        }
+        throw new Error(`응답 파싱 실패: ${text.substring(0, 120)}`);
+      }
       if (!result.success) throw new Error(result.error || "생성 실패");
       setAiIdeas(prev => ({ ...prev, [key]: { loading: false, error: null, ideas: result.data.ideas || [] } }));
     } catch (e) {
