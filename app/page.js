@@ -3789,8 +3789,13 @@ export default function Home() {
         borderTop: "1px solid #E5E7EB",
         background: "#FFFFFF",
       }}>
-        <div style={{ fontSize: 10, color: "#9CA3AF", letterSpacing: 1, fontWeight: 600 }}>
+        <div style={{ fontSize: 10, color: "#9CA3AF", letterSpacing: 1, fontWeight: 600, marginBottom: 6 }}>
           PENTACLE × AI &nbsp;·&nbsp; ALGORITHM PERFORMANCE PLATFORM
+        </div>
+        <div style={{ display: "flex", gap: 14, justifyContent: "center", alignItems: "center", flexWrap: "wrap" }}>
+          <a href="/workbench" style={{ fontSize: 10, color: "#9CA3AF", textDecoration: "none" }}>⭐ 내 워크벤치</a>
+          <span style={{ color: "#E5E7EB" }}>·</span>
+          <a href="/admin/cannibalization" style={{ fontSize: 10, color: "#9CA3AF", textDecoration: "none" }}>🔀 카드 중복 분석 (관리자)</a>
         </div>
       </div>
     </div>
