@@ -10,50 +10,20 @@ const PERSPECTIVE_INSTRUCTIONS = {
   cross:   "C. 크로스 카테고리 — 이 기회를 다른 카드·페르소나와 교차시켜 새로운 내러티브 발굴.",
 };
 
-const SYSTEM_PROMPT = `당신은 KB국민카드의 숏폼 콘텐츠 전략 전문가입니다.
-주어진 기회를 바탕으로 YouTube Shorts / Instagram Reels용 15-30초 숏폼 아이디어 **정확히 5개**를 생성합니다.
+const SYSTEM_PROMPT = `당신은 KB국민카드 숏폼 전문가. 주어진 기회로 15-30초 숏폼 아이디어 **3개** 생성.
 
 ## 규칙
-1. 첫 3초 훅이 알고리즘을 자극 (궁금증/공감/발견 중 하나)
-2. 5개 아이디어는 서로 다른 hookType: "공감형", "궁금증형", "발견형", "경험담형", "반전형"
-3. 각 아이디어에 4개 scene (15-30초)
-4. 각 아이디어에 완성 점수 (score) 0-100 부여 (85-95 범위 권장)
-5. 범퍼 광고·DA 배너 금지, 순수 숏폼만
+- 각 아이디어 서로 다른 hookType: "공감형", "궁금증형", "발견형" 중 택
+- 각 아이디어 4개 scene
+- score 0-100 (85-95 권장)
+- 과장·단정·차별 표현 금지, 구체 수치는 USP 범위만, 금융 민감영역 회피
 
-## 가드레일
-- 과장·단정 표현 금지 ("100%", "무조건", "무한", "유일", "보장")
-- 차별·비하 금지
-- 구체 수치는 제공된 USP 범위만 (임의 할인율·환급액 생성 금지)
-- 금리·신용·대출 등 금융 민감 영역 회피
+## JSON만 출력 (설명 금지)
+{"ideas":[
+{"id":1,"score":92,"title":"제목","hookType":"공감형","funnelStage":"Awareness","duration":"15-30초","targetKeyword":{"term":"키워드","volume":120000},"uspAnchor":"USP 한 줄","openingHook":"3초 훅","targetEmotion":"감정","scenes":[{"seq":1,"time":"0-3s","visual":"비주얼","copy":"카피","soundCue":"사운드"}],"callToAction":"CTA","proof":"증명","hashtags":["#t1","#t2","#t3"],"creatorFit":"스타일","creatorCollab":"협업","algorithmInsight":"시그널"}
+]}
 
-## 출력 (JSON만, 설명 문구 금지)
-{
-  "ideas": [
-    {
-      "id": 1,
-      "score": 92,
-      "title": "아이디어 제목",
-      "hookType": "공감형",
-      "funnelStage": "Awareness",
-      "duration": "15-30초",
-      "targetKeyword": { "term": "키워드", "volume": 120000 },
-      "uspAnchor": "USP 한 줄",
-      "openingHook": "첫 3초 훅 문장",
-      "targetEmotion": "타겟 감정",
-      "scenes": [
-        { "seq": 1, "time": "0-3s", "visual": "비주얼", "copy": "카피", "soundCue": "사운드" }
-      ],
-      "callToAction": "CTA",
-      "proof": "증명 한 줄",
-      "hashtags": ["#태그1", "#태그2", "#태그3"],
-      "creatorFit": "크리에이터 스타일",
-      "creatorCollab": "협업 제안",
-      "algorithmInsight": "알고리즘 시그널"
-    }
-  ]
-}
-
-반드시 ideas 배열 5개. JSON만 출력.`;
+반드시 ideas 3개. JSON만.`;
 
 export async function POST(request) {
   try {
@@ -75,29 +45,23 @@ export async function POST(request) {
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const perspectiveInstruction = PERSPECTIVE_INSTRUCTIONS[perspective] || PERSPECTIVE_INSTRUCTIONS.auto;
 
-    const userPrompt = `## 관점 (Perspective)
-${perspectiveInstruction}
+    const topKeywords = (opportunity.relatedKeywords || []).slice(0, 3)
+      .map(k => `${k.term}(${(k.volume || 0).toLocaleString()})`).join(", ");
+    const userPrompt = `관점: ${perspectiveInstruction}
 
-## 기회 정보
-- **카드**: ${cardMeta.cardName || opportunity.card || ""} ${cardMeta.cardTagline ? `(${cardMeta.cardTagline})` : ""}
-- **페르소나**: ${persona.title || ""} — ${persona.subtitle || ""}
-- **기회 제목**: ${opportunity.title}
-- **설명**: ${opportunity.description || opportunity.subtitle || ""}
-- **페인포인트**: ${(opportunity.painPoints || []).join(" / ")}
-- **USP 연결**: ${opportunity.uspConnection || ""}
-- **콘텐츠 훅 후보**: ${opportunity.contentHook || ""}
-- **검색 여정**: ${(opportunity.pathFinder || opportunity.pathJourney || []).join(" → ")}
-- **관련 키워드**: ${(opportunity.relatedKeywords || []).map(k => `${k.term}(${(k.volume || 0).toLocaleString()})`).join(", ")}
-- **시즌성**: ${opportunity.seasonality?.description || "연중 안정"}
-- **알고리즘 시그널**: ${opportunity.algorithmSignal || ""}
-- **연간 검색량**: ${(opportunity.annualVolume || opportunity.annualVol || 0).toLocaleString()}회
-${opportunity.competition?.insight ? `- **경쟁 환경**: ${opportunity.competition.insight}` : ""}
+카드: ${cardMeta.cardName || opportunity.card || ""}
+페르소나: ${persona.title || ""}
+기회: ${opportunity.title}
+USP: ${opportunity.uspConnection || ""}
+페인: ${(opportunity.painPoints || []).slice(0, 3).join(" / ")}
+키워드: ${topKeywords}
+콘텐츠 훅: ${opportunity.contentHook || ""}
 
-위 정보와 관점을 반영해 숏폼 아이디어 **정확히 5개**를 JSON으로 생성하세요.`;
+위 정보로 숏폼 아이디어 3개 JSON 생성.`;
 
     const message = await client.messages.create({
       model: "claude-sonnet-4-5-20250929",
-      max_tokens: 5000,
+      max_tokens: 3500,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userPrompt }],
     });
