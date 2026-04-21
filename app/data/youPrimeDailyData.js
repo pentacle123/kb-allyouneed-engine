@@ -124,6 +124,18 @@ export const YOU_PRIME_DAILY_PERSONAS = [
     opportunityCount: 1,
     color: "#10B981",
     demoTags: ["20후~40 1인 가구", "반려견·반려묘 동거", "반려동물 월 지출 20-30%", "펫보험 대상"]
+  },
+  {
+    id: "DAILY-COVER-5",
+    icon: "📍",
+    title: "하이퍼로컬 라이프러",
+    subtitle: "내 반경 500m를 가장 잘 쓰는 사람",
+    description: "20-30대 싱글·직장인의 '반경 500m' 생활 반경. 점심·저녁 동네 맛집, 퇴근길 편의점, 주말 근거리 외출.",
+    linkedUSP: ["daily-convenience", "daily-self-care", "daily-delivery"],
+    annualSearchVolume: 2030000,
+    opportunityCount: 1,
+    color: "#06B6D4",
+    demoTags: ["20-30대 싱글·직장인", "동네 단골 중심 소비", "반경 500m 생활권", "이동 피로 회피"]
   }
 ];
 
@@ -317,6 +329,54 @@ export const YOU_PRIME_DAILY_OPPORTUNITIES = [
     contentHook: "혼자 사는 건 아니잖아요 — 반려 가족이 있는 1인 생활",
     painPoints: ["반려동물 고정 지출 부담", "펫 특화 카드 부재"],
     uspConnection: "온라인쇼핑 10% + 취미·자기관리 5% + App 10% (반려동물 라이프)"
+  },
+  {
+    id: "DAILY-COVER-5",
+    personaId: "DAILY-COVER-5",
+    icon: "📍",
+    tier: "MEGA",
+    card: "YOU Prime 일상팩",
+    hookType: "COVER",
+    title: "내 반경 500m를 가장 잘 쓰는 카드",
+    subtitle: "동네 카페·편의점·맛집·공유주차, 하이퍼로컬 루틴",
+    description: "내 근처 맛집 연 127만 + 내 근처 카페 연 76만 = 하이퍼로컬 200만+ 검색. 20-30대 1인가구·직장인의 '반경 500m' 생활 반경. 새로운 타깃 세그먼트.",
+    annualVolume: 2030000,
+    monthlyVolume: 169167,
+    seasonality: { type: "flat", description: "연중 안정, 점심·저녁 시간대 폭증" },
+    who: {
+      tags: ["20-30대 싱글·직장인", "동네 단골 중심 소비", "반경 500m 생활권"],
+      dataEvidence: "내 근처 맛집 +26% 트렌드, 내근처 카페 +34% 트렌드"
+    },
+    what: {
+      tags: ["편의점 10% + 카페 10% + 배달 10% + 자기관리 5%", "4개 영역 자연 커버"],
+      dataEvidence: "동네 소비 월 30-50만 × 평균 8% = 월 2-4만 환급"
+    },
+    when: {
+      tags: ["평일 점심·저녁 피크", "주말 근거리 외출", "퇴근 후 편의점"],
+      dataEvidence: "내 근처 맛집 검색 점심 12-1시·저녁 6-8시 피크"
+    },
+    where: {
+      tags: ["네이버 지도", "카카오맵", "배달 앱"],
+      dataEvidence: "네이버 지도 일 사용자 수천만"
+    },
+    why: {
+      tags: ["'집 근처에서 끝내는' 효율 추구", "이동 피로 최소화", "단골 중심 관계"],
+      dataEvidence: "하이퍼로컬 커머스 연 +30% 성장"
+    },
+    how: {
+      tags: ["'내 반경 500m 브이로그' 크리에이터 협업", "네이버 지도 딥링크"],
+      dataEvidence: "동네 브이로그 평균 완청률 80%+"
+    },
+    pathFinder: ["내 근처 맛집", "내근처 카페", "동네 편의점", "YOU Prime 일상팩"],
+    cluster: ["내 근처 맛집", "내근처 카페", "동네 편의점", "하이퍼로컬"],
+    relatedKeywords: [
+      { term: "내 근처 맛집", volume: 1273340, trend: 0.26 },
+      { term: "내근처 카페", volume: 758400, trend: 0.34 },
+      { term: "동네 카페", volume: 26190 }
+    ],
+    contentHook: "내 반경 500m를 가장 잘 쓰는 카드",
+    painPoints: ["동네 소비의 혜택 사각지대", "이동 피로", "단골 가맹점 할인 부재"],
+    uspConnection: "편의점 10% + 카페 10% + 배달 10% + 취미 5% (4개 영역 자연 커버)"
   },
 
   // ========== 🟠 ACCENT 기회 3개 ==========

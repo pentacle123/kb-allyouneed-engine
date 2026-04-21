@@ -103,6 +103,18 @@ export const NEED_PAY_PERSONAS = [
     opportunityCount: 1,
     color: "#8B5CF6",
     demoTags: ["30-50대", "페이 3개+ 보유", "오프라인·온라인 혼용", "페이 택1 피로층"]
+  },
+  {
+    id: "PAY-COVER-P5",
+    icon: "✈️",
+    title: "해외 크로스보더 결제자",
+    subtitle: "여행·직구·글로벌 구독·환율, 한 카드 통합",
+    description: "연 여행 2회+, 월 직구 1회+, 글로벌 OTT/AI 구독자. 여행자보험 285만 검색 시장 = NEED 전체 단일 최대 기회.",
+    linkedUSP: ["pay-simple-payment"],
+    annualSearchVolume: 2850200,
+    opportunityCount: 1,
+    color: "#3B82F6",
+    demoTags: ["해외여행 연 2회+", "직구 월 1회+", "글로벌 OTT·AI 구독", "환율 민감 세그먼트"]
   }
 ];
 
@@ -304,6 +316,53 @@ export const NEED_PAY_OPPORTUNITIES = [
     contentHook: "페이 택1, 이제 끝 — 어느 페이든 한 카드로",
     painPoints: ["페이별 가맹점 파편화", "혜택 비교 피로", "카드 × 페이 조합 복잡성"],
     uspConnection: "간편결제 15% / KB Pay 10% — 페이 중립 통합 구조"
+  },
+  {
+    id: "PAY-COVER-P5",
+    personaId: "PAY-COVER-P5",
+    icon: "✈️",
+    tier: "MEGA",
+    card: "NEED Pay",
+    hookType: "COVER",
+    title: "해외에서도 NEED Pay — 여행·직구·환율 통합",
+    subtitle: "여행자보험 285만 + 환율·직구·글로벌 OTT 전방위",
+    description: "여행자보험 연 285만 = NEED 카드 전체에서 단일 최대 기회. 해외여행·직구·글로벌 구독(Claude·Netflix 미국 계정)·환율 조회를 한 카드로. ALL 카드 해외 2%와 차별 — NEED Pay는 '간편결제 해외 확장' 축.",
+    annualVolume: 2850200,
+    monthlyVolume: 237517,
+    seasonality: { type: "yearstart_peak", peakMonths: [12, 1], description: "12-1월 해외여행 성수기 피크" },
+    who: {
+      tags: ["해외여행 연 2회+", "직구 월 1회+", "글로벌 OTT·AI 구독자"],
+      dataEvidence: "여행자보험 연 285만 + 환율 검색 +50% 트렌드"
+    },
+    what: {
+      tags: ["여행자보험 자동 가입", "해외 직구 간편결제", "환율 수수료 절감"],
+      dataEvidence: "여행자보험 평균 월 5만, 직구 월 20만 = 월 25만 × 해외 2% = 월 5천원"
+    },
+    when: {
+      tags: ["여행 1-2주 전 준비기", "직구 세일 (1111·618·블프)", "해외 구독 결제일"],
+      dataEvidence: "여행자보험 검색 12-1월 피크 연 313K"
+    },
+    where: {
+      tags: ["여행사 예약 페이지", "테무·알리·아마존", "OpenAI·Anthropic 결제"],
+      dataEvidence: "여행자보험 월 MAU 수십만"
+    },
+    why: {
+      tags: ["해외 결제 카드 분리 관리 피로", "여행 준비 통합 니즈"],
+      dataEvidence: "'해외 환율' 트렌드 +50%"
+    },
+    how: {
+      tags: ["여행 체크리스트 크리에이터", "직구 세일 타깃 광고"],
+      dataEvidence: "여행 준비 콘텐츠 평균 체류 7분+"
+    },
+    pathFinder: ["여행자보험 비교", "해외 환율 조회", "직구 결제 카드", "NEED Pay"],
+    cluster: ["여행자보험", "해외 환율", "직구", "글로벌 OTT"],
+    relatedKeywords: [
+      { term: "여행자보험", volume: 2850200 },
+      { term: "해외 환율", volume: 4860, trend: 0.50 }
+    ],
+    contentHook: "해외에서도 NEED Pay — 여행·직구 통합",
+    painPoints: ["해외 결제 수수료 누적", "여행 카드 따로 관리 피로", "직구·여행 할인 정보 분산"],
+    uspConnection: "간편결제 15% 해외 확장 + 여행자보험 자동 연계"
   },
 
   // ========== 🟠 ACCENT 기회 5개 ==========

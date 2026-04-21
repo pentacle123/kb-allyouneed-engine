@@ -124,6 +124,30 @@ export const YOU_PRIME_FAMILY_PERSONAS = [
     opportunityCount: 1,
     color: "#10B981",
     demoTags: ["30-40대 가족", "온라인 장보기 전환", "주간 정기 결제", "편의성 민감"]
+  },
+  {
+    id: "FAMILY-COVER-5",
+    icon: "🐕",
+    title: "반려동물과 사는 가족",
+    subtitle: "또 다른 가족, 사료·병원·미용 월 정기 지출",
+    description: "30-40대 기혼·싱글 양쪽에 걸친 새 세그먼트. 반려동물이 가족이자 월 지출 20-30만. 펫보험 +8% 성장 시장.",
+    linkedUSP: ["family-groceries", "family-care", "family-utilities"],
+    annualSearchVolume: 534000,
+    opportunityCount: 1,
+    color: "#10B981",
+    demoTags: ["30-40대 기혼·싱글", "반려동물 동거", "월 지출 20-30만", "펫보험 대상"]
+  },
+  {
+    id: "FAMILY-COVER-6",
+    icon: "⚡",
+    title: "워킹맘·워킹대디",
+    subtitle: "시간이 없는 당신을 위한 압축 혜택",
+    description: "유치원 알리장·반찬 배달·새벽배송·가사도우미로 매일 루틴을 압축하는 맞벌이 부모. FAMILY-COVER-1의 '외주 서비스'와 차별 — '매일 반복되는 가족 루틴' 관점.",
+    linkedUSP: ["family-groceries", "family-care", "family-academy"],
+    annualSearchVolume: 882580,
+    opportunityCount: 1,
+    color: "#8B5CF6",
+    demoTags: ["맞벌이 30-40대 부모", "유치원·초등 자녀", "매일 루틴 압축 니즈", "시간 > 돈"]
   }
 ];
 
@@ -320,6 +344,103 @@ export const YOU_PRIME_FAMILY_OPPORTUNITIES = [
     contentHook: "주간 장보기 루틴, 매달 1만원이 조용히 돌아옵니다",
     painPoints: ["마트 시간 소요", "새벽배송 고정비", "여러 앱 분산"],
     uspConnection: "온라인 장보기 10% + 대형마트 10% (스마트 장보기 가족)"
+  },
+  {
+    id: "FAMILY-COVER-5",
+    personaId: "FAMILY-COVER-5",
+    icon: "🐕",
+    tier: "LARGE",
+    card: "YOU Prime 가족팩",
+    hookType: "COVER",
+    title: "또 다른 가족을 위한 YOU",
+    subtitle: "반려견·반려묘도 가족, 사료·병원·미용 통합 혜택",
+    description: "펫보험 연 44만+ (+8%) · 반려견 59만 · 반려묘 3.3만 검색. 30-40대 기혼·1인가구 양쪽에 걸친 새 세그먼트. 반려동물 월 고정 지출을 가족팩 영역으로 흡수.",
+    annualVolume: 534000,
+    monthlyVolume: 44500,
+    seasonality: { type: "flat", description: "연중 안정, 사료·의료비 정기 결제" },
+    who: {
+      tags: ["30-40대 기혼·싱글", "반려동물과 동거", "반려동물 월 지출 20-30만", "펫보험 대상"],
+      dataEvidence: "펫보험 가입자 대부분 30-40대, +8% 트렌드"
+    },
+    what: {
+      tags: ["사료·용품 온라인쇼핑 10%", "동물병원·미용 일상케어 10%", "펫보험 자동납부"],
+      dataEvidence: "월 사료 15만 + 병원·미용 10만 + 보험 3만 = 월 28만 × 10% = 2.8만 → 캡 1만"
+    },
+    when: {
+      tags: ["사료 정기 구매", "월 1회 미용·분기별 병원", "펫보험 월납"],
+      dataEvidence: "펫프렌즈 정기 구독 증가, 펫보험 가입 +8% 지속"
+    },
+    where: {
+      tags: ["펫프렌즈·어바웃펫", "동물병원", "펫 미용샵", "펫보험 가입 페이지"],
+      dataEvidence: "펫프렌즈 MAU 150만+"
+    },
+    why: {
+      tags: ["반려동물이 가족", "고정 지출 혜택 니즈", "'우리 아이' 케어 의식"],
+      dataEvidence: "반려동물 시장 연 10% 성장"
+    },
+    how: {
+      tags: ["'또 다른 가족' 스토리텔링", "펫 인플루언서 협업"],
+      dataEvidence: "펫 콘텐츠 공유율 15-20%"
+    },
+    pathFinder: ["펫보험 비교", "반려견 사료", "동물병원 비용", "YOU Prime 가족팩"],
+    cluster: ["펫보험", "반려견", "반려묘", "반려동물"],
+    relatedKeywords: [
+      { term: "펫보험", volume: 443970, trend: 0.08 },
+      { term: "반려견", volume: 590000 },
+      { term: "반려동물 사료", volume: 3630 }
+    ],
+    contentHook: "또 다른 가족을 위한 YOU",
+    painPoints: ["반려동물 고정 지출 급증", "펫 특화 카드 부재", "'우리 아이' 혜택 사각지대"],
+    uspConnection: "온라인쇼핑 10% + 일상케어 10% + 생활요금 10% (반려동물 3대 영역)"
+  },
+  {
+    id: "FAMILY-COVER-6",
+    personaId: "FAMILY-COVER-6",
+    icon: "⚡",
+    tier: "LARGE",
+    card: "YOU Prime 가족팩",
+    hookType: "COVER",
+    title: "시간이 없는 당신을 위한 압축 혜택",
+    subtitle: "유치원 알림장·반찬 배달·새벽배송을 매일 쓰는 맞벌이 부모",
+    description: "유치원 알리미 34만 + 새벽배송 32만 + 반찬 배달 13만 + 가사도우미 10만 = 연 88만 검색. 시간 빈곤 맞벌이 부모가 '매일 반복 루틴'을 압축하는 서비스 조합. FAMILY-COVER-1과 달리 '매일의 루틴' 축.",
+    annualVolume: 882580,
+    monthlyVolume: 73548,
+    seasonality: { type: "flat", description: "연중 안정, 신학기 3·9월 소폭 상승" },
+    who: {
+      tags: ["맞벌이 30-40대 부모", "유치원·초등 자녀", "매일 루틴 압축 니즈"],
+      dataEvidence: "유치원 알리미 검색 학부모 90%+, 새벽배송 맞벌이 50%+ 추정"
+    },
+    what: {
+      tags: ["반찬 배달·새벽배송 장보기 10%", "학원 자동결제 10%", "가사도우미 일상케어 10%"],
+      dataEvidence: "월 장보기 40만 + 학원 30만 + 가사 10만 = 월 80만 × 평균 10% = 월 8만 → 캡 월 3만(3개 영역)"
+    },
+    when: {
+      tags: ["평일 저녁 식사 준비", "주간 정기 장보기", "월 1-2회 가사도우미"],
+      dataEvidence: "새벽배송 주문 평일 저녁, 유치원 알리미 오후 3-5시 피크"
+    },
+    where: {
+      tags: ["유치원 알리미 앱", "마켓컬리·쿠팡 새벽배송", "반찬 배달 플랫폼"],
+      dataEvidence: "유치원 알리미 MAU 약 170만, 새벽배송 MAU 2,400만"
+    },
+    why: {
+      tags: ["퇴근 후 저녁 준비 시간 부족", "'좋은 부모 콤플렉스' vs 현실"],
+      dataEvidence: "'반찬 배달' 검색 평일 저녁 피크, 맞벌이 육아 스트레스 콘텐츠 조회 증가"
+    },
+    how: {
+      tags: ["'퇴근 후 저녁' 브이로그 크리에이터", "맘카페 워킹맘 게시판 제휴"],
+      dataEvidence: "워킹맘 브이로그 평균 완청률 85%+"
+    },
+    pathFinder: ["유치원 알리미", "반찬 배달", "가사도우미 비용", "YOU Prime 가족팩"],
+    cluster: ["유치원 알리미", "반찬 배달", "새벽배송", "가사도우미"],
+    relatedKeywords: [
+      { term: "유치원 알리미", volume: 337240 },
+      { term: "새벽배송", volume: 315910 },
+      { term: "반찬 배달", volume: 126230 },
+      { term: "가사도우미", volume: 103200, trend: 0.04 }
+    ],
+    contentHook: "시간이 없는 당신을 위한 압축 혜택",
+    painPoints: ["퇴근 후 저녁 준비 시간 부족", "아이 학교 소통 + 일 병행 피로", "가사 외주 고정비 누적"],
+    uspConnection: "온라인 장보기 10% + 일상케어 10% + 학원 10% (루틴 3대 영역)"
   },
 
   // ========== 🟠 ACCENT 기회 5개 ==========

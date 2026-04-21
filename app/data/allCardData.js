@@ -64,7 +64,7 @@ export const ALL_CARD_PERSONAS = [
     description: "체리피커·상테크 7년 차, 매달 40만 채웠나 계산하는 피로 누적. ALL 카드 국내 1% 무실적·무한도가 종착지.",
     linkedUSP: ["usp-domestic-1pct"],
     annualSearchVolume: 2280000,
-    opportunityCount: 6,
+    opportunityCount: 7,
     color: "#3B82F6",
     demoTags: ["25-45세", "남녀 혼합", "신용카드 2장+", "연 2,500만+ 카드 지출"]
   },
@@ -88,7 +88,7 @@ export const ALL_CARD_PERSONAS = [
     description: "넷플릭스 가격 인상 3번째, 유튜브 프리미엄 우회 VPN 막힌 2026. 구독료 저항층이 찾는 합법 할인 경로.",
     linkedUSP: ["usp-ott-10pct"],
     annualSearchVolume: 5780000,
-    opportunityCount: 6,
+    opportunityCount: 7,
     color: "#EC4899",
     demoTags: ["20-40대", "여성 55%", "OTT 2-4개 구독", "월 구독료 5만+"]
   },
@@ -112,7 +112,7 @@ export const ALL_CARD_PERSONAS = [
     description: "연말정산 실적 합산, 자녀 첫 체크카드, 아이 용돈 카드(+88%). 가족 단위로 혜택을 확장하려는 가장·배우자.",
     linkedUSP: ["usp-domestic-1pct", "usp-shopping-membership"],
     annualSearchVolume: 86000,
-    opportunityCount: 5,
+    opportunityCount: 6,
     color: "#8B5CF6",
     demoTags: ["35-55세", "남녀 혼합", "기혼·자녀 있음", "가족카드 기발급"]
   }
@@ -404,6 +404,54 @@ export const ALL_CARD_OPPORTUNITIES = [
     contentHook: "월 300만 쓰면 연 36만 돌려받는 유일한 구조",
     painPoints: ["한도 초과 후 혜택 0원", "카드사 캡 정책 실망", "고소비자용 카드 부재"],
     uspConnection: "월 할인 한도 없음 조항"
+  },
+  {
+    id: "P1-7",
+    personaId: "P1",
+    icon: "📦",
+    tier: "MEDIUM",
+    card: "ALL",
+    hookType: "Reset-hook",
+    title: "새 주소, 새 카드로 고정비 한번에 리셋",
+    subtitle: "이사·신학기에 카드 교체가 가장 쉬운 이유",
+    description: "이사 인터넷 이전, 공과금 정산, 신학기 준비물 등 '전환 비용이 큰 순간'은 카드 교체의 골든 윈도우. 기존 자동납부 리셋 타이밍에 ALL 카드로 이관 유도.",
+    annualVolume: 60000,
+    monthlyVolume: 5000,
+    seasonality: { type: "school_semester", peakMonths: [2, 3, 9], description: "2-3월·9월 이사·신학기 피크" },
+    who: {
+      tags: ["이사 예정자", "신학기 부모", "20-40대 가족·1인가구"],
+      dataEvidence: "이사 인터넷 이전 설치 키워드 클러스터 + 신학기 준비물 2월 3,900회 피크"
+    },
+    what: {
+      tags: ["전체 자동납부 통합 리셋", "ALL 카드 1% 무실적"],
+      dataEvidence: "전환 비용 큰 시점에 한 번에 정리 가능 = 카드 이관 전환율 3배+"
+    },
+    when: {
+      tags: ["2-3월 이사 성수기", "3월·9월 신학기", "이사 D-30 준비기"],
+      dataEvidence: "신학기 준비물 트렌드 +112%, 이사 인터넷 트렌드 +26%"
+    },
+    where: {
+      tags: ["이사 후기 블로그", "아파트 커뮤니티", "맘카페 신학기 게시판"],
+      dataEvidence: "이사 정보 커뮤니티 월 수백만 PV"
+    },
+    why: {
+      tags: ["한 번에 정리하고 싶은 충동", "기존 카드 혜택 축소 체감"],
+      dataEvidence: "이사시 결제 수단 통합 검색 증가 패턴"
+    },
+    how: {
+      tags: ["'새 주소 = 새 카드' 캠페인", "이사 체크리스트 콘텐츠 제휴"],
+      dataEvidence: "시즌 캠페인 CPA 평월 대비 40% 낮음"
+    },
+    pathFinder: ["이사 인터넷 이전", "공과금 자동이체", "신학기 카드 추천", "ALL 카드"],
+    cluster: ["이사 인터넷", "공과금 정산", "신학기 준비물", "자동납부 리셋"],
+    relatedKeywords: [
+      { term: "이사 인터넷", volume: 6017, trend: 0.26 },
+      { term: "신학기 준비물", volume: 4065, trend: 1.12 },
+      { term: "이사 공과금 정산", volume: 2000 }
+    ],
+    contentHook: "새 주소, 새 카드로 한번에",
+    painPoints: ["이사 후 카드·자동납부 이전 번거로움", "신학기 고정비 급증", "혜택 비교 없이 기존 카드 그대로"],
+    uspConnection: "국내 1% 무실적 + 자동납부 다중 통합 구조"
   },
 
   // ========== P2. 쿠팡·네이버 멤버십 반값 유지형 (5개) ==========
@@ -917,6 +965,54 @@ export const ALL_CARD_OPPORTUNITIES = [
     painPoints: ["구독 누적 피로", "총액 파악 어려움", "통제감 상실"],
     uspConnection: "OTT 10% 통합 운영"
   },
+  {
+    id: "P3-7",
+    personaId: "P3",
+    icon: "🔄",
+    tier: "MEDIUM",
+    card: "ALL",
+    hookType: "Diet-hook",
+    title: "정기적 구독 다이어트 파트너",
+    subtitle: "'안 쓰는 구독 있나?' 계절마다 한번씩 점검",
+    description: "구독 해지 고민을 '계절 루틴'으로 포지셔닝. 분기별로 구독 리스트 점검 → 불필요한 것 해지 + 핵심 구독만 ALL 카드 10%로 유지. '해지 유도'가 아닌 '스마트 유지'.",
+    annualVolume: 100000,
+    monthlyVolume: 8333,
+    seasonality: { type: "yearend_peak", peakMonths: [12, 1, 2], description: "연말·연초 가계 점검기 피크" },
+    who: {
+      tags: ["OTT 3개+ 유저", "가계부 작성자", "30-40대 고정비 관리층"],
+      dataEvidence: "넷플릭스 해지 연 98K, 구독 관련 검색 연초 피크"
+    },
+    what: {
+      tags: ["분기별 구독 점검 루틴", "핵심 3개만 ALL로 유지"],
+      dataEvidence: "분기 점검으로 구독 2-3개 해지 평균 월 3만 절약 + ALL 10%로 추가 절약"
+    },
+    when: {
+      tags: ["1월 신년 결심기", "4·7·10월 분기 점검", "결제일 직전"],
+      dataEvidence: "구독 해지 검색 12-2월·결제일 전후 피크"
+    },
+    where: {
+      tags: ["가계부 앱", "토스 카드 가계부", "유튜브 구독 다이어트"],
+      dataEvidence: "구독 다이어트 영상 월 조회 100만+"
+    },
+    why: {
+      tags: ["구독 피로 누적", "해지 vs 유지 반복 고민", "'안 쓰는데 빠지는 돈'"],
+      dataEvidence: "'구독료 얼마' 검색 +30%"
+    },
+    how: {
+      tags: ["'분기 구독 점검' 체크리스트", "구독 다이어트 가이드 콘텐츠"],
+      dataEvidence: "체크리스트 콘텐츠 저장률 20%+"
+    },
+    pathFinder: ["구독 해지 고민", "구독 다이어트", "핵심 구독만 할인", "ALL 카드"],
+    cluster: ["구독 해지", "구독 다이어트", "OTT 정리", "넷플릭스 해지"],
+    relatedKeywords: [
+      { term: "넷플릭스 해지", volume: 97860 },
+      { term: "유튜브 프리미엄 해지", volume: 30000 },
+      { term: "티빙 해지", volume: 15000 }
+    ],
+    contentHook: "안 쓰는 구독 다 빼고, 핵심만 10% 할인으로",
+    painPoints: ["구독 누적 부담", "해지 vs 유지 반복 갈등", "구독 관리 도구 부족"],
+    uspConnection: "OTT 10% (핵심 유지 구독 대상)"
+  },
 
   // ========== P4. 365일 해외 카드형 (6개) ==========
   {
@@ -1426,6 +1522,53 @@ export const ALL_CARD_OPPORTUNITIES = [
     contentHook: "가족 4인 전원 1%, 연회비 0원",
     painPoints: ["가족 카드 분산 관리", "연회비 누적 부담"],
     uspConnection: "가족카드 무료·무제한 + 국내 1% 풀 결합"
+  },
+  {
+    id: "P5-6",
+    personaId: "P5",
+    icon: "🏥",
+    tier: "LARGE",
+    card: "ALL",
+    hookType: "Care-hook",
+    title: "부모의 시간을 관리하는 카드",
+    subtitle: "요양·간병·건강검진, 부모 돌봄비를 한 카드로",
+    description: "요양병원 연 37만 검색 시장. 40-50대가 부모 세대의 의료·요양 비용을 관리하는 구조. 가족카드 무료 + 1% 적립으로 부모 돌봄비를 가계 합산 관리.",
+    annualVolume: 375000,
+    monthlyVolume: 31250,
+    seasonality: { type: "flat", description: "연중 안정적, 부모 건강 이슈 시 급증" },
+    who: {
+      tags: ["40-50대 자녀", "부모 돌봄 의사결정자", "기혼·부모 부양 세대"],
+      dataEvidence: "요양병원 검색 40-50대 주도 추정"
+    },
+    what: {
+      tags: ["가족카드로 부모 의료비 합산", "1% 적립 + 실적 합산"],
+      dataEvidence: "가족카드 무료·무제한 + 국내 1% 무실적"
+    },
+    when: {
+      tags: ["부모 건강 이슈 발생 시", "건강검진 예약 시", "요양원 결정기"],
+      dataEvidence: "요양병원 검색 연 37만 지속"
+    },
+    where: {
+      tags: ["맘카페 부모 돌봄 게시판", "요양병원 비교 사이트", "건강검진 예약 플랫폼"],
+      dataEvidence: "부모 돌봄 정보 블로그 지속 증가"
+    },
+    why: {
+      tags: ["부모 돌봄 비용 급증", "가계 통합 관리 욕구", "'내 소비와 분리되는 돈' 관리"],
+      dataEvidence: "부모 의료비 관련 검색 지속 상승"
+    },
+    how: {
+      tags: ["40-50대 자녀 타깃 광고", "부모 돌봄 가이드 콘텐츠"],
+      dataEvidence: "부모 돌봄 관련 콘텐츠 체류 5분+"
+    },
+    pathFinder: ["요양병원 비교", "간병인 비용", "건강검진 패키지", "ALL 카드"],
+    cluster: ["요양병원", "간병", "건강검진", "부모 돌봄"],
+    relatedKeywords: [
+      { term: "요양병원", volume: 369770 },
+      { term: "건강검진 패키지", volume: 4260, trend: 0.21 }
+    ],
+    contentHook: "부모의 시간을 관리하는 카드",
+    painPoints: ["부모 돌봄비 급증 부담", "가계 통합 관리 어려움", "카드 혜택 사각지대"],
+    uspConnection: "가족카드 무료·무제한 + 국내 1% 무실적 (가족 확장 극단)"
   }
 ];
 
