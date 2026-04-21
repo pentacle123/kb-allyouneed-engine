@@ -19,6 +19,7 @@ import * as youfamily from "./data/youPrimeFamilyData";
 import * as youdaily from "./data/youPrimeDailyData";
 import { generateMonthlyTrend } from "../lib/generateMonthlyTrend";
 import { enrichContentHook } from "../lib/enrichContentHook";
+import { detectCannibalization } from "../lib/cannibalization";
 
 // ══════════════════════════════════════════════════════════════
 // KB ALL·YOU·NEED AI Brandformance Engine v3.0
@@ -3272,6 +3273,74 @@ export default function Home() {
             {opp.monthlyVol > 0 && <span style={pill(`${cardColor}15`, cardColor)}>월 {fmt(opp.monthlyVol)}회</span>}
           </div>
         </div>
+
+        {/* 카니발라이제이션 배너 (Phase 8-2) */}
+        {(() => {
+          const warnings = detectCannibalization(opp);
+          if (warnings.length === 0) return null;
+          const isRecommended = warnings.every(w => w.recommendation.oppId === opp.id);
+
+          if (isRecommended) {
+            return (
+              <div style={{
+                padding: "14px 18px", marginBottom: 16, borderRadius: 12,
+                background: "linear-gradient(135deg, #F0FDF4, #ECFDF5)",
+                border: "1px solid #A7F3D0",
+                display: "flex", alignItems: "flex-start", gap: 12,
+              }}>
+                <span style={{ fontSize: 18 }}>✓</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "#047857", marginBottom: 2 }}>
+                    이 카드가 최적의 연결 지점
+                  </div>
+                  <div style={{ fontSize: 11, color: "#065F46", lineHeight: 1.5 }}>
+                    {warnings.length}개 키워드에서 이 기회가 타 카드 대비 최우선 추천됨 (tier/검색량 기준)
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div style={{
+              padding: "14px 18px", marginBottom: 16, borderRadius: 12,
+              background: "linear-gradient(135deg, #FFFBEB, #FEF3C7)",
+              border: "1px solid #FCD34D",
+              display: "flex", alignItems: "flex-start", gap: 12,
+            }}>
+              <span style={{ fontSize: 18 }}>⚠️</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "#92400E", marginBottom: 8 }}>
+                  이 기회는 다른 카드와 일부 겹칩니다
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {warnings.slice(0, 3).map((w, i) => {
+                    const isMine = w.recommendation.oppId === opp.id;
+                    return (
+                      <div key={i} style={{ fontSize: 11, color: "#78350F", lineHeight: 1.5 }}>
+                        <span style={{ fontWeight: 700 }}>"{w.term}"</span>
+                        <span style={{ color: "#B45309" }}> → </span>
+                        {isMine ? (
+                          <span style={{ color: "#047857", fontWeight: 700 }}>✓ 이 카드가 최적</span>
+                        ) : (
+                          <span>
+                            <strong style={{ color: "#92400E" }}>{w.recommendation.card}</strong> 권장
+                            <span style={{ color: "#A16207" }}> ({w.recommendation.tier} · 연 {fmt(w.recommendation.volume)}회)</span>
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                {warnings.length > 3 && (
+                  <div style={{ fontSize: 10, color: "#A16207", marginTop: 6 }}>
+                    외 {warnings.length - 3}개 키워드 중복
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Monthly Trend */}
         <div style={{ background: "#FFFFFF", borderRadius: 14, border: `1px solid ${C.border}`, padding: 20, marginBottom: 16 }}>
