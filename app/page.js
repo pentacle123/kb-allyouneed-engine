@@ -1380,7 +1380,7 @@ export default function Home() {
   // ──────────── Step Indicator ────────────
   const StepIndicator = () => (
     <div style={{ background: "#FFFFFF", borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0, zIndex: 99 }}>
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "14px 20px", display: "flex", alignItems: "center" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "14px 24px", display: "flex", alignItems: "center" }}>
         {STEPS_LABEL.map((s, i) => (
           <React.Fragment key={i}>
             {i > 0 && (
@@ -1540,7 +1540,7 @@ export default function Home() {
 
   // ──────────── HUB VIEW ────────────
   const renderHub = () => (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 20px 60px" }}>
+    <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
       <Hero />
       <div style={{ fontSize: 11, fontWeight: 800, color: C.textSoft, letterSpacing: 1, textTransform: "uppercase", marginBottom: 14, paddingLeft: 4 }}>
         카드별 기회 맵
@@ -1663,7 +1663,7 @@ export default function Home() {
     // 하위카드 선택 안 됨 → 선택 페이지
     if (!needSubCard) {
       return (
-        <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
           <BackNav label="← 전체 기회로 돌아가기" />
 
           {/* Header */}
@@ -1739,7 +1739,7 @@ export default function Home() {
     const oppCount = autoslim.getOpportunityCount();
 
     return (
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← NEED 카드 선택으로" />
 
         {/* Header */}
@@ -1893,7 +1893,7 @@ export default function Home() {
     const oppCount = needpay.getOpportunityCount();
 
     return (
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← NEED 카드 선택으로" />
 
         {/* Header */}
@@ -2047,7 +2047,7 @@ export default function Home() {
     const oppCount = neededu.getOpportunityCount();
 
     return (
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← NEED 카드 선택으로" />
 
         {/* Header */}
@@ -2210,7 +2210,7 @@ export default function Home() {
     // 하위카드 선택 안 됨 → 선택 페이지
     if (!youSubCard) {
       return (
-        <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
           <BackNav label="← 전체 기회로 돌아가기" />
 
           <div style={{ background: "#FFFFFF", borderRadius: 18, border: "1px solid #7C3AED25", marginBottom: 22, overflow: "hidden" }}>
@@ -2288,7 +2288,7 @@ export default function Home() {
       : allOpps.length;
 
     return (
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← YOU Prime 팩 선택으로" />
 
         {/* Header */}
@@ -2447,7 +2447,7 @@ export default function Home() {
       : allOpps.length;
 
     return (
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← YOU Prime 팩 선택으로" />
 
         {/* Header */}
@@ -2597,7 +2597,7 @@ export default function Home() {
     const oppCount = getOpportunityCount();
 
     return (
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← 전체 기회로 돌아가기" />
 
         {/* Category Header */}
@@ -2946,7 +2946,7 @@ export default function Home() {
     const totalAnnual = opps.reduce((s, o) => s + (o.annualVol || 0), 0);
 
     return (
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← 전체 기회로 돌아가기" />
 
         {/* Category Header */}
@@ -3079,7 +3079,7 @@ export default function Home() {
     const cardName = CARDS[opp.card]?.name || opp.card;
 
     return (
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← 기회 목록으로" />
 
         {/* Hero Header */}
@@ -3123,9 +3123,9 @@ export default function Home() {
           <MiniHeatmap data={opp.peakMonths} color={cardColor} />
         </div>
 
-        {/* 6-Axis Grid */}
+        {/* 6-Axis Grid — 1280 레이아웃에서 3열 확장 */}
         {opp.context && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 18 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12, marginBottom: 18 }}>
             {AXIS_CFG.map(ax => {
               const d = opp.context[ax.key];
               if (!d) return null;
@@ -3342,7 +3342,7 @@ export default function Home() {
     const opp = selectedOpp;
     const cardColor = CARDS[opp.card]?.color || "#2563EB";
     return (
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "24px 20px 60px" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← 기회 분석으로" />
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
           <span style={{ fontSize: 32 }}>{opp.icon}</span>
