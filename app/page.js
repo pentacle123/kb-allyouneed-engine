@@ -1106,21 +1106,21 @@ const OPPS = [
 
 const CATEGORIES = {
   all: {
-    key: "all", label: "A. ALL 카드", title: "ALL 카드",
+    key: "all", label: "A · 5 페르소나", title: "ALL 카드",
     tagline: "고민없이 받는 혜택 — 365일 쓰는 카드",
     color: "#2563EB", icons: ["🛒", "🎬", "✈️", "📶", "💳"],
     headerMeta: "연회비 2만원 · 전월 40만+ · 가족카드 무료",
     uspPills: ["국내 1%", "해외 2%", "쇼핑멤버십 50%", "OTT 10%", "통신 5%"],
   },
   you: {
-    key: "you", label: "B. YOU Prime", title: "YOU Prime 카드",
+    key: "you", label: "B · 2 팩", title: "YOU Prime 카드",
     tagline: "나에게 딱 맞춘 혜택 — 일상팩·가족팩",
     color: "#7C3AED", icons: ["⛽", "💪", "🛒", "☕", "🏠"],
     headerMeta: "연회비 3만원 · 전월 40만+ · 가족카드 7,000원",
     uspPills: ["주유 10%", "배달 10%", "자기관리 5%", "장보기 10%", "카페 5%"],
   },
   need: {
-    key: "need", label: "C. NEED", title: "NEED 카드",
+    key: "need", label: "C · 3 카드", title: "NEED 카드",
     tagline: "Pay·Autoslim·Edu 특화 기회",
     color: "#DC2626", icons: ["📱", "🔋", "🛡️", "📚", "💊"],
     multiColor: ["#059669", "#D97706", "#DC2626"],
@@ -1486,15 +1486,12 @@ export default function Home() {
         const isYou = cat.key === "you";
         let count, annual, previews;
         if (isAll) {
-          count = getOpportunityCount() + ALL_CARD_CROSS_INSIGHTS.length;
+          count = getOpportunityCount(); // cross insights 제외: 28
           annual = getTotalAnnualVolume();
-          previews = ALL_CARD_PERSONAS.slice(0, 3).map(p => ({ icon: p.icon, title: p.title }));
+          previews = ALL_CARD_PERSONAS.map(p => ({ icon: p.icon, title: p.title })); // P1~P5 전부
         } else if (isNeed) {
-          // NEED = AutoSlim + Pay + Edu (모두 v2)
-          const autoCount = autoslim.getOpportunityCount() + autoslim.NEED_AUTOSLIM_CROSS_INSIGHTS.length;
-          const payCount = needpay.getOpportunityCount() + needpay.NEED_PAY_CROSS_INSIGHTS.length;
-          const eduCount = neededu.getOpportunityCount() + neededu.NEED_EDU_CROSS_INSIGHTS.length;
-          count = autoCount + payCount + eduCount;
+          // NEED = AutoSlim + Pay + Edu (opportunities만, cross insights 제외)
+          count = autoslim.getOpportunityCount() + needpay.getOpportunityCount() + neededu.getOpportunityCount(); // 9+9+10 = 28
           annual = autoslim.getTotalAnnualVolume() + needpay.getTotalAnnualVolume() + neededu.getTotalAnnualVolume();
           previews = [
             { icon: "🚗", title: "NEED AutoSlim — 자동차 카드 (신차·주유·보험·정비)" },
@@ -1502,12 +1499,12 @@ export default function Home() {
             { icon: "📚", title: "NEED Edu — 교육·생활 (자녀 교육·자기계발)" },
           ];
         } else if (isYou) {
-          // YOU = 가족팩 + 일상팩 (모두 v2)
-          const famCount = (youfamily.getOpportunityCount ? youfamily.getOpportunityCount() : youfamily.YOU_PRIME_FAMILY_OPPORTUNITIES.length) + youfamily.YOU_PRIME_FAMILY_CROSS_INSIGHTS.length;
-          const dailyCount = (youdaily.getOpportunityCount ? youdaily.getOpportunityCount() : youdaily.YOU_PRIME_DAILY_OPPORTUNITIES.length) + youdaily.YOU_PRIME_DAILY_CROSS_INSIGHTS.length;
+          // YOU = 가족팩 + 일상팩 (opportunities만)
+          const famCount = youfamily.getOpportunityCount ? youfamily.getOpportunityCount() : youfamily.YOU_PRIME_FAMILY_OPPORTUNITIES.length;
+          const dailyCount = youdaily.getOpportunityCount ? youdaily.getOpportunityCount() : youdaily.YOU_PRIME_DAILY_OPPORTUNITIES.length;
           const famAnnual = youfamily.getTotalAnnualVolume ? youfamily.getTotalAnnualVolume() : youfamily.YOU_PRIME_FAMILY_OPPORTUNITIES.reduce((s, o) => s + (o.annualVolume || 0), 0);
           const dailyAnnual = youdaily.getTotalAnnualVolume ? youdaily.getTotalAnnualVolume() : youdaily.YOU_PRIME_DAILY_OPPORTUNITIES.reduce((s, o) => s + (o.annualVolume || 0), 0);
-          count = famCount + dailyCount;
+          count = famCount + dailyCount; // 9 + 7 = 16
           annual = famAnnual + dailyAnnual;
           previews = [
             { icon: "🏠", title: "YOU 가족팩 — 3세대 지원·가족 재무 관리" },
