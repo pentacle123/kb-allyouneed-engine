@@ -18,6 +18,7 @@ import * as neededu from "./data/needEduData";
 import * as youfamily from "./data/youPrimeFamilyData";
 import * as youdaily from "./data/youPrimeDailyData";
 import { generateMonthlyTrend } from "../lib/generateMonthlyTrend";
+import { enrichContentHook } from "../lib/enrichContentHook";
 
 // ══════════════════════════════════════════════════════════════
 // KB ALL·YOU·NEED AI Brandformance Engine v3.0
@@ -2980,6 +2981,8 @@ export default function Home() {
     if (opp._isAllV2) {
       const persona = opp._persona;
       const axisAdapter = (axis) => axis ? { tags: axis.tags || [], evidence: axis.dataEvidence || "" } : null;
+      // 콘텐츠 훅 enrichment (algorithmSignal + contentHookEvidence 자동 생성)
+      opp = enrichContentHook(opp);
       opp = {
         ...opp,
         card: "ALL",
@@ -3128,15 +3131,49 @@ export default function Home() {
           </div>
         )}
 
-        {/* Content Hook + Data Evidence */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
-          <div style={{ background: `linear-gradient(135deg, ${cardColor}08, ${cardColor}03)`, borderRadius: 14, border: `1px solid ${cardColor}30`, padding: 18 }}>
-            <div style={{ color: cardColor, fontSize: 12, fontWeight: 800, marginBottom: 8 }}>✨ 콘텐츠 훅 예시</div>
-            <div style={{ color: C.text, fontSize: 14, fontWeight: 800, lineHeight: 1.5 }}>"{opp.contentHook}"</div>
+        {/* Content Hook + Data Evidence (Phase 7.3) */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12, marginBottom: 14 }}>
+          {/* ✨ 콘텐츠 훅 (오렌지) */}
+          <div style={{
+            background: "linear-gradient(135deg, #FFF7ED, #FEF3C7)",
+            borderRadius: 14, border: "1px solid #FDBA74",
+            padding: 18,
+          }}>
+            <div style={{ color: "#C2410C", fontSize: 11, fontWeight: 800, marginBottom: 8, letterSpacing: 0.5 }}>
+              ✨ 콘텐츠 훅 예시
+            </div>
+            {opp.contentHook && (
+              <div style={{ color: "#1E293B", fontSize: 15, fontWeight: 800, lineHeight: 1.5, marginBottom: 12 }}>
+                "{opp.contentHook}"
+              </div>
+            )}
+            {opp.algorithmSignal && (
+              <div style={{
+                paddingTop: 10,
+                borderTop: "1px solid #FDBA7455",
+              }}>
+                <div style={{ fontSize: 9, fontWeight: 800, color: "#C2410C", marginBottom: 4, letterSpacing: 0.5 }}>
+                  🔥 알고리즘 시그널
+                </div>
+                <div style={{ fontSize: 10.5, color: "#7C2D12", lineHeight: 1.6 }}>
+                  {opp.algorithmSignal}
+                </div>
+              </div>
+            )}
           </div>
-          <div style={{ background: "#F8FAFC", borderRadius: 14, border: `1px solid ${C.border}`, padding: 18 }}>
-            <div style={{ color: C.text, fontSize: 12, fontWeight: 800, marginBottom: 8 }}>📊 DATA EVIDENCE</div>
-            <div style={{ color: C.text, fontSize: 11.5, lineHeight: 1.6 }}>{opp.dataProof}</div>
+
+          {/* 📊 DATA EVIDENCE (블루) */}
+          <div style={{
+            background: "linear-gradient(135deg, #EFF6FF, #F0F9FF)",
+            borderRadius: 14, border: "1px solid #93C5FD",
+            padding: 18,
+          }}>
+            <div style={{ color: "#1D4ED8", fontSize: 11, fontWeight: 800, marginBottom: 8, letterSpacing: 0.5 }}>
+              📊 DATA EVIDENCE
+            </div>
+            <div style={{ color: "#1E3A8A", fontSize: 11.5, lineHeight: 1.7 }}>
+              {opp.contentHookEvidence || opp.dataProof || "검색 데이터 기반 타겟 확보"}
+            </div>
           </div>
         </div>
 
