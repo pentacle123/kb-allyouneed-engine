@@ -1152,13 +1152,40 @@ export default function Home() {
   const [needSubCard, setNeedSubCard] = useState(null); // "edu" | "pay" | "autoslim"
   const [youSubCard, setYouSubCard] = useState(null);   // "daily" | "family"
   const [openPersona, setOpenPersona] = useState("P1");  // ALL 카드 첫 페르소나만 기본 펼침
+  const [aiIdeas, setAiIdeas] = useState({}); // { [oppId]: { loading, error, ideas } }
 
   const activeStep = VIEW_STEP[currentView] ?? 0;
   const showStepIndicator = currentView !== "hub";
 
   const goToCategory  = (cat) => { setCurrentCategory(cat); setNeedSubCard(null); setYouSubCard(null); setCurrentView("category"); };
   const goToAnalysis  = (opp) => { setSelectedOpp(opp); setCurrentView("analysis"); };
-  const goToIdeas     = () => setCurrentView("ideas");
+  const goToIdeas     = () => {
+    setCurrentView("ideas");
+    if (selectedOpp && !aiIdeas[selectedOpp.id]?.ideas && !aiIdeas[selectedOpp.id]?.loading) {
+      generateIdeas(selectedOpp);
+    }
+  };
+
+  const generateIdeas = async (opp) => {
+    if (!opp || !opp.id) return;
+    setAiIdeas(prev => ({ ...prev, [opp.id]: { loading: true, error: null, ideas: null } }));
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          opportunity: opp,
+          cardMeta: { cardName: CARDS[opp.card]?.name || opp.card, cardTagline: CARDS[opp.card]?.tagline || "" },
+          persona: opp._persona || {},
+        }),
+      });
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error || "생성 실패");
+      setAiIdeas(prev => ({ ...prev, [opp.id]: { loading: false, error: null, ideas: result.data.ideas || [] } }));
+    } catch (e) {
+      setAiIdeas(prev => ({ ...prev, [opp.id]: { loading: false, error: e.message, ideas: null } }));
+    }
+  };
   const goToNeedSub   = (sub) => { setNeedSubCard(sub); };
   const goToYouSub    = (sub) => { setYouSubCard(sub); };
   const goBack = () => {
@@ -1417,6 +1444,148 @@ export default function Home() {
       {currentView !== "hub" && <span onClick={goHome} style={{ color: C.textSoft, fontSize: 12, cursor: "pointer" }}>← 처음으로</span>}
     </div>
   );
+
+  // ──────────── ShortformIdeaCard (AI 생성 결과) ────────────
+  const ShortformIdeaCard = ({ idea, cardColor }) => {
+    const hookColors = {
+      "공감형": { bg: "#DBEAFE", fg: "#1D4ED8", border: "#BFDBFE" },
+      "발견형": { bg: "#D1FAE5", fg: "#047857", border: "#A7F3D0" },
+      "궁금증형": { bg: "#FEF3C7", fg: "#92400E", border: "#FCD34D" },
+    };
+    const hc = hookColors[idea.hookType] || { bg: "#F3F4F6", fg: "#374151", border: "#E5E7EB" };
+
+    return (
+      <div style={{
+        background: "#FFFFFF", borderRadius: 16,
+        border: "1px solid #E5E7EB",
+        overflow: "hidden",
+      }}>
+        {/* 헤더 */}
+        <div style={{
+          padding: "18px 20px",
+          background: "linear-gradient(135deg, #FFF7ED, #FEF3C7)",
+          borderBottom: "1px solid #FDBA7440",
+        }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 10 }}>
+            <div style={{
+              width: 28, height: 28, borderRadius: "50%",
+              background: "#EA580C", color: "#FFFFFF",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 13, fontWeight: 900,
+            }}>{idea.id || "?"}</div>
+            {idea.hookType && (
+              <span style={{
+                fontSize: 10, fontWeight: 800, padding: "3px 10px", borderRadius: 20,
+                background: hc.bg, color: hc.fg,
+                border: `1px solid ${hc.border}`,
+              }}>{idea.hookType}</span>
+            )}
+            {idea.duration && (
+              <span style={{ fontSize: 10, color: C.textSoft, fontWeight: 600 }}>⏱️ {idea.duration}</span>
+            )}
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 900, color: "#7C2D12", lineHeight: 1.4, marginBottom: 8 }}>
+            {idea.title}
+          </div>
+          {idea.openingHook && (
+            <div style={{
+              padding: "10px 12px", borderRadius: 8,
+              background: "rgba(255,255,255,0.7)",
+              border: "1px solid #FDBA7440",
+              fontSize: 12, color: "#9A3412", lineHeight: 1.5,
+            }}>
+              <span style={{ fontSize: 10, fontWeight: 800, color: "#C2410C", marginRight: 6 }}>🎣 오프닝 훅</span>
+              <span style={{ fontWeight: 700, fontStyle: "italic" }}>"{idea.openingHook}"</span>
+            </div>
+          )}
+          {idea.targetEmotion && (
+            <div style={{ fontSize: 11, color: "#9A3412", marginTop: 8 }}>
+              💭 타겟 감정: <strong>"{idea.targetEmotion}"</strong>
+            </div>
+          )}
+        </div>
+
+        {/* 씬별 스토리보드 */}
+        {idea.scenes && idea.scenes.length > 0 && (
+          <div style={{ padding: "18px 20px" }}>
+            <div style={{ fontSize: 11, fontWeight: 800, color: C.text, marginBottom: 12, letterSpacing: 0.5 }}>
+              📽️ 씬별 스토리보드 ({idea.scenes.length}씬)
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {idea.scenes.map((scene, i) => (
+                <div key={i} style={{
+                  display: "grid", gridTemplateColumns: "60px 1fr", gap: 12,
+                  padding: "10px 12px", borderRadius: 10,
+                  background: "#F9FAFB", border: "1px solid #F3F4F6",
+                }}>
+                  <div style={{
+                    fontSize: 10, fontWeight: 800, color: cardColor,
+                    fontFamily: "monospace", paddingTop: 2,
+                  }}>{scene.time || `씬${i + 1}`}</div>
+                  <div>
+                    {scene.visual && (
+                      <div style={{ fontSize: 12, fontWeight: 700, color: C.text, marginBottom: 3 }}>
+                        🎬 {scene.visual}
+                      </div>
+                    )}
+                    {scene.copy && (
+                      <div style={{ fontSize: 11, color: "#4B5563", marginBottom: 3, lineHeight: 1.5 }}>
+                        💬 "{scene.copy}"
+                      </div>
+                    )}
+                    {scene.soundCue && (
+                      <div style={{ fontSize: 10, color: C.textSoft, lineHeight: 1.5 }}>
+                        🔊 {scene.soundCue}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 푸터: CTA, 알고리즘, 크리에이터, 해시태그 */}
+        <div style={{
+          padding: "14px 20px 18px", display: "flex", flexDirection: "column", gap: 10,
+          borderTop: "1px solid #F3F4F6",
+        }}>
+          {idea.callToAction && (
+            <div style={{
+              padding: "8px 12px", borderRadius: 8,
+              background: "#F9FAFB", border: "1px solid #E5E7EB",
+              fontSize: 11, lineHeight: 1.5,
+            }}>
+              <span style={{ fontSize: 9, fontWeight: 800, color: C.textSoft, marginRight: 6 }}>📣 CTA</span>
+              <span style={{ color: C.text }}>{idea.callToAction}</span>
+            </div>
+          )}
+          {idea.algorithmInsight && (
+            <div style={{
+              padding: "8px 12px", borderRadius: 8,
+              background: "#EFF6FF", border: "1px solid #BFDBFE",
+              fontSize: 11, lineHeight: 1.6, color: "#1E40AF",
+            }}>
+              <span style={{ fontSize: 9, fontWeight: 800, color: "#1D4ED8", marginRight: 6 }}>🔥 알고리즘 시그널</span>
+              {idea.algorithmInsight}
+            </div>
+          )}
+          {idea.creatorFit && (
+            <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>
+              👤 <strong>크리에이터 Fit:</strong> {idea.creatorFit}
+            </div>
+          )}
+          {idea.hashtags && idea.hashtags.length > 0 && (
+            <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+              {idea.hashtags.map((tag, i) => (
+                <span key={i} style={{ fontSize: 11, color: "#2563EB", fontWeight: 600 }}>{tag}</span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   // ──────────── SectionDivider ────────────
   const SectionDivider = ({ label, color, count }) => (
@@ -3341,56 +3510,107 @@ export default function Home() {
     if (!selectedOpp) return null;
     const opp = selectedOpp;
     const cardColor = CARDS[opp.card]?.color || "#2563EB";
+    const state = aiIdeas[opp.id] || {};
+    const { loading, error, ideas } = state;
+
     return (
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← 기회 분석으로" />
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-          <span style={{ fontSize: 32 }}>{opp.icon}</span>
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 900, color: C.text }}>{opp.title}</div>
-            <div style={{ fontSize: 12, color: C.textSoft }}>AI 숏폼 아이디어</div>
+
+        {/* 타이틀 */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ fontSize: 32 }}>{opp.icon}</span>
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 900, color: C.text }}>{opp.title}</div>
+              <div style={{ fontSize: 12, color: C.textSoft }}>
+                🎬 AI 생성 숏폼 아이디어 {ideas ? `(${ideas.length}개)` : ""}
+              </div>
+            </div>
           </div>
+          {ideas && !loading && (
+            <button
+              onClick={() => generateIdeas(opp)}
+              style={{
+                padding: "8px 16px", borderRadius: 10,
+                border: "1px solid #FB923C",
+                background: "#FFFFFF", color: "#EA580C",
+                fontSize: 12, fontWeight: 700, cursor: "pointer",
+              }}
+            >↻ 다시 생성</button>
+          )}
         </div>
 
-        {opp.shortformIdeas && opp.shortformIdeas.length > 0 ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {opp.shortformIdeas.map((idea, i) => (
-              <div key={i} style={{
-                background: "#FFFFFF", borderRadius: 14,
-                border: "1px solid #E5E7EB", borderLeft: `4px solid ${cardColor}`,
-                padding: "18px 20px",
-              }}>
-                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: 18,
-                    background: `${cardColor}15`, color: cardColor,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 16, fontWeight: 900, flexShrink: 0,
-                  }}>{i + 1}</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 11, color: cardColor, fontWeight: 700, marginBottom: 4 }}>🎬 SHORTFORM IDEA</div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: C.text, lineHeight: 1.5 }}>{idea}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div style={{ textAlign: "center", padding: 60, color: C.textSoft }}>
-            아이디어가 아직 준비되지 않았습니다
+        {/* 로딩 */}
+        {loading && (
+          <div style={{
+            padding: "60px 24px", borderRadius: 16,
+            background: "linear-gradient(135deg, #FFF7ED, #FEF3C7)",
+            border: "2px solid #FDBA74",
+            textAlign: "center",
+          }}>
+            <div style={{
+              display: "inline-block", width: 40, height: 40,
+              border: "4px solid #FED7AA", borderTopColor: "#EA580C",
+              borderRadius: "50%", animation: "spin 0.8s linear infinite",
+              marginBottom: 16,
+            }} />
+            <div style={{ fontSize: 15, fontWeight: 800, color: "#7C2D12", marginBottom: 4 }}>
+              Claude Sonnet 4.5가 숏폼 아이디어를 생성 중...
+            </div>
+            <div style={{ fontSize: 11, color: "#9A3412" }}>
+              약 10-30초 소요됩니다 · 페르소나·페인포인트·검색 여정 기반 맞춤 생성
+            </div>
           </div>
         )}
 
-        <div style={{
-          marginTop: 28, padding: "20px", borderRadius: 14,
-          background: "#FEF3C7", border: "1px solid #FCD34D",
-          textAlign: "center",
-        }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: "#92400E", marginBottom: 6 }}>🚧 Phase 2 — AI 생성 기능 준비 중</div>
-          <div style={{ fontSize: 11, color: "#92400E", lineHeight: 1.6 }}>
-            스토리보드, 씬별 디렉션, 크리에이터 매칭, 플랫폼별 최적화는 다음 단계에서 추가됩니다.
+        {/* 에러 */}
+        {error && !loading && (
+          <div style={{
+            padding: "20px", borderRadius: 12,
+            background: "#FEF2F2", border: "1px solid #FECACA",
+          }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#B91C1C", marginBottom: 6 }}>⚠️ 생성 실패</div>
+            <div style={{ fontSize: 12, color: "#7F1D1D", marginBottom: 12, lineHeight: 1.6 }}>{error}</div>
+            <button
+              onClick={() => generateIdeas(opp)}
+              style={{
+                padding: "8px 14px", borderRadius: 8,
+                border: "none", background: "#DC2626", color: "#FFFFFF",
+                fontSize: 12, fontWeight: 700, cursor: "pointer",
+              }}
+            >재시도</button>
           </div>
-        </div>
+        )}
+
+        {/* 아이디어 결과 */}
+        {ideas && !loading && ideas.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {ideas.map((idea, idx) => (
+              <ShortformIdeaCard key={idea.id || idx} idea={idea} cardColor={cardColor} />
+            ))}
+          </div>
+        )}
+
+        {/* 초기 상태 (로딩도 에러도 결과도 없음) */}
+        {!loading && !error && !ideas && (
+          <div style={{ textAlign: "center", padding: 60 }}>
+            <div style={{ fontSize: 13, color: C.textSoft, marginBottom: 16 }}>
+              Claude AI로 이 기회에 맞는 숏폼 아이디어 3개를 생성할 수 있습니다.
+            </div>
+            <button
+              onClick={() => generateIdeas(opp)}
+              style={{
+                padding: "14px 28px", borderRadius: 12,
+                border: "none",
+                background: "linear-gradient(135deg, #FB923C, #EA580C)",
+                color: "#FFFFFF",
+                fontSize: 14, fontWeight: 800, cursor: "pointer",
+                boxShadow: "0 4px 12px rgba(234, 88, 12, 0.3)",
+              }}
+            >🎬 AI 아이디어 생성 시작</button>
+          </div>
+        )}
       </div>
     );
   };
@@ -3406,6 +3626,7 @@ export default function Home() {
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
         button:hover { opacity: 0.92; }
       `}</style>
 
