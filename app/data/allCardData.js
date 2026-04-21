@@ -168,7 +168,16 @@ export const ALL_CARD_OPPORTUNITIES = [
     ],
     contentHook: "7년 체리피커가 결국 돌아온 카드",
     painPoints: ["매달 실적 체크 피로", "카드 혜택 비교 지침", "조건 맞추기 위한 편법 사용 죄책감"],
-    uspConnection: "국내 1% 무실적·무한도"
+    uspConnection: "국내 1% 무실적·무한도",
+    competition: {
+      ranking: [
+        { name: "카드고릴라", type: "카드 비교 플랫폼", share: "1위", volume: 2036100 },
+        { name: "신용카드 추천 (자연 검색)", type: "정보 허브", share: "2위", volume: 587880 },
+        { name: "뽐뿌 카드정보", type: "커뮤니티", share: "3위", volume: 250000 },
+        { name: "KB국민카드 브랜드 검색", type: "카드사", share: "인지도 낮음", volume: 45000 }
+      ],
+      insight: "체리피커 검색 여정 1순위가 카드고릴라. KB는 카드고릴라 '1티어 무실적 카드' 섹션 상위 노출 확보 + 체리피커 졸업 후기 콘텐츠로 검색 여정 종점 확보 가능."
+    }
   },
   {
     id: "P1-2",
@@ -826,7 +835,17 @@ export const ALL_CARD_OPPORTUNITIES = [
     ],
     contentHook: "인상 3번째, 이번엔 해지 말고 10% 돌려받기",
     painPoints: ["반복 가격 인상 분노", "해지 고민 피로", "대체 OTT 부재"],
-    uspConnection: "OTT 10% (넷플릭스 공식 홈페이지 결제 조건)"
+    uspConnection: "OTT 10% (넷플릭스 공식 홈페이지 결제 조건)",
+    competition: {
+      ranking: [
+        { name: "넷플릭스 할인 (자연 검색)", type: "정보 허브", share: "1위", volume: 64870 },
+        { name: "넷플릭스 싸게", type: "정보 검색", share: "2위", volume: 16870 },
+        { name: "신한카드 B라운드", type: "경쟁 카드사", share: "3위", volume: 12000 },
+        { name: "넷플릭스 할인카드", type: "비교 검색", share: "4위", volume: 10750 },
+        { name: "KB국민카드 (OTT 혜택)", type: "카드사", share: "인지도 낮음", volume: 3000 }
+      ],
+      insight: "넷플릭스 가격 인상 이후 '할인 카드' 검색 여정에 KB 부재. 신한카드가 'OTT 월 15%' 포지션 선점 중. ALL 카드 OTT 10%는 '무실적·무한도' 차별점으로 공략."
+    }
   },
   {
     id: "P3-4",

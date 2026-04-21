@@ -169,7 +169,17 @@ export const NEED_PAY_OPPORTUNITIES = [
     ],
     contentHook: "네이버 생태계 40% 해커 — 시장 유일 조합",
     painPoints: ["여러 페이 분산 관리", "혜택 조합 복잡성", "네이버플러스 혜택 최대 활용 정보 부족"],
-    uspConnection: "네이버플러스 결합 40% (네이버페이 × KB Pay × 네이버플러스 3중 결합)"
+    uspConnection: "네이버플러스 결합 40% (네이버페이 × KB Pay × 네이버플러스 3중 결합)",
+    competition: {
+      ranking: [
+        { name: "네이버페이 (플랫폼)", type: "플랫폼", share: "생태계 허브", volume: 10670000 },
+        { name: "네이버플러스 멤버십", type: "구독 혜택", share: "진입 채널", volume: 1780000 },
+        { name: "현대카드 제로", type: "경쟁 카드사", share: "2위", volume: 200000 },
+        { name: "삼성카드 iD ON", type: "경쟁 카드사", share: "3위", volume: 150000 },
+        { name: "KB NEED Pay (네이버 축)", type: "카드사", share: "포지셔닝 공백", volume: 12000 }
+      ],
+      insight: "네이버 생태계 40% 실질 환급은 국내 유일 조합. 현대·삼성이 네이버페이 제휴는 있으나 '네이버플러스 × KB Pay' 3중 결합 미제공. 시장 선점 기회."
+    }
   },
   {
     id: "PAY-COVER-P2-1",
@@ -362,7 +372,16 @@ export const NEED_PAY_OPPORTUNITIES = [
     ],
     contentHook: "해외에서도 NEED Pay — 여행·직구 통합",
     painPoints: ["해외 결제 수수료 누적", "여행 카드 따로 관리 피로", "직구·여행 할인 정보 분산"],
-    uspConnection: "간편결제 15% 해외 확장 + 여행자보험 자동 연계"
+    uspConnection: "간편결제 15% 해외 확장 + 여행자보험 자동 연계",
+    competition: {
+      ranking: [
+        { name: "여행자보험 (자연 검색)", type: "정보 허브", share: "1위", volume: 2850200 },
+        { name: "트래블러스 체크카드 (하나카드)", type: "경쟁 카드사", share: "2위", volume: 500000 },
+        { name: "토스 트래블 카드", type: "핀테크", share: "3위", volume: 300000 },
+        { name: "KB NEED Pay (해외)", type: "카드사", share: "진입 단계", volume: 20000 }
+      ],
+      insight: "해외 여행·직구 시장은 하나·토스가 선점. NEED Pay는 '간편결제 15% 해외 확장'이 미발굴된 각도. '직구 + 여행자보험 + 글로벌 OTT' 통합 포지션이 공백."
+    }
   },
 
   // ========== 🟠 ACCENT 기회 5개 ==========

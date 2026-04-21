@@ -376,7 +376,16 @@ export const YOU_PRIME_DAILY_OPPORTUNITIES = [
     ],
     contentHook: "내 반경 500m를 가장 잘 쓰는 카드",
     painPoints: ["동네 소비의 혜택 사각지대", "이동 피로", "단골 가맹점 할인 부재"],
-    uspConnection: "편의점 10% + 카페 10% + 배달 10% + 취미 5% (4개 영역 자연 커버)"
+    uspConnection: "편의점 10% + 카페 10% + 배달 10% + 취미 5% (4개 영역 자연 커버)",
+    competition: {
+      ranking: [
+        { name: "네이버 지도 (내 근처 맛집)", type: "플랫폼", share: "검색 1위", volume: 1273340 },
+        { name: "카카오맵", type: "플랫폼", share: "검색 2위", volume: 450000 },
+        { name: "현대카드 DiGital Lovers", type: "경쟁 카드사", share: "3위", volume: 80000 },
+        { name: "YOU Prime 일상팩 (하이퍼로컬)", type: "카드사", share: "포지셔닝 신설", volume: 5000 }
+      ],
+      insight: "하이퍼로컬 검색 1,273K 시장에 카드사 포지셔닝 공백. '내 반경 500m' 축은 현재 아무도 점유 안함. YOU Prime 일상팩이 최초 진입 시 5년간 독점 가능."
+    }
   },
 
   // ========== 🟠 ACCENT 기회 3개 ==========

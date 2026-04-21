@@ -1135,13 +1135,14 @@ const CATEGORIES = {
 const STEPS_LABEL = ["기회 발견", "기회 분석", "AI 아이디어", "스토리보드"];
 const VIEW_STEP = { hub: -1, category: 0, analysis: 1, ideas: 2, storyboard: 3 };
 
+// Phase 10-2: 6박스 재배치 + 재명명 (스토리 흐름 — WHO → WHEN → JOURNEY → PAIN → USP FIT → HOOK)
 const AXIS_CFG = [
-  { key: "who",   icon: "👥", label: "타겟 소비자",   sub: "WHO",   color: "#0770E3" },
-  { key: "what",  icon: "🎯", label: "핵심 니즈",     sub: "WHAT",  color: "#FF6B00" },
-  { key: "when",  icon: "⏰", label: "침투 타이밍",   sub: "WHEN",  color: "#10B981" },
-  { key: "where", icon: "📍", label: "접점 채널",     sub: "WHERE", color: "#8B5CF6" },
-  { key: "why",   icon: "💡", label: "핵심 발견",     sub: "WHY",   color: "#D97706" },
-  { key: "how",   icon: "🎬", label: "콘텐츠 전략",   sub: "HOW",   color: "#EF4444" },
+  { key: "who",   icon: "👤", label: "WHO",      sub: "누가 검색하는가?",           color: "#0770E3" },
+  { key: "when",  icon: "📅", label: "WHEN",     sub: "언제 검색하는가?",           color: "#10B981" },
+  { key: "where", icon: "🔍", label: "JOURNEY",  sub: "어떤 경로로 검색하는가?",    color: "#8B5CF6" },
+  { key: "why",   icon: "😣", label: "PAIN",     sub: "소비자의 고통은?",           color: "#D97706" },
+  { key: "what",  icon: "🔗", label: "USP FIT",  sub: "이 카드가 해결할 수 있는 것", color: "#FF6B00" },
+  { key: "how",   icon: "🎣", label: "HOOK",     sub: "콘텐츠 진입점",              color: "#EF4444" },
 ];
 
 // ══════════════════════════════════════════════════════════════
@@ -3485,19 +3486,23 @@ export default function Home() {
                   <React.Fragment key={i}>
                     {i > 0 && (
                       <span style={{
-                        color: isLast ? "#F97316" : cardColor,
+                        color: isLast ? "#F97316" : "#6B7280",
                         fontWeight: 800, fontSize: 14,
                       }}>→</span>
                     )}
                     <span style={{
-                      background: isLast ? "#FFEDD5" : `${cardColor}10`,
-                      color: isLast ? "#C2410C" : cardColor,
-                      padding: "5px 12px", borderRadius: 20,
+                      background: isLast
+                        ? "linear-gradient(135deg, #F97316, #EA580C)"
+                        : "linear-gradient(135deg, #F0FDF4, #DCFCE7)",
+                      color: isLast ? "#FFFFFF" : "#166534",
+                      padding: "6px 13px", borderRadius: 10,
                       fontSize: 11, fontWeight: isLast ? 800 : 700,
-                      border: `1px solid ${isLast ? "#FDBA74" : cardColor + "30"}`,
-                      boxShadow: isLast ? "0 0 0 3px #FFEDD580" : "none",
+                      border: `1px solid ${isLast ? "#EA580C" : "#BBF7D0"}`,
+                      boxShadow: isLast ? "0 0 0 3px #FDBA7440, 0 2px 6px rgba(234, 88, 12, 0.2)" : "none",
+                      display: "inline-flex", alignItems: "center", gap: 4,
                     }}>
-                      {isLast ? "🎯 " : ""}{node}
+                      {isLast && <span>🎯</span>}
+                      <span>{node}</span>
                     </span>
                   </React.Fragment>
                 );
@@ -3542,6 +3547,74 @@ export default function Home() {
           <div style={{ background: `${cardColor}08`, borderRadius: 14, border: `1px solid ${cardColor}20`, padding: 18, marginBottom: 14 }}>
             <div style={{ color: C.text, fontSize: 13, fontWeight: 800, marginBottom: 8 }}>🧠 소비자 인식 (Cluster)</div>
             <div style={{ color: C.text, fontSize: 12, lineHeight: 1.7 }}>{opp.clusterInsight}</div>
+          </div>
+        )}
+
+        {/* 🏆 경쟁 환경 (Phase 10-5) */}
+        {opp.competition && opp.competition.ranking && opp.competition.ranking.length > 0 && (
+          <div style={{ background: "#FFFFFF", borderRadius: 14, border: `1px solid ${C.border}`, padding: 20, marginBottom: 14 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+              <div style={{ color: C.text, fontSize: 13, fontWeight: 800, display: "flex", alignItems: "center", gap: 6 }}>
+                <span>🏆</span>
+                <span>경쟁 환경</span>
+              </div>
+              <span style={{ fontSize: 10, color: C.textSoft, fontWeight: 600 }}>
+                이 키워드 영역의 검색 경쟁 맵
+              </span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 14 }}>
+              {opp.competition.ranking.map((comp, i) => {
+                const isKB = comp.name.includes("KB") || comp.name.includes("국민카드")
+                  || comp.name.includes("NEED") || comp.name.includes("YOU Prime") || comp.name.includes("ALL ");
+                const getBadge = (share) => {
+                  if (share?.includes("1위") || share?.includes("허브")) return { icon: "1", bg: "#FEF3C7", color: "#92400E" };
+                  if (share?.includes("2위")) return { icon: "2", bg: "#F3F4F6", color: "#374151" };
+                  if (share?.includes("3위")) return { icon: "3", bg: "#FED7AA", color: "#9A3412" };
+                  if (share?.includes("4위")) return { icon: "4", bg: "#DBEAFE", color: "#1E40AF" };
+                  if (share?.includes("공백") || share?.includes("신설")) return { icon: "✨", bg: "#D1FAE5", color: "#047857" };
+                  return { icon: "?", bg: "#FEE2E2", color: "#B91C1C" };
+                };
+                const badge = getBadge(comp.share);
+                return (
+                  <div key={i} style={{
+                    display: "flex", alignItems: "center", gap: 12,
+                    padding: "10px 12px", borderRadius: 10,
+                    background: isKB ? "#FEFCE8" : "#F9FAFB",
+                    border: `1px solid ${isKB ? "#FDE68A" : "#F3F4F6"}`,
+                  }}>
+                    <span style={{
+                      width: 26, height: 26, borderRadius: "50%",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      background: badge.bg, color: badge.color,
+                      fontSize: 11, fontWeight: 800, flexShrink: 0,
+                    }}>{badge.icon}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: isKB ? "#854D0E" : C.text }}>
+                        {comp.name}
+                        {isKB && <span style={{ marginLeft: 6, fontSize: 9, color: "#A16207" }}>(자사)</span>}
+                      </div>
+                      <div style={{ fontSize: 10, color: C.textSoft, marginTop: 2 }}>{comp.type}</div>
+                    </div>
+                    <div style={{ fontSize: 11, color: C.textSoft, fontWeight: 600, fontFamily: "monospace", flexShrink: 0 }}>
+                      연 {fmt(comp.volume)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {opp.competition.insight && (
+              <div style={{
+                padding: "10px 12px", borderRadius: 10,
+                background: "#EFF6FF", border: "1px solid #BFDBFE",
+              }}>
+                <div style={{ fontSize: 10, fontWeight: 800, color: "#1D4ED8", marginBottom: 4, letterSpacing: 0.5 }}>
+                  💡 INSIGHT
+                </div>
+                <div style={{ fontSize: 11, color: "#1E3A8A", lineHeight: 1.6 }}>
+                  {opp.competition.insight}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
