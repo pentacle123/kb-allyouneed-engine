@@ -1788,7 +1788,13 @@ export default function Home() {
                     {persona && <span style={{ fontSize: 10, color: pColor, fontWeight: 600 }}>{persona.icon} {persona.title}</span>}
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>{opp.title}</div>
-                  {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{opp.subtitle}</div>}
+                  {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5, marginBottom: opp.painPoints?.length ? 4 : 0 }}>{opp.subtitle}</div>}
+                  {opp.painPoints && opp.painPoints.length > 0 && (
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 5, marginTop: 4, fontSize: 10.5, color: "#6B7280", lineHeight: 1.4 }}>
+                      <span style={{ flexShrink: 0, fontSize: 10 }}>😣</span>
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>{opp.painPoints[0]}</span>
+                    </div>
+                  )}
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <div style={{ color: pColor, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
@@ -1826,7 +1832,13 @@ export default function Home() {
                   <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#FED7AA", color: "#9A3412", fontWeight: 700 }}>🟠 ACCENT</span>
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>{opp.title}</div>
-                {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{opp.subtitle}</div>}
+                {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5, marginBottom: opp.painPoints?.length ? 4 : 0 }}>{opp.subtitle}</div>}
+                {opp.painPoints && opp.painPoints.length > 0 && (
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 5, marginTop: 4, fontSize: 10.5, color: "#6B7280", lineHeight: 1.4 }}>
+                    <span style={{ flexShrink: 0, fontSize: 10 }}>😣</span>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>{opp.painPoints[0]}</span>
+                  </div>
+                )}
               </div>
               <div style={{ textAlign: "right", flexShrink: 0 }}>
                 <div style={{ color: color, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
@@ -1930,7 +1942,13 @@ export default function Home() {
                     {persona && <span style={{ fontSize: 10, color: pColor, fontWeight: 600 }}>{persona.icon} {persona.title}</span>}
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>{opp.title}</div>
-                  {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{opp.subtitle}</div>}
+                  {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5, marginBottom: opp.painPoints?.length ? 4 : 0 }}>{opp.subtitle}</div>}
+                  {opp.painPoints && opp.painPoints.length > 0 && (
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 5, marginTop: 4, fontSize: 10.5, color: "#6B7280", lineHeight: 1.4 }}>
+                      <span style={{ flexShrink: 0, fontSize: 10 }}>😣</span>
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>{opp.painPoints[0]}</span>
+                    </div>
+                  )}
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <div style={{ color: pColor, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
@@ -1968,7 +1986,13 @@ export default function Home() {
                   <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#FED7AA", color: "#9A3412", fontWeight: 700 }}>🟠 ACCENT</span>
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>{opp.title}</div>
-                {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{opp.subtitle}</div>}
+                {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5, marginBottom: opp.painPoints?.length ? 4 : 0 }}>{opp.subtitle}</div>}
+                {opp.painPoints && opp.painPoints.length > 0 && (
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 5, marginTop: 4, fontSize: 10.5, color: "#6B7280", lineHeight: 1.4 }}>
+                    <span style={{ flexShrink: 0, fontSize: 10 }}>😣</span>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>{opp.painPoints[0]}</span>
+                  </div>
+                )}
               </div>
               <div style={{ textAlign: "right", flexShrink: 0 }}>
                 <div style={{ color: color, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
@@ -2072,7 +2096,13 @@ export default function Home() {
                     {persona && <span style={{ fontSize: 10, color: pColor, fontWeight: 600 }}>{persona.icon} {persona.title}</span>}
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>{opp.title}</div>
-                  {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{opp.subtitle}</div>}
+                  {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5, marginBottom: opp.painPoints?.length ? 4 : 0 }}>{opp.subtitle}</div>}
+                  {opp.painPoints && opp.painPoints.length > 0 && (
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 5, marginTop: 4, fontSize: 10.5, color: "#6B7280", lineHeight: 1.4 }}>
+                      <span style={{ flexShrink: 0, fontSize: 10 }}>😣</span>
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>{opp.painPoints[0]}</span>
+                    </div>
+                  )}
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <div style={{ color: pColor, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
@@ -2110,7 +2140,13 @@ export default function Home() {
                   <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#FED7AA", color: "#9A3412", fontWeight: 700 }}>🟠 ACCENT</span>
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>{opp.title}</div>
-                {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{opp.subtitle}</div>}
+                {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5, marginBottom: opp.painPoints?.length ? 4 : 0 }}>{opp.subtitle}</div>}
+                {opp.painPoints && opp.painPoints.length > 0 && (
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 5, marginTop: 4, fontSize: 10.5, color: "#6B7280", lineHeight: 1.4 }}>
+                    <span style={{ flexShrink: 0, fontSize: 10 }}>😣</span>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>{opp.painPoints[0]}</span>
+                  </div>
+                )}
               </div>
               <div style={{ textAlign: "right", flexShrink: 0 }}>
                 <div style={{ color: color, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
@@ -2301,7 +2337,13 @@ export default function Home() {
                     {persona && <span style={{ fontSize: 10, color: pColor, fontWeight: 600 }}>{persona.icon} {persona.title}</span>}
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>{opp.title}</div>
-                  {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{opp.subtitle}</div>}
+                  {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5, marginBottom: opp.painPoints?.length ? 4 : 0 }}>{opp.subtitle}</div>}
+                  {opp.painPoints && opp.painPoints.length > 0 && (
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 5, marginTop: 4, fontSize: 10.5, color: "#6B7280", lineHeight: 1.4 }}>
+                      <span style={{ flexShrink: 0, fontSize: 10 }}>😣</span>
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>{opp.painPoints[0]}</span>
+                    </div>
+                  )}
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <div style={{ color: pColor, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
@@ -2339,7 +2381,13 @@ export default function Home() {
                   <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#FED7AA", color: "#9A3412", fontWeight: 700 }}>🟠 ACCENT</span>
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>{opp.title}</div>
-                {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{opp.subtitle}</div>}
+                {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5, marginBottom: opp.painPoints?.length ? 4 : 0 }}>{opp.subtitle}</div>}
+                {opp.painPoints && opp.painPoints.length > 0 && (
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 5, marginTop: 4, fontSize: 10.5, color: "#6B7280", lineHeight: 1.4 }}>
+                    <span style={{ flexShrink: 0, fontSize: 10 }}>😣</span>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>{opp.painPoints[0]}</span>
+                  </div>
+                )}
               </div>
               <div style={{ textAlign: "right", flexShrink: 0 }}>
                 <div style={{ color: color, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
@@ -2448,7 +2496,13 @@ export default function Home() {
                     {persona && <span style={{ fontSize: 10, color: pColor, fontWeight: 600 }}>{persona.icon} {persona.title}</span>}
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>{opp.title}</div>
-                  {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{opp.subtitle}</div>}
+                  {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5, marginBottom: opp.painPoints?.length ? 4 : 0 }}>{opp.subtitle}</div>}
+                  {opp.painPoints && opp.painPoints.length > 0 && (
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 5, marginTop: 4, fontSize: 10.5, color: "#6B7280", lineHeight: 1.4 }}>
+                      <span style={{ flexShrink: 0, fontSize: 10 }}>😣</span>
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>{opp.painPoints[0]}</span>
+                    </div>
+                  )}
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <div style={{ color: pColor, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
@@ -2486,7 +2540,13 @@ export default function Home() {
                   <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 10, background: "#FED7AA", color: "#9A3412", fontWeight: 700 }}>🟠 ACCENT</span>
                 </div>
                 <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 2 }}>{opp.title}</div>
-                {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{opp.subtitle}</div>}
+                {opp.subtitle && <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5, marginBottom: opp.painPoints?.length ? 4 : 0 }}>{opp.subtitle}</div>}
+                {opp.painPoints && opp.painPoints.length > 0 && (
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 5, marginTop: 4, fontSize: 10.5, color: "#6B7280", lineHeight: 1.4 }}>
+                    <span style={{ flexShrink: 0, fontSize: 10 }}>😣</span>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>{opp.painPoints[0]}</span>
+                  </div>
+                )}
               </div>
               <div style={{ textAlign: "right", flexShrink: 0 }}>
                 <div style={{ color: color, fontSize: 11, fontWeight: 800 }}>연 {fmt(opp.annualVolume)}</div>
@@ -2798,8 +2858,14 @@ export default function Home() {
                             {opp.title}
                           </div>
                           {opp.subtitle && (
-                            <div style={{ fontSize: 10.5, color: C.textSoft, lineHeight: 1.5 }}>
+                            <div style={{ fontSize: 10.5, color: C.textSoft, lineHeight: 1.5, marginBottom: opp.painPoints?.length ? 4 : 0 }}>
                               {opp.subtitle}
+                            </div>
+                          )}
+                          {opp.painPoints && opp.painPoints.length > 0 && (
+                            <div style={{ display: "flex", alignItems: "flex-start", gap: 5, marginTop: 4, fontSize: 10, color: "#6B7280", lineHeight: 1.4 }}>
+                              <span style={{ flexShrink: 0 }}>😣</span>
+                              <span style={{ overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical" }}>{opp.painPoints[0]}</span>
                             </div>
                           )}
                         </div>
@@ -3087,19 +3153,71 @@ export default function Home() {
           </div>
         )}
 
-        {/* Search Journey */}
+        {/* Search Journey — 마지막 노드를 오렌지로 강조 (종착지 = 카드 도달점) */}
         {opp.pathJourney && opp.pathJourney.length > 0 && (
           <div style={{ background: "#FFFFFF", borderRadius: 14, border: `1px solid ${C.border}`, padding: 20, marginBottom: 14 }}>
-            <div style={{ color: C.text, fontSize: 13, fontWeight: 800, marginBottom: 12 }}>🔍 검색 여정 (PathFinder)</div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <span style={{ color: C.text, fontSize: 13, fontWeight: 800 }}>🔍 검색 여정 (PathFinder)</span>
+              <span style={{ fontSize: 10, color: C.textSoft, fontWeight: 600 }}>
+                {opp.pathJourney.length}단계 · 오렌지 = 카드 도달점
+              </span>
+            </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
-              {opp.pathJourney.map((node, i) => (
-                <React.Fragment key={i}>
-                  {i > 0 && <span style={{ color: cardColor, fontWeight: 800, fontSize: 14 }}>→</span>}
-                  <span style={{ background: `${cardColor}10`, color: cardColor, padding: "5px 12px", borderRadius: 20, fontSize: 11, fontWeight: 700, border: `1px solid ${cardColor}30` }}>{node}</span>
-                </React.Fragment>
-              ))}
+              {opp.pathJourney.map((node, i) => {
+                const isLast = i === opp.pathJourney.length - 1;
+                return (
+                  <React.Fragment key={i}>
+                    {i > 0 && (
+                      <span style={{
+                        color: isLast ? "#F97316" : cardColor,
+                        fontWeight: 800, fontSize: 14,
+                      }}>→</span>
+                    )}
+                    <span style={{
+                      background: isLast ? "#FFEDD5" : `${cardColor}10`,
+                      color: isLast ? "#C2410C" : cardColor,
+                      padding: "5px 12px", borderRadius: 20,
+                      fontSize: 11, fontWeight: isLast ? 800 : 700,
+                      border: `1px solid ${isLast ? "#FDBA74" : cardColor + "30"}`,
+                      boxShadow: isLast ? "0 0 0 3px #FFEDD580" : "none",
+                    }}>
+                      {isLast ? "🎯 " : ""}{node}
+                    </span>
+                  </React.Fragment>
+                );
+              })}
             </div>
             {opp.pathInsight && <div style={{ color: C.textSoft, fontSize: 11, lineHeight: 1.6 }}>{opp.pathInsight}</div>}
+          </div>
+        )}
+
+        {/* 경쟁 환경 — competitors 필드가 있는 경우에만 (미래 확장용) */}
+        {opp.competitors && opp.competitors.length > 0 && (
+          <div style={{ background: "#FFFFFF", borderRadius: 14, border: `1px solid ${C.border}`, padding: 20, marginBottom: 14 }}>
+            <div style={{ color: C.text, fontSize: 13, fontWeight: 800, marginBottom: 12 }}>🏆 경쟁 카드 환경</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+              {opp.competitors.map((comp, i) => (
+                <div key={i} style={{
+                  display: "flex", justifyContent: "space-between", alignItems: "center",
+                  padding: "10px 0",
+                  borderBottom: i < opp.competitors.length - 1 ? "1px solid #F3F4F6" : "none",
+                }}>
+                  <span style={{ fontSize: 12, color: C.text, fontWeight: 600 }}>{comp.name}</span>
+                  <span style={{ fontSize: 12, color: C.textSoft, fontWeight: 700 }}>
+                    연 {(comp.annualVolume || 0).toLocaleString()}회
+                  </span>
+                </div>
+              ))}
+            </div>
+            {opp.competitiveInsight && (
+              <div style={{
+                marginTop: 12, padding: "10px 14px", borderRadius: 10,
+                background: "#EFF6FF", border: "1px solid #BFDBFE",
+                fontSize: 11, color: "#1E40AF", lineHeight: 1.6,
+              }}>
+                <strong>💡 INSIGHT:</strong> {opp.competitiveInsight}
+              </div>
+            )}
           </div>
         )}
 
