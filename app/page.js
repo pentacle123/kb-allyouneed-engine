@@ -1114,6 +1114,13 @@ const CATEGORIES = {
     color: "#2563EB", icons: ["🛒", "🎬", "✈️", "📶", "💳"],
     headerMeta: "연회비 2만원 · 전월 40만+ · 가족카드 무료",
     uspPills: ["국내 1%", "해외 2%", "쇼핑멤버십 50%", "OTT 10%", "통신 5%"],
+    whyTitle: "실적 피로 없는 '정착의 카드'",
+    whyDescription: "7년간 카드 갈아탄 체리피커도 결국 돌아오는 곳. 매월 실적 체크 스트레스 없이 '한 장으로 365일' 쓸 수 있는 상시 혜택 구조가 ALL 카드의 정체성.",
+    coreValueProps: [
+      { title: "조건 없는 1%", description: "국내 모든 가맹점 · 전월 실적·월 한도 無" },
+      { title: "365일 · 5개 영역", description: "쇼핑멤버십·OTT·통신·해외·일상 필수 5축 커버" },
+      { title: "가족 확장", description: "가족카드 무료 · 최대 5장까지 · 실적 합산 가능" }
+    ],
   },
   you: {
     key: "you", label: "B · 2 팩", title: "YOU Prime 카드",
@@ -1121,6 +1128,13 @@ const CATEGORIES = {
     color: "#7C3AED", icons: ["⛽", "💪", "🛒", "☕", "🏠"],
     headerMeta: "연회비 3만원 · 전월 40만+ · 가족카드 7,000원",
     uspPills: ["주유 10%", "배달 10%", "자기관리 5%", "장보기 10%", "카페 5%"],
+    whyTitle: "3세대를 잇는 가족 재무 관리",
+    whyDescription: "일상 루틴(주유·배달·자기관리)과 가족 확장(장보기·학원·돌봄)을 두 팩으로 분리해 '나의 하루'와 '우리 집'을 모두 커버. 맞벌이·반려동물·하이퍼로컬까지 포함.",
+    coreValueProps: [
+      { title: "일상팩 4축 + 하이퍼로컬", description: "주유·배달·자기관리·고정비 + 반경 500m" },
+      { title: "가족팩 4축", description: "장보기·돌봄·학원·유틸리티 통합" },
+      { title: "또 다른 가족", description: "반려동물 사료·병원·펫보험 포함" }
+    ],
   },
   need: {
     key: "need", label: "C · 3 카드", title: "NEED 카드",
@@ -1129,6 +1143,13 @@ const CATEGORIES = {
     multiColor: ["#059669", "#D97706", "#DC2626"],
     headerMeta: "NEED Pay (1.9만) · NEED Autoslim (2만) · NEED Edu (2.5만)",
     uspPills: ["간편결제 15%", "OTT 30%", "충전소 5%", "보험 2만원", "교육 10%"],
+    whyTitle: "생애 특정 순간에 최적화",
+    whyDescription: "일상 혜택이 아닌 '특정 상황·시기'에 압도적 환급. Pay(간편결제)·Autoslim(자동차)·Edu(교육) 3개 축으로 생애 이벤트 중심 구성. 연 2.85억 검색 기반 최대 기회.",
+    coreValueProps: [
+      { title: "Pay · 15% 간편결제", description: "네이버·쿠팡·구독 + 해외 크로스보더" },
+      { title: "Autoslim · 주유·자동차", description: "주유 5% + 신차·정비·보험 통합" },
+      { title: "Edu · 자녀교육·자기계발", description: "학원·리스킬링·자격증 최대 10%" }
+    ],
   },
 };
 
@@ -1155,7 +1176,11 @@ export default function Home() {
   const [needSubCard, setNeedSubCard] = useState(null); // "edu" | "pay" | "autoslim"
   const [youSubCard, setYouSubCard] = useState(null);   // "daily" | "family"
   const [openPersona, setOpenPersona] = useState("P1");  // ALL 카드 첫 페르소나만 기본 펼침
-  const [aiIdeas, setAiIdeas] = useState({}); // { [oppId]: { loading, error, ideas } }
+  const [aiIdeas, setAiIdeas] = useState({}); // { [oppId::perspective]: { loading, error, ideas } }
+  const [ideasTab, setIdeasTab] = useState("auto"); // "auto" | "context" | "journey" | "cross"
+  const [selectedIdea, setSelectedIdea] = useState(null); // Phase 12-8 storyboard
+  const [storyboards, setStoryboards] = useState({}); // { [oppId::ideaId]: { loading, error, data } }
+  const [ytCreators, setYtCreators] = useState({}); // { [oppId]: { loading, error, channels } }
 
   const activeStep = VIEW_STEP[currentView] ?? 0;
   const showStepIndicator = currentView !== "hub";
@@ -1164,14 +1189,53 @@ export default function Home() {
   const goToAnalysis  = (opp) => { setSelectedOpp(opp); setCurrentView("analysis"); };
   const goToIdeas     = () => {
     setCurrentView("ideas");
-    if (selectedOpp && !aiIdeas[selectedOpp.id]?.ideas && !aiIdeas[selectedOpp.id]?.loading) {
-      generateIdeas(selectedOpp);
+    const key = selectedOpp ? `${selectedOpp.id}::auto` : null;
+    if (selectedOpp && !aiIdeas[key]?.ideas && !aiIdeas[key]?.loading) {
+      generateIdeas(selectedOpp, "auto");
     }
   };
 
-  const generateIdeas = async (opp) => {
+  // Phase 12-8: 스토리보드 생성
+  const generateStoryboard = async (opp, idea) => {
+    if (!opp || !idea) return;
+    const key = `${opp.id}::${idea.id}`;
+    setStoryboards(prev => ({ ...prev, [key]: { loading: true, error: null, data: null } }));
+    try {
+      const res = await fetch("/api/storyboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          opportunity: opp, idea,
+          cardMeta: { cardName: CARDS[opp.card]?.name || opp.card, cardTagline: CARDS[opp.card]?.tagline || "" },
+          persona: opp._persona || {},
+        }),
+      });
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error || "생성 실패");
+      setStoryboards(prev => ({ ...prev, [key]: { loading: false, error: null, data: result.data } }));
+    } catch (e) {
+      setStoryboards(prev => ({ ...prev, [key]: { loading: false, error: e.message, data: null } }));
+    }
+  };
+
+  // YouTube 크리에이터 검색
+  const searchYouTubeCreators = async (oppId, query) => {
+    if (!oppId || !query) return;
+    setYtCreators(prev => ({ ...prev, [oppId]: { loading: true, error: null, channels: null } }));
+    try {
+      const res = await fetch(`/api/youtube?q=${encodeURIComponent(query)}&maxResults=6`);
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error || "검색 실패");
+      setYtCreators(prev => ({ ...prev, [oppId]: { loading: false, error: null, channels: result.channels || [] } }));
+    } catch (e) {
+      setYtCreators(prev => ({ ...prev, [oppId]: { loading: false, error: e.message, channels: null } }));
+    }
+  };
+
+  const generateIdeas = async (opp, perspective = "auto") => {
     if (!opp || !opp.id) return;
-    setAiIdeas(prev => ({ ...prev, [opp.id]: { loading: true, error: null, ideas: null } }));
+    const key = `${opp.id}::${perspective}`;
+    setAiIdeas(prev => ({ ...prev, [key]: { loading: true, error: null, ideas: null } }));
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
@@ -1180,13 +1244,14 @@ export default function Home() {
           opportunity: opp,
           cardMeta: { cardName: CARDS[opp.card]?.name || opp.card, cardTagline: CARDS[opp.card]?.tagline || "" },
           persona: opp._persona || {},
+          perspective,
         }),
       });
       const result = await res.json();
       if (!result.success) throw new Error(result.error || "생성 실패");
-      setAiIdeas(prev => ({ ...prev, [opp.id]: { loading: false, error: null, ideas: result.data.ideas || [] } }));
+      setAiIdeas(prev => ({ ...prev, [key]: { loading: false, error: null, ideas: result.data.ideas || [] } }));
     } catch (e) {
-      setAiIdeas(prev => ({ ...prev, [opp.id]: { loading: false, error: e.message, ideas: null } }));
+      setAiIdeas(prev => ({ ...prev, [key]: { loading: false, error: e.message, ideas: null } }));
     }
   };
   const goToNeedSub   = (sub) => { setNeedSubCard(sub); };
@@ -1201,7 +1266,7 @@ export default function Home() {
       else { setCurrentView("hub"); setCurrentCategory(null); }
     }
   };
-  const goHome = () => { setCurrentView("hub"); setCurrentCategory(null); setSelectedOpp(null); setNeedSubCard(null); setYouSubCard(null); };
+  const goHome = () => { setCurrentView("hub"); setCurrentCategory(null); setSelectedOpp(null); setSelectedIdea(null); setNeedSubCard(null); setYouSubCard(null); };
 
   const pill = (bg, color) => ({
     fontSize: 10, fontWeight: 600, color, background: bg,
@@ -1231,11 +1296,13 @@ export default function Home() {
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{
               width: 40, height: 40, borderRadius: 10,
-              background: "linear-gradient(135deg, #FFD700, #FFA500)",
+              background: "#000000",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 16, fontWeight: 900, color: "#1E293B",
-              boxShadow: "0 2px 6px rgba(255, 165, 0, 0.25)",
-            }}>KB</div>
+              overflow: "hidden",
+              boxShadow: "0 2px 6px rgba(0, 0, 0, 0.15)",
+            }}>
+              <img src="/kb-symbol.png" alt="KB" style={{ width: 40, height: 40, objectFit: "contain" }} />
+            </div>
             <div>
               <div style={{ fontSize: 15, fontWeight: 800, color: C.text, lineHeight: 1.2 }}>
                 KB <span style={{ color: "#F97316" }}>AI Brandformance</span> Engine
@@ -1411,34 +1478,76 @@ export default function Home() {
   };
 
   // ──────────── Step Indicator ────────────
+  // Phase 12-6: Step Indicator 클릭 이동 활성화 (완료된 단계 클릭 가능)
+  const goToStep = (stepIdx) => {
+    // stepIdx: 0=category, 1=analysis, 2=ideas, 3=storyboard
+    if (stepIdx > activeStep) return; // 미도달 단계는 이동 불가
+    if (stepIdx === activeStep) return; // 현재 단계
+    if (stepIdx === 0) {
+      // 기회 발견: Hub (랜딩) 또는 Category
+      if (currentCategory) {
+        setCurrentView("category");
+        setSelectedOpp(null);
+      } else {
+        goHome();
+      }
+    } else if (stepIdx === 1) {
+      // 기회 분석 (Analysis)
+      if (selectedOpp) setCurrentView("analysis");
+    } else if (stepIdx === 2) {
+      // AI 아이디어
+      if (selectedOpp) setCurrentView("ideas");
+    }
+  };
+
   const StepIndicator = () => (
     <div style={{ background: "#FFFFFF", borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0, zIndex: 99 }}>
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "14px 24px", display: "flex", alignItems: "center" }}>
-        {STEPS_LABEL.map((s, i) => (
-          <React.Fragment key={i}>
-            {i > 0 && (
-              <div style={{
-                flex: 1, height: 2,
-                background: i <= activeStep ? "#2563EB" : "#CBD5E1",
-                margin: "0 6px",
-              }} />
-            )}
-            <div style={{ display: "flex", alignItems: "center", gap: 6, opacity: i <= activeStep ? 1 : 0.4 }}>
-              <div style={{
-                width: 24, height: 24, borderRadius: 12,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                background: i === activeStep ? "#2563EB" : i < activeStep ? C.accent : "#CBD5E1",
-                color: i <= activeStep ? "#fff" : C.textSoft,
-                fontSize: 11, fontWeight: 800,
-              }}>{i + 1}</div>
-              <span style={{
-                color: i <= activeStep ? C.text : C.textSoft,
-                fontSize: 11, fontWeight: i === activeStep ? 800 : 600,
-                whiteSpace: "nowrap",
-              }}>{s}</span>
-            </div>
-          </React.Fragment>
-        ))}
+        {STEPS_LABEL.map((s, i) => {
+          const isCurrent = i === activeStep;
+          const isCompleted = i < activeStep;
+          const isClickable = (isCompleted || (i === 0 && currentView !== "hub")) && !isCurrent;
+          return (
+            <React.Fragment key={i}>
+              {i > 0 && (
+                <div style={{
+                  flex: 1, height: 2,
+                  background: i <= activeStep ? "#2563EB" : "#CBD5E1",
+                  margin: "0 6px",
+                }} />
+              )}
+              <div
+                onClick={() => isClickable && goToStep(i)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 6,
+                  opacity: i <= activeStep ? 1 : 0.4,
+                  cursor: isClickable ? "pointer" : (isCurrent ? "default" : "not-allowed"),
+                  transition: "transform 0.15s",
+                }}
+                onMouseEnter={(e) => { if (isClickable) e.currentTarget.style.transform = "translateY(-1px)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
+                title={isClickable ? `${s}으로 돌아가기` : (isCurrent ? "현재 단계" : "미도달")}
+              >
+                <div style={{
+                  width: 24, height: 24, borderRadius: 12,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  background: isCurrent ? "#2563EB" : isCompleted ? C.accent : "#CBD5E1",
+                  color: i <= activeStep ? "#fff" : C.textSoft,
+                  fontSize: 11, fontWeight: 800,
+                  boxShadow: isCurrent ? "0 2px 6px rgba(37, 99, 235, 0.35)" : "none",
+                  transform: isCurrent ? "scale(1.1)" : "scale(1)",
+                  transition: "all 0.2s",
+                }}>{i + 1}</div>
+                <span style={{
+                  color: i <= activeStep ? C.text : C.textSoft,
+                  fontSize: 11, fontWeight: isCurrent ? 800 : 600,
+                  whiteSpace: "nowrap",
+                  textDecoration: isClickable ? "none" : "none",
+                }}>{s}</span>
+              </div>
+            </React.Fragment>
+          );
+        })}
       </div>
     </div>
   );
@@ -1452,142 +1561,187 @@ export default function Home() {
   );
 
   // ──────────── ShortformIdeaCard (AI 생성 결과) ────────────
-  const ShortformIdeaCard = ({ idea, cardColor }) => {
-    const hookColors = {
-      "공감형": { bg: "#DBEAFE", fg: "#1D4ED8", border: "#BFDBFE" },
-      "발견형": { bg: "#D1FAE5", fg: "#047857", border: "#A7F3D0" },
-      "궁금증형": { bg: "#FEF3C7", fg: "#92400E", border: "#FCD34D" },
+  // Phase 12-7: ShortformIdeaCard — 트립닷컴 스타일 (점수 우측 + 가로 씬 + USP 앵커 + creatorCollab)
+  const ShortformIdeaCard = ({ idea, index, cardColor = "#2563EB", tabColor = "#2563EB", perspectiveLabel = "" }) => {
+    const hookStyle = {
+      "공감형":   { bg: "#FEE2E2", fg: "#B91C1C", label: "🎭 공감형" },
+      "궁금증형": { bg: "#FEF3C7", fg: "#92400E", label: "🎭 궁금증형" },
+      "발견형":   { bg: "#DBEAFE", fg: "#1D4ED8", label: "🖋️ 발견형" },
+      "경험담형": { bg: "#E0E7FF", fg: "#4338CA", label: "🎭 경험담형" },
+      "반전형":   { bg: "#F3E8FF", fg: "#7C3AED", label: "🖋️ 반전형" },
     };
-    const hc = hookColors[idea.hookType] || { bg: "#F3F4F6", fg: "#374151", border: "#E5E7EB" };
+    const funnelLabels = {
+      Awareness: "Dream", Consideration: "Plan", Decision: "Book", Loyalty: "Loyalty",
+    };
+    const hs = hookStyle[idea.hookType] || { bg: "#F3F4F6", fg: "#374151", label: idea.hookType || "숏폼" };
+    const score = typeof idea.score === "number" ? idea.score : 85;
+    const scoreColor = score >= 90 ? "#047857" : score >= 80 ? "#2563EB" : score >= 70 ? "#EA580C" : "#6B7280";
+    const funnelLabel = funnelLabels[idea.funnelStage] || "Dream";
+    const rank = idea.id || (index + 1);
+
+    const goToStoryboard = () => {
+      // sessionStorage에 아이디어 저장 → 스토리보드 뷰에서 참조
+      try {
+        const saved = JSON.parse(sessionStorage.getItem("lastGeneratedIdeas") || "{}");
+        if (!saved[selectedOpp.id]) saved[selectedOpp.id] = [];
+        if (!saved[selectedOpp.id].find(i => (i.id || 0) === rank)) {
+          saved[selectedOpp.id].push({ ...idea, id: rank });
+        }
+        sessionStorage.setItem("lastGeneratedIdeas", JSON.stringify(saved));
+        sessionStorage.setItem("selectedStoryboardIdea", JSON.stringify({ oppId: selectedOpp.id, ideaId: rank }));
+      } catch (e) { /* ignore */ }
+      setSelectedIdea({ ...idea, id: rank });
+      setCurrentView("storyboard");
+    };
 
     return (
       <div style={{
-        background: "#FFFFFF", borderRadius: 16,
+        background: "#FFFFFF", borderRadius: 14,
         border: "1px solid #E5E7EB",
-        overflow: "hidden",
+        borderLeft: `4px solid ${tabColor}`,
+        padding: "18px 20px",
+        display: "flex", alignItems: "flex-start", gap: 16,
       }}>
-        {/* 헤더 */}
+        {/* 번호 */}
         <div style={{
-          padding: "18px 20px",
-          background: "linear-gradient(135deg, #FFF7ED, #FEF3C7)",
-          borderBottom: "1px solid #FDBA7440",
-        }}>
-          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginBottom: 10 }}>
-            <div style={{
-              width: 28, height: 28, borderRadius: "50%",
-              background: "#EA580C", color: "#FFFFFF",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 13, fontWeight: 900,
-            }}>{idea.id || "?"}</div>
-            {idea.hookType && (
+          width: 34, height: 34, borderRadius: "50%",
+          background: "#F3F4F6", color: "#374151",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 14, fontWeight: 800, flexShrink: 0,
+        }}>{rank}</div>
+
+        {/* 본문 */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {/* 3태그 조합 */}
+          <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap", alignItems: "center" }}>
+            {perspectiveLabel && (
               <span style={{
-                fontSize: 10, fontWeight: 800, padding: "3px 10px", borderRadius: 20,
-                background: hc.bg, color: hc.fg,
-                border: `1px solid ${hc.border}`,
-              }}>{idea.hookType}</span>
+                padding: "2px 8px", borderRadius: 4,
+                background: `${tabColor}15`, color: tabColor,
+                fontSize: 10, fontWeight: 800,
+              }}>{perspectiveLabel}</span>
             )}
+            <span style={{
+              padding: "2px 8px", borderRadius: 4,
+              background: hs.bg, color: hs.fg,
+              fontSize: 10, fontWeight: 800,
+            }}>{hs.label}</span>
+            <span style={{
+              padding: "2px 8px", borderRadius: 4,
+              background: "#DBEAFE", color: "#1D4ED8",
+              fontSize: 10, fontWeight: 800,
+            }}>{funnelLabel}</span>
             {idea.duration && (
-              <span style={{ fontSize: 10, color: C.textSoft, fontWeight: 600 }}>⏱️ {idea.duration}</span>
+              <span style={{ fontSize: 10, color: C.textSoft }}>⏱️ {idea.duration}</span>
             )}
           </div>
-          <div style={{ fontSize: 16, fontWeight: 900, color: "#7C2D12", lineHeight: 1.4, marginBottom: 8 }}>
+
+          {/* 제목 */}
+          <div style={{ fontSize: 16, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 10 }}>
             {idea.title}
           </div>
+
+          {/* 타겟 키워드 */}
+          {idea.targetKeyword && idea.targetKeyword.term && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 11, color: C.textSoft, fontWeight: 700 }}>🎯 타겟 키워드:</span>
+              <span style={{
+                padding: "3px 9px", borderRadius: 10,
+                background: "#DBEAFE", color: "#1D4ED8",
+                fontSize: 11, fontWeight: 700,
+              }}>{idea.targetKeyword.term}</span>
+              {idea.targetKeyword.volume > 0 && (
+                <span style={{ fontSize: 10, color: C.textSoft }}>
+                  (연 {idea.targetKeyword.volume.toLocaleString()}회)
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* USP 앵커 */}
+          {idea.uspAnchor && (
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 6, marginBottom: 10, fontSize: 11, color: "#374151", lineHeight: 1.5 }}>
+              <span style={{ flexShrink: 0 }}>📇</span>
+              <span>{idea.uspAnchor}</span>
+            </div>
+          )}
+
+          {/* HOOK */}
           {idea.openingHook && (
             <div style={{
-              padding: "10px 12px", borderRadius: 8,
-              background: "rgba(255,255,255,0.7)",
+              padding: "10px 12px", marginBottom: 12, borderRadius: 8,
+              background: "linear-gradient(135deg, #FFF7ED, #FEF3C7)",
               border: "1px solid #FDBA7440",
-              fontSize: 12, color: "#9A3412", lineHeight: 1.5,
             }}>
-              <span style={{ fontSize: 10, fontWeight: 800, color: "#C2410C", marginRight: 6 }}>🎣 오프닝 훅</span>
-              <span style={{ fontWeight: 700, fontStyle: "italic" }}>"{idea.openingHook}"</span>
+              <div style={{ fontSize: 10, fontWeight: 800, color: "#C2410C", marginBottom: 3 }}>✦ HOOK</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#7C2D12", lineHeight: 1.5, fontStyle: "italic" }}>
+                "{idea.openingHook}"
+              </div>
             </div>
           )}
-          {idea.targetEmotion && (
-            <div style={{ fontSize: 11, color: "#9A3412", marginTop: 8 }}>
-              💭 타겟 감정: <strong>"{idea.targetEmotion}"</strong>
-            </div>
-          )}
-        </div>
 
-        {/* 씬별 스토리보드 */}
-        {idea.scenes && idea.scenes.length > 0 && (
-          <div style={{ padding: "18px 20px" }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: C.text, marginBottom: 12, letterSpacing: 0.5 }}>
-              📽️ 씬별 스토리보드 ({idea.scenes.length}씬)
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {idea.scenes.map((scene, i) => (
+          {/* 씬 플로우 가로 4개 박스 */}
+          {idea.scenes && idea.scenes.length > 0 && (
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${Math.min(idea.scenes.length, 5)}, 1fr)`,
+              gap: 8, marginBottom: 12,
+            }}>
+              {idea.scenes.slice(0, 5).map((scene, i) => (
                 <div key={i} style={{
-                  display: "grid", gridTemplateColumns: "60px 1fr", gap: 12,
-                  padding: "10px 12px", borderRadius: 10,
+                  padding: "8px 10px", borderRadius: 10,
                   background: "#F9FAFB", border: "1px solid #F3F4F6",
+                  minHeight: 70,
                 }}>
-                  <div style={{
-                    fontSize: 10, fontWeight: 800, color: cardColor,
-                    fontFamily: "monospace", paddingTop: 2,
-                  }}>{scene.time || `씬${i + 1}`}</div>
-                  <div>
-                    {scene.visual && (
-                      <div style={{ fontSize: 12, fontWeight: 700, color: C.text, marginBottom: 3 }}>
-                        🎬 {scene.visual}
-                      </div>
-                    )}
-                    {scene.copy && (
-                      <div style={{ fontSize: 11, color: "#4B5563", marginBottom: 3, lineHeight: 1.5 }}>
-                        💬 "{scene.copy}"
-                      </div>
-                    )}
-                    {scene.soundCue && (
-                      <div style={{ fontSize: 10, color: C.textSoft, lineHeight: 1.5 }}>
-                        🔊 {scene.soundCue}
-                      </div>
-                    )}
+                  <div style={{ fontSize: 9, fontWeight: 800, color: cardColor, marginBottom: 4 }}>
+                    씬{i + 1}{scene.time ? ` · ${scene.time}` : ""}
+                  </div>
+                  <div style={{ fontSize: 10.5, color: C.text, lineHeight: 1.45, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 4, WebkitBoxOrient: "vertical" }}>
+                    {scene.visual || scene.copy || ""}
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* 푸터: CTA, 알고리즘, 크리에이터, 해시태그 */}
-        <div style={{
-          padding: "14px 20px 18px", display: "flex", flexDirection: "column", gap: 10,
-          borderTop: "1px solid #F3F4F6",
-        }}>
-          {idea.callToAction && (
-            <div style={{
-              padding: "8px 12px", borderRadius: 8,
-              background: "#F9FAFB", border: "1px solid #E5E7EB",
-              fontSize: 11, lineHeight: 1.5,
-            }}>
-              <span style={{ fontSize: 9, fontWeight: 800, color: C.textSoft, marginRight: 6 }}>📣 CTA</span>
-              <span style={{ color: C.text }}>{idea.callToAction}</span>
+          {/* 증명 */}
+          {idea.proof && (
+            <div style={{ fontSize: 11, color: C.textSoft, marginBottom: 8, lineHeight: 1.5 }}>
+              📊 <strong>증명:</strong> {idea.proof}
             </div>
           )}
-          {idea.algorithmInsight && (
+
+          {/* 크리에이터 협업 */}
+          {idea.creatorCollab && (
             <div style={{
               padding: "8px 12px", borderRadius: 8,
               background: "#EFF6FF", border: "1px solid #BFDBFE",
-              fontSize: 11, lineHeight: 1.6, color: "#1E40AF",
+              fontSize: 11, color: "#1E40AF", lineHeight: 1.5,
+              display: "flex", alignItems: "flex-start", gap: 6,
             }}>
-              <span style={{ fontSize: 9, fontWeight: 800, color: "#1D4ED8", marginRight: 6 }}>🔥 알고리즘 시그널</span>
-              {idea.algorithmInsight}
+              <span style={{ flexShrink: 0 }}>🎥</span>
+              <span><strong>크리에이터 협업:</strong> {idea.creatorCollab}</span>
             </div>
           )}
-          {idea.creatorFit && (
-            <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>
-              👤 <strong>크리에이터 Fit:</strong> {idea.creatorFit}
-            </div>
-          )}
-          {idea.hashtags && idea.hashtags.length > 0 && (
-            <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-              {idea.hashtags.map((tag, i) => (
-                <span key={i} style={{ fontSize: 11, color: "#2563EB", fontWeight: 600 }}>{tag}</span>
-              ))}
-            </div>
-          )}
+        </div>
+
+        {/* 우측: 점수 + 스토리보드 버튼 */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 12, flexShrink: 0, minWidth: 120 }}>
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 38, fontWeight: 900, color: scoreColor, lineHeight: 1 }}>{score}</div>
+            <div style={{ fontSize: 9, color: C.textSoft, fontWeight: 600, marginTop: 2 }}>완성점수</div>
+          </div>
+          <button
+            onClick={goToStoryboard}
+            style={{
+              padding: "9px 14px", borderRadius: 8,
+              border: "none",
+              background: "#2563EB", color: "#FFFFFF",
+              fontSize: 11, fontWeight: 800, cursor: "pointer",
+              whiteSpace: "nowrap",
+              boxShadow: "0 2px 4px rgba(37, 99, 235, 0.2)",
+            }}
+          >스토리보드 →</button>
         </div>
       </div>
     );
@@ -1847,19 +2001,30 @@ export default function Home() {
               display: "flex", flexDirection: "column",
             }}
           >
+            {/* Phase 12-2: 카드명 그라디언트 상단 배너 */}
             <div style={{
-              height: 5,
+              padding: "14px 20px",
               background: isMulti
-                ? `linear-gradient(90deg, ${cat.multiColor[0]}, ${cat.multiColor[1]}, ${cat.multiColor[2]})`
-                : `linear-gradient(90deg, ${cat.color}, ${cat.color}80)`,
-            }} />
-            <div style={{ padding: "24px 22px", position: "relative", flex: 1, display: "flex", flexDirection: "column" }}>
+                ? `linear-gradient(135deg, ${cat.multiColor[0]}, ${cat.multiColor[1]}, ${cat.multiColor[2]})`
+                : `linear-gradient(135deg, ${cat.color}, ${cat.color}DD)`,
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+            }}>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.85)", letterSpacing: 1.5, marginBottom: 2 }}>
+                  {cat.label}
+                </div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: "#FFFFFF", lineHeight: 1.1 }}>
+                  {cat.title}
+                </div>
+              </div>
+              <div style={{ fontSize: 20, color: "rgba(255,255,255,0.7)" }}>→</div>
+            </div>
+            <div style={{ padding: "22px 22px", position: "relative", flex: 1, display: "flex", flexDirection: "column" }}>
               {!isMulti && (
                 <div style={{ position: "absolute", top: -40, left: -40, width: 160, height: 160, borderRadius: "50%", background: `radial-gradient(circle, ${cat.color}14, transparent 70%)`, pointerEvents: "none" }} />
               )}
               <div style={{ position: "relative", flex: 1, display: "flex", flexDirection: "column" }}>
-                <div style={{ fontSize: 24, marginBottom: 14, letterSpacing: 3 }}>{cat.icons.join(" ")}</div>
-                <div style={{ fontSize: 11, fontWeight: 800, color: cat.color, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>{cat.label}</div>
+                <div style={{ fontSize: 24, marginBottom: 12, letterSpacing: 3 }}>{cat.icons.join(" ")}</div>
                 <div style={{ fontSize: 13, color: C.textSoft, marginBottom: 14, lineHeight: 1.5 }}>{cat.tagline}</div>
                 <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
                   <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: cat.color + "15", color: cat.color }}>{count}개 기회</span>
@@ -1915,11 +2080,35 @@ export default function Home() {
           {/* Header */}
           <div style={{ background: "#FFFFFF", borderRadius: 18, border: "1px solid #DC262625", marginBottom: 22, overflow: "hidden" }}>
             <div style={{ height: 5, background: "linear-gradient(90deg, #059669, #D97706, #DC2626)" }} />
-            <div style={{ padding: "24px" }}>
-              <div style={{ fontSize: 22, marginBottom: 12, letterSpacing: 3 }}>📱 🔋 🛡️ 📚 💊</div>
-              <div style={{ color: "#DC2626", fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>C. NEED</div>
-              <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>NEED 카드</div>
-              <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>3개 세부 카드 중 하나를 선택하세요</div>
+            <div style={{ padding: "24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
+              <div>
+                <div style={{ fontSize: 22, marginBottom: 12, letterSpacing: 3 }}>📱 🔋 🛡️ 📚 💊</div>
+                <div style={{ color: "#DC2626", fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>C. NEED</div>
+                <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>NEED 카드</div>
+                <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>3개 세부 카드 중 하나를 선택하세요</div>
+              </div>
+              {CATEGORIES.need?.whyTitle && (
+                <div style={{
+                  background: "linear-gradient(135deg, #DC262608, #DC262612)",
+                  border: "1px solid #DC262625",
+                  borderRadius: 12, padding: 20,
+                }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: "#DC2626", letterSpacing: 1, marginBottom: 8 }}>WHY NEED CARD?</div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 10, lineHeight: 1.4 }}>{CATEGORIES.need.whyTitle}</div>
+                  <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7, marginBottom: 14 }}>{CATEGORIES.need.whyDescription}</div>
+                  <div style={{ paddingTop: 12, borderTop: "1px solid #DC262620", display: "flex", flexDirection: "column", gap: 8 }}>
+                    {CATEGORIES.need.coreValueProps?.map((prop, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                        <span style={{ color: "#DC2626", flexShrink: 0, fontWeight: 800, fontSize: 13, marginTop: 1 }}>✓</span>
+                        <div>
+                          <div style={{ fontSize: 12, fontWeight: 800, color: C.text }}>{prop.title}</div>
+                          <div style={{ fontSize: 11, color: C.textSoft, marginTop: 1 }}>{prop.description}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -2461,11 +2650,35 @@ export default function Home() {
 
           <div style={{ background: "#FFFFFF", borderRadius: 18, border: "1px solid #7C3AED25", marginBottom: 22, overflow: "hidden" }}>
             <div style={{ height: 5, background: "linear-gradient(90deg, #7C3AED, #A78BFA)" }} />
-            <div style={{ padding: "24px" }}>
-              <div style={{ fontSize: 22, marginBottom: 12, letterSpacing: 3 }}>⛽ 💪 🛒 ☕ 🏠</div>
-              <div style={{ color: "#7C3AED", fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>B. YOU Prime</div>
-              <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>YOU Prime 카드</div>
-              <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>혜택 팩 선택 — 일상팩 / 가족팩</div>
+            <div style={{ padding: "24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
+              <div>
+                <div style={{ fontSize: 22, marginBottom: 12, letterSpacing: 3 }}>⛽ 💪 🛒 ☕ 🏠</div>
+                <div style={{ color: "#7C3AED", fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>B. YOU Prime</div>
+                <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>YOU Prime 카드</div>
+                <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>혜택 팩 선택 — 일상팩 / 가족팩</div>
+              </div>
+              {CATEGORIES.you?.whyTitle && (
+                <div style={{
+                  background: "linear-gradient(135deg, #7C3AED08, #7C3AED12)",
+                  border: "1px solid #7C3AED25",
+                  borderRadius: 12, padding: 20,
+                }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: "#7C3AED", letterSpacing: 1, marginBottom: 8 }}>WHY YOU CARD?</div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 10, lineHeight: 1.4 }}>{CATEGORIES.you.whyTitle}</div>
+                  <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7, marginBottom: 14 }}>{CATEGORIES.you.whyDescription}</div>
+                  <div style={{ paddingTop: 12, borderTop: "1px solid #7C3AED20", display: "flex", flexDirection: "column", gap: 8 }}>
+                    {CATEGORIES.you.coreValueProps?.map((prop, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                        <span style={{ color: "#7C3AED", flexShrink: 0, fontWeight: 800, fontSize: 13, marginTop: 1 }}>✓</span>
+                        <div>
+                          <div style={{ fontSize: 12, fontWeight: 800, color: C.text }}>{prop.title}</div>
+                          <div style={{ fontSize: 11, color: C.textSoft, marginTop: 1 }}>{prop.description}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -2846,25 +3059,58 @@ export default function Home() {
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← 전체 기회로 돌아가기" />
 
-        {/* Category Header */}
+        {/* Category Header — Phase 12-3: 2열 그리드 (왼쪽 정보 + 오른쪽 WHY 블록) */}
         <div style={{ background: "#FFFFFF", borderRadius: 18, border: `1px solid ${cat.color}25`, marginBottom: 22, overflow: "hidden" }}>
           <div style={{ height: 5, background: `linear-gradient(90deg, ${cat.color}, ${cat.color}80)` }} />
-          <div style={{ padding: "24px" }}>
-            <div style={{ fontSize: 22, marginBottom: 12, letterSpacing: 3 }}>{cat.icons.join(" ")}</div>
-            <div style={{ color: cat.color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>{cat.label}</div>
-            <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>{cat.title}</div>
-            <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>{cat.tagline}</div>
-            <div style={{ color: C.textSoft, fontSize: 11, marginBottom: 12, fontWeight: 600 }}>{cat.headerMeta}</div>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
-              {cat.uspPills.map((p, i) => (
-                <span key={i} style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 20, background: `${cat.color}12`, color: cat.color, border: `1px solid ${cat.color}30` }}>{p}</span>
-              ))}
+          <div style={{ padding: "24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 20 }}>
+            {/* 왼쪽: 기존 정보 */}
+            <div>
+              <div style={{ fontSize: 22, marginBottom: 12, letterSpacing: 3 }}>{cat.icons.join(" ")}</div>
+              <div style={{ color: cat.color, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>{cat.label}</div>
+              <div style={{ color: C.text, fontSize: 20, fontWeight: 900, marginBottom: 6 }}>{cat.title}</div>
+              <div style={{ color: C.textSoft, fontSize: 12, marginBottom: 10 }}>{cat.tagline}</div>
+              <div style={{ color: C.textSoft, fontSize: 11, marginBottom: 12, fontWeight: 600 }}>{cat.headerMeta}</div>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
+                {cat.uspPills.map((p, i) => (
+                  <span key={i} style={{ fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 20, background: `${cat.color}12`, color: cat.color, border: `1px solid ${cat.color}30` }}>{p}</span>
+                ))}
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: cat.color + "15", color: cat.color }}>{oppCount}개 기회</span>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
+                <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>5 페르소나</span>
+              </div>
             </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700, background: cat.color + "15", color: cat.color }}>{oppCount}개 기회</span>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>연간 {fmt(totalAnnual)}회</span>
-              <span style={{ padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#F3F4F6", color: "#374151" }}>5 페르소나</span>
-            </div>
+
+            {/* 오른쪽: WHY 블록 */}
+            {cat.whyTitle && (
+              <div style={{
+                background: `linear-gradient(135deg, ${cat.color}08, ${cat.color}12)`,
+                border: `1px solid ${cat.color}25`,
+                borderRadius: 12, padding: 20,
+              }}>
+                <div style={{ fontSize: 10, fontWeight: 800, color: cat.color, letterSpacing: 1, marginBottom: 8 }}>
+                  WHY {cat.key.toUpperCase()} CARD?
+                </div>
+                <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 10, lineHeight: 1.4 }}>
+                  {cat.whyTitle}
+                </div>
+                <div style={{ fontSize: 12, color: "#374151", lineHeight: 1.7, marginBottom: 14 }}>
+                  {cat.whyDescription}
+                </div>
+                <div style={{ paddingTop: 12, borderTop: `1px solid ${cat.color}20`, display: "flex", flexDirection: "column", gap: 8 }}>
+                  {cat.coreValueProps?.map((prop, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                      <span style={{ color: cat.color, flexShrink: 0, fontWeight: 800, fontSize: 13, marginTop: 1 }}>✓</span>
+                      <div>
+                        <div style={{ fontSize: 12, fontWeight: 800, color: C.text }}>{prop.title}</div>
+                        <div style={{ fontSize: 11, color: C.textSoft, marginTop: 1 }}>{prop.description}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -3129,52 +3375,7 @@ export default function Home() {
           );
         })}
 
-        {/* 교차 인사이트 섹션 */}
-        <div style={{ marginTop: 16, marginBottom: 20 }}>
-          <div style={{
-            display: "flex", alignItems: "center", gap: 10, marginBottom: 12,
-          }}>
-            <div style={{ flex: 1, height: 1, background: "#DC262625" }} />
-            <span style={{ color: "#DC2626", fontSize: 11, fontWeight: 800, padding: "4px 12px", background: "#DC262610", borderRadius: 12 }}>
-              ⚡ 교차 인사이트 ({ALL_CARD_CROSS_INSIGHTS.length})
-            </span>
-            <div style={{ flex: 1, height: 1, background: "#DC262625" }} />
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {ALL_CARD_CROSS_INSIGHTS.map(ins => (
-              <div key={ins.id} style={{
-                background: "#FFFFFF", borderRadius: 12,
-                border: "1px solid #FECACA",
-                borderLeft: "3px solid #DC2626",
-                padding: "14px 16px",
-              }}>
-                <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap", alignItems: "center" }}>
-                  <span style={{ fontSize: 14 }}>{ins.icon}</span>
-                  <span style={{
-                    fontSize: 10, padding: "2px 8px", borderRadius: 4,
-                    background: "#FEE2E2", color: "#B91C1C", fontWeight: 800,
-                  }}>{ins.hookType}</span>
-                </div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 6 }}>
-                  {ins.title}
-                </div>
-                <div style={{ fontSize: 12, color: "#4B5563", lineHeight: 1.6, marginBottom: 8 }}>
-                  {ins.description}
-                </div>
-                {ins.implication && (
-                  <div style={{
-                    padding: "8px 12px", borderRadius: 8,
-                    background: "linear-gradient(135deg, #FEF2F208, transparent)",
-                    border: "1px solid #FECACA40",
-                    fontSize: 11, color: "#7F1D1D", lineHeight: 1.6,
-                  }}>
-                    <strong>💡 시사점:</strong> {ins.implication}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Phase 12-4: 교차 인사이트 섹션 삭제됨 (경쟁 환경 섹션이 대체) */}
       </div>
     );
   };
@@ -3725,61 +3926,111 @@ export default function Home() {
     );
   };
 
-  // ──────────── IDEAS STUB ────────────
+  // ──────────── IDEAS VIEW (Phase 12-7: 4탭 + 점수 + 트립닷컴 스타일) ────────────
+  const IDEAS_TABS = [
+    { id: "auto",    label: "AI 자동추천",          color: "#2563EB" },
+    { id: "context", label: "A. 소비자 맥락 조합",    color: "#EC4899" },
+    { id: "journey", label: "B. 검색 여정 앵글",      color: "#10B981" },
+    { id: "cross",   label: "C. 크로스 카테고리",     color: "#8B5CF6" },
+  ];
+
   const renderIdeas = () => {
     if (!selectedOpp) return null;
     const opp = selectedOpp;
     const cardColor = CARDS[opp.card]?.color || "#2563EB";
-    const state = aiIdeas[opp.id] || {};
+    const key = `${opp.id}::${ideasTab}`;
+    const state = aiIdeas[key] || {};
     const { loading, error, ideas } = state;
+    const activeTabMeta = IDEAS_TABS.find(t => t.id === ideasTab);
 
     return (
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
         <BackNav label="← 기회 분석으로" />
 
         {/* 타이틀 */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ fontSize: 32 }}>{opp.icon}</span>
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 900, color: C.text }}>{opp.title}</div>
-              <div style={{ fontSize: 12, color: C.textSoft }}>
-                🎬 AI 생성 숏폼 아이디어 {ideas ? `(${ideas.length}개)` : ""}
-              </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 34 }}>{opp.icon}</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 20, fontWeight: 900, color: C.text, lineHeight: 1.3 }}>{opp.title}</div>
+            <div style={{ fontSize: 12, color: C.textSoft, marginTop: 3 }}>
+              🎬 AI 생성 숏폼 아이디어 결과 · {activeTabMeta?.label} 관점
+              {ideas && ` · 숏폼 아이디어 ${ideas.length}개 생성 완료`}
             </div>
           </div>
-          {ideas && !loading && (
-            <button
-              onClick={() => generateIdeas(opp)}
-              style={{
-                padding: "8px 16px", borderRadius: 10,
-                border: "1px solid #FB923C",
-                background: "#FFFFFF", color: "#EA580C",
-                fontSize: 12, fontWeight: 700, cursor: "pointer",
-              }}
-            >↻ 다시 생성</button>
-          )}
+        </div>
+
+        {/* 4탭 */}
+        <div style={{
+          display: "flex", gap: 2, marginBottom: 20,
+          borderBottom: "1px solid #E5E7EB",
+          overflowX: "auto",
+        }}>
+          {IDEAS_TABS.map(tab => {
+            const tabKey = `${opp.id}::${tab.id}`;
+            const tabState = aiIdeas[tabKey];
+            const hasIdeas = tabState?.ideas?.length > 0;
+            const isLoading = tabState?.loading;
+            const isActive = ideasTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setIdeasTab(tab.id);
+                  if (!tabState?.ideas && !tabState?.loading) {
+                    generateIdeas(opp, tab.id);
+                  }
+                }}
+                style={{
+                  padding: "10px 16px",
+                  border: "none",
+                  borderBottom: `3px solid ${isActive ? tab.color : "transparent"}`,
+                  background: isActive ? `${tab.color}12` : "transparent",
+                  color: isActive ? tab.color : hasIdeas ? C.text : C.textSoft,
+                  fontSize: 12, fontWeight: isActive ? 800 : 600,
+                  cursor: "pointer", whiteSpace: "nowrap",
+                  display: "inline-flex", alignItems: "center", gap: 6,
+                  transition: "all 0.15s",
+                }}
+              >
+                {tab.label}
+                {isLoading && (
+                  <span style={{
+                    width: 12, height: 12,
+                    border: "2px solid #CBD5E1", borderTopColor: tab.color,
+                    borderRadius: "50%", animation: "spin 0.8s linear infinite",
+                  }} />
+                )}
+                {hasIdeas && !isActive && (
+                  <span style={{
+                    padding: "1px 6px", borderRadius: 10,
+                    background: "#E5E7EB", color: "#6B7280",
+                    fontSize: 9, fontWeight: 800,
+                  }}>{tabState.ideas.length}</span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* 로딩 */}
         {loading && (
           <div style={{
             padding: "60px 24px", borderRadius: 16,
-            background: "linear-gradient(135deg, #FFF7ED, #FEF3C7)",
-            border: "2px solid #FDBA74",
+            background: `linear-gradient(135deg, ${activeTabMeta?.color}08, ${activeTabMeta?.color}14)`,
+            border: `2px solid ${activeTabMeta?.color}30`,
             textAlign: "center",
           }}>
             <div style={{
               display: "inline-block", width: 40, height: 40,
-              border: "4px solid #FED7AA", borderTopColor: "#EA580C",
+              border: "4px solid #E5E7EB", borderTopColor: activeTabMeta?.color,
               borderRadius: "50%", animation: "spin 0.8s linear infinite",
               marginBottom: 16,
             }} />
-            <div style={{ fontSize: 15, fontWeight: 800, color: "#7C2D12", marginBottom: 4 }}>
-              Claude Sonnet 4.5가 숏폼 아이디어를 생성 중...
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>
+              {activeTabMeta?.label} 관점으로 생성 중...
             </div>
-            <div style={{ fontSize: 11, color: "#9A3412" }}>
-              약 10-30초 소요됩니다 · 페르소나·페인포인트·검색 여정 기반 맞춤 생성
+            <div style={{ fontSize: 11, color: C.textSoft }}>
+              약 20-40초 소요 · Claude Sonnet 4.5 · 5개 아이디어 동시 생성
             </div>
           </div>
         )}
@@ -3793,7 +4044,7 @@ export default function Home() {
             <div style={{ fontSize: 13, fontWeight: 700, color: "#B91C1C", marginBottom: 6 }}>⚠️ 생성 실패</div>
             <div style={{ fontSize: 12, color: "#7F1D1D", marginBottom: 12, lineHeight: 1.6 }}>{error}</div>
             <button
-              onClick={() => generateIdeas(opp)}
+              onClick={() => generateIdeas(opp, ideasTab)}
               style={{
                 padding: "8px 14px", borderRadius: 8,
                 border: "none", background: "#DC2626", color: "#FFFFFF",
@@ -3805,30 +4056,565 @@ export default function Home() {
 
         {/* 아이디어 결과 */}
         {ideas && !loading && ideas.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {ideas.map((idea, idx) => (
-              <ShortformIdeaCard key={idea.id || idx} idea={idea} cardColor={cardColor} />
+              <ShortformIdeaCard
+                key={idea.id || idx}
+                idea={idea}
+                index={idx}
+                cardColor={cardColor}
+                tabColor={activeTabMeta?.color}
+                perspectiveLabel={activeTabMeta?.label}
+              />
             ))}
+            <button
+              onClick={() => generateIdeas(opp, ideasTab)}
+              style={{
+                marginTop: 6, padding: "12px", borderRadius: 10,
+                border: "1px dashed #CBD5E1", background: "#FFFFFF",
+                color: C.textSoft, fontSize: 12, fontWeight: 700, cursor: "pointer",
+              }}
+            >↻ 이 관점으로 다시 생성</button>
           </div>
         )}
 
-        {/* 초기 상태 (로딩도 에러도 결과도 없음) */}
+        {/* 초기 상태 */}
         {!loading && !error && !ideas && (
           <div style={{ textAlign: "center", padding: 60 }}>
             <div style={{ fontSize: 13, color: C.textSoft, marginBottom: 16 }}>
-              Claude AI로 이 기회에 맞는 숏폼 아이디어 3개를 생성할 수 있습니다.
+              {activeTabMeta?.label} 관점으로 5개의 숏폼 아이디어를 생성합니다.
             </div>
             <button
-              onClick={() => generateIdeas(opp)}
+              onClick={() => generateIdeas(opp, ideasTab)}
               style={{
                 padding: "14px 28px", borderRadius: 12,
                 border: "none",
-                background: "linear-gradient(135deg, #FB923C, #EA580C)",
+                background: `linear-gradient(135deg, ${activeTabMeta?.color}, ${activeTabMeta?.color}DD)`,
                 color: "#FFFFFF",
                 fontSize: 14, fontWeight: 800, cursor: "pointer",
-                boxShadow: "0 4px 12px rgba(234, 88, 12, 0.3)",
+                boxShadow: `0 4px 12px ${activeTabMeta?.color}40`,
               }}
             >🎬 AI 아이디어 생성 시작</button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ──────────── STORYBOARD VIEW (Phase 12-8) ────────────
+  const renderStoryboard = () => {
+    if (!selectedOpp || !selectedIdea) {
+      return (
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "40px 24px" }}>
+          <BackNav label="← 아이디어 목록으로" />
+          <div style={{ textAlign: "center", padding: 60, color: C.textSoft }}>
+            아이디어를 먼저 선택해주세요.
+          </div>
+        </div>
+      );
+    }
+    const opp = selectedOpp;
+    const idea = selectedIdea;
+    const cardColor = CARDS[opp.card]?.color || "#2563EB";
+    const sbKey = `${opp.id}::${idea.id}`;
+    const sbState = storyboards[sbKey] || {};
+    const { loading, error, data } = sbState;
+
+    // 자동 생성 트리거 (처음 진입 시 1회)
+    if (!loading && !error && !data && typeof window !== "undefined") {
+      // 무한 루프 방지: state에 loading:true 즉시 설정
+      if (!storyboards[sbKey]) {
+        setTimeout(() => generateStoryboard(opp, idea), 0);
+      }
+    }
+
+    // YouTube 크리에이터 자동 검색
+    const ytState = ytCreators[opp.id] || {};
+    if (!ytState.loading && !ytState.channels && !ytState.error && typeof window !== "undefined") {
+      if (!ytCreators[opp.id]) {
+        setTimeout(() => {
+          const query = (opp.relatedKeywords?.[0]?.term) || opp.title?.substring(0, 20) || "KB 국민카드";
+          searchYouTubeCreators(opp.id, query);
+        }, 0);
+      }
+    }
+
+    return (
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 24px 60px" }}>
+        <BackNav label="← 아이디어 목록으로" />
+
+        {/* 아이디어 헤더 */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 22, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 14, flex: 1, minWidth: 0 }}>
+            <span style={{ fontSize: 32 }}>🎯</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", gap: 6, marginBottom: 6, flexWrap: "wrap" }}>
+                {idea.hookType && (
+                  <span style={{
+                    padding: "2px 8px", borderRadius: 4,
+                    background: "#FEE2E2", color: "#B91C1C",
+                    fontSize: 10, fontWeight: 800,
+                  }}>🎭 {idea.hookType}</span>
+                )}
+                {idea.funnelStage && (
+                  <span style={{
+                    padding: "2px 8px", borderRadius: 4,
+                    background: "#DBEAFE", color: "#1D4ED8",
+                    fontSize: 10, fontWeight: 800,
+                  }}>{idea.funnelStage === "Awareness" ? "Dream" : idea.funnelStage === "Consideration" ? "Plan" : idea.funnelStage === "Decision" ? "Book" : idea.funnelStage}</span>
+                )}
+                {typeof idea.score === "number" && (
+                  <span style={{ fontSize: 10, color: C.textSoft, fontWeight: 700 }}>완성점수 {idea.score}</span>
+                )}
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: C.text, lineHeight: 1.4 }}>{idea.title}</div>
+              {idea.openingHook && (
+                <div style={{ fontSize: 12, color: "#EA580C", marginTop: 4, fontStyle: "italic" }}>
+                  "{idea.openingHook}"
+                </div>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={() => generateStoryboard(opp, idea)}
+            disabled={loading}
+            style={{
+              padding: "8px 14px", borderRadius: 8,
+              border: "1px solid #BFDBFE", background: "#FFFFFF", color: "#2563EB",
+              fontSize: 12, fontWeight: 700, cursor: loading ? "wait" : "pointer",
+              flexShrink: 0,
+            }}
+          >{loading ? "생성 중..." : "↻ 다시 생성"}</button>
+        </div>
+
+        {/* 탭 (숏폼 콘텐츠만) */}
+        <div style={{ display: "flex", borderBottom: "1px solid #E5E7EB", marginBottom: 22 }}>
+          <button style={{
+            padding: "10px 18px", borderTopLeftRadius: 8, borderTopRightRadius: 8,
+            background: "#2563EB", color: "#FFFFFF", border: "none",
+            fontSize: 13, fontWeight: 800, cursor: "default",
+            display: "inline-flex", alignItems: "center", gap: 6,
+          }}>
+            <span>▶</span>
+            <span>숏폼 콘텐츠</span>
+          </button>
+        </div>
+
+        {/* 로딩 */}
+        {loading && !data && (
+          <div style={{
+            padding: "60px 24px", borderRadius: 16,
+            background: "linear-gradient(135deg, #EFF6FF, #DBEAFE)",
+            border: "2px solid #BFDBFE",
+            textAlign: "center", marginBottom: 24,
+          }}>
+            <div style={{
+              display: "inline-block", width: 40, height: 40,
+              border: "4px solid #DBEAFE", borderTopColor: "#2563EB",
+              borderRadius: "50%", animation: "spin 0.8s linear infinite",
+              marginBottom: 16,
+            }} />
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>
+              플랫폼별 스토리보드 생성 중...
+            </div>
+            <div style={{ fontSize: 11, color: C.textSoft }}>
+              약 30-60초 소요 · YouTube Shorts + Instagram Reels 각 맞춤 각색
+            </div>
+          </div>
+        )}
+
+        {/* 에러 */}
+        {error && !loading && (
+          <div style={{
+            padding: 20, borderRadius: 12,
+            background: "#FEF2F2", border: "1px solid #FECACA",
+            marginBottom: 16,
+          }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#B91C1C", marginBottom: 6 }}>⚠️ 생성 실패</div>
+            <div style={{ fontSize: 12, color: "#7F1D1D", marginBottom: 10, lineHeight: 1.6 }}>{error}</div>
+            <button
+              onClick={() => generateStoryboard(opp, idea)}
+              style={{
+                padding: "8px 14px", borderRadius: 8,
+                border: "none", background: "#DC2626", color: "#FFFFFF",
+                fontSize: 12, fontWeight: 700, cursor: "pointer",
+              }}
+            >재시도</button>
+          </div>
+        )}
+
+        {/* 플랫폼 2열 */}
+        {data && (
+          <>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
+              gap: 14, marginBottom: 20,
+            }}>
+              <StoryboardPlatform platform="youtube" data={data.youtube_shorts} />
+              <StoryboardPlatform platform="instagram" data={data.instagram_reels} />
+            </div>
+
+            {/* 미니 팩트 4개 */}
+            {data.miniFacts && data.miniFacts.length > 0 && (
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: 10, marginBottom: 20,
+              }}>
+                {data.miniFacts.map((fact, i) => (
+                  <div key={i} style={{
+                    padding: "12px 14px", borderRadius: 10,
+                    background: "#FFFFFF", border: "1px solid #E5E7EB",
+                  }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: C.text, display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                      <span>{fact.icon}</span>
+                      <span>{fact.label}</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: C.textSoft, lineHeight: 1.5 }}>{fact.content}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 콘텐츠 팩트시트 (노란) */}
+            {data.factSheet && (
+              <div style={{
+                padding: "22px", borderRadius: 16,
+                background: "#FEFCE8", border: "1px solid #FDE68A",
+                marginBottom: 20,
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                  <span style={{ fontSize: 20 }}>📋</span>
+                  <div style={{ fontSize: 15, fontWeight: 900, color: "#78350F" }}>콘텐츠 팩트시트</div>
+                </div>
+                <div style={{ fontSize: 11, color: "#92400E", marginBottom: 16 }}>
+                  이 아이디어 실제 숏폼 제작에 바로 활용할 검증된 팩트 모음
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 18 }}>
+                  {data.factSheet.benefit_facts && (
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 800, color: "#78350F", marginBottom: 8, paddingBottom: 6, borderBottom: "1px solid #FDE68A" }}>
+                        💳 {opp.card} 혜택 팩트
+                      </div>
+                      {data.factSheet.benefit_facts.map((fact, i) => (
+                        <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, fontSize: 12 }}>
+                          <div style={{ color: C.textSoft, flexShrink: 0, width: 70 }}>{fact.label}</div>
+                          <div style={{ color: C.text, fontWeight: 700 }}>{fact.value}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {data.factSheet.search_facts && (
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 800, color: "#78350F", marginBottom: 8, paddingBottom: 6, borderBottom: "1px solid #FDE68A" }}>
+                        📊 검색 데이터 팩트
+                      </div>
+                      {data.factSheet.search_facts.map((fact, i) => (
+                        <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, fontSize: 12 }}>
+                          <div style={{ color: C.textSoft, flexShrink: 0, width: 80 }}>{fact.label}</div>
+                          <div style={{ color: C.text }}>{fact.value}</div>
+                        </div>
+                      ))}
+                      {opp.annualVolume > 0 && (
+                        <div style={{ display: "flex", gap: 10, marginTop: 10, paddingTop: 8, borderTop: "1px solid #FDE68A", fontSize: 12 }}>
+                          <div style={{ color: C.textSoft, flexShrink: 0, width: 80 }}>연 검색량</div>
+                          <div style={{ color: "#047857", fontWeight: 800, fontSize: 14 }}>{opp.annualVolume.toLocaleString()}회</div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                {(data.factSheet.shooting_timing || data.factSheet.connection) && (
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 18, marginTop: 16, paddingTop: 14, borderTop: "1px solid #FDE68A" }}>
+                    {data.factSheet.shooting_timing && (
+                      <div>
+                        <div style={{ fontSize: 11, fontWeight: 800, color: "#78350F", marginBottom: 4 }}>📅 촬영 타이밍</div>
+                        <div style={{ fontSize: 12, color: C.text, lineHeight: 1.5 }}>{data.factSheet.shooting_timing}</div>
+                      </div>
+                    )}
+                    {data.factSheet.connection && (
+                      <div>
+                        <div style={{ fontSize: 11, fontWeight: 800, color: "#78350F", marginBottom: 4 }}>🔗 KB 연결</div>
+                        <div style={{ fontSize: 12, color: C.text, lineHeight: 1.5 }}>{data.factSheet.connection}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 광고 타겟팅 */}
+            {data.ad_targeting && data.ad_targeting.length > 0 && (
+              <AdTargetingBlock rows={data.ad_targeting} />
+            )}
+          </>
+        )}
+
+        {/* 크리에이터 매칭 (YouTube API) */}
+        <CreatorMatching oppId={opp.id} opp={opp} />
+
+        {/* 하단 CTA */}
+        <button
+          onClick={() => setCurrentView("ideas")}
+          style={{
+            width: "100%", marginTop: 24, padding: "14px",
+            borderRadius: 12, border: "1px solid #E5E7EB",
+            background: "#FFFFFF", color: C.textSoft,
+            fontSize: 13, fontWeight: 700, cursor: "pointer",
+          }}
+        >— 다른 아이디어 보기 —</button>
+      </div>
+    );
+  };
+
+  // ──────────── StoryboardPlatform ────────────
+  const StoryboardPlatform = ({ platform, data }) => {
+    if (!data) return null;
+    const meta = platform === "youtube"
+      ? { name: "YouTube Shorts", color: "#FF0000", icon: "📺", max: "MAX 60s" }
+      : { name: "Instagram Reels", color: "#C13584", icon: "📱", max: "MAX 90s" };
+
+    return (
+      <div style={{
+        background: "#FFFFFF", borderRadius: 14,
+        border: `1px solid ${meta.color}30`, overflow: "hidden",
+      }}>
+        <div style={{
+          padding: "12px 16px",
+          background: `linear-gradient(135deg, ${meta.color}12, ${meta.color}06)`,
+          borderBottom: `1px solid ${meta.color}20`,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 18 }}>{meta.icon}</span>
+            <span style={{ fontSize: 13, fontWeight: 800, color: meta.color }}>{meta.name}</span>
+            <span style={{ fontSize: 10, color: C.textSoft, fontWeight: 600 }}>{meta.max}</span>
+          </div>
+          <span style={{ fontSize: 10, color: C.textSoft, fontWeight: 600 }}>9:16</span>
+        </div>
+        <div style={{ padding: "16px 18px" }}>
+          {data.title && (
+            <div style={{ fontSize: 14, fontWeight: 800, color: C.text, lineHeight: 1.4, marginBottom: 10 }}>
+              {data.title}
+            </div>
+          )}
+          {data.hook && (
+            <div style={{
+              padding: "8px 12px", borderRadius: 8, marginBottom: 12,
+              background: "#FFF7ED", border: "1px solid #FDBA7440",
+            }}>
+              <div style={{ fontSize: 9, fontWeight: 800, color: "#C2410C", marginBottom: 3 }}>✦ HOOK</div>
+              <div style={{ fontSize: 12, color: "#7C2D12", fontStyle: "italic", lineHeight: 1.5 }}>"{data.hook}"</div>
+            </div>
+          )}
+          {data.scenes && data.scenes.length > 0 && (
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 10, fontWeight: 800, color: C.text, marginBottom: 6 }}>📽️ SCENE FLOW</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                {data.scenes.map((s, i) => (
+                  <div key={i} style={{ display: "flex", gap: 8, fontSize: 11 }}>
+                    <span style={{ fontWeight: 800, color: meta.color, flexShrink: 0, fontFamily: "monospace", minWidth: 40 }}>
+                      {s.time || `씬${i + 1}`}
+                    </span>
+                    <span style={{ color: C.text, lineHeight: 1.5 }}>
+                      {s.visual || s.copy || ""}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {data.proof && (
+            <div style={{ fontSize: 11, color: C.textSoft, marginBottom: 10, lineHeight: 1.5 }}>
+              📊 <strong>PROOF:</strong> {data.proof}
+            </div>
+          )}
+          {data.cta && (
+            <div style={{ fontSize: 11, color: C.text, marginBottom: 10, lineHeight: 1.5 }}>
+              📣 <strong>CTA:</strong> {data.cta}
+            </div>
+          )}
+          {data.hashtags && data.hashtags.length > 0 && (
+            <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 10 }}>
+              {data.hashtags.map((tag, i) => (
+                <span key={i} style={{ fontSize: 10, color: meta.color, fontWeight: 600 }}>{tag}</span>
+              ))}
+            </div>
+          )}
+          <div style={{
+            paddingTop: 10, borderTop: "1px solid #F3F4F6",
+            display: "flex", gap: 12, flexWrap: "wrap",
+            fontSize: 10, color: C.textSoft,
+          }}>
+            {data.bestTimeToPost && <span>🕒 {data.bestTimeToPost}</span>}
+            {data.targetDemo && <span>👥 {data.targetDemo}</span>}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ──────────── AdTargetingBlock (접힘) ────────────
+  const AdTargetingBlock = ({ rows }) => {
+    const [open, setOpen] = useState(false);
+    return (
+      <div style={{
+        background: "#FFFFFF", borderRadius: 12,
+        border: "1px solid #E5E7EB",
+        overflow: "hidden", marginBottom: 20,
+      }}>
+        <div
+          onClick={() => setOpen(!open)}
+          style={{
+            padding: "12px 16px", cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 16 }}>📱</span>
+            <span style={{ fontSize: 13, fontWeight: 800, color: C.text }}>광고 노출 추천</span>
+          </div>
+          <span style={{ fontSize: 12, color: C.textSoft, transform: open ? "rotate(180deg)" : "rotate(0)", transition: "transform 0.2s" }}>▼</span>
+        </div>
+        {open && (
+          <div style={{ padding: "0 16px 14px 16px", borderTop: "1px solid #F3F4F6" }}>
+            <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
+              {rows.map((row, i) => (
+                <div key={i} style={{ display: "flex", gap: 8, fontSize: 11, color: C.text, lineHeight: 1.6 }}>
+                  <span style={{ color: C.textSoft, flexShrink: 0 }}>•</span>
+                  <span>{row}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ──────────── CreatorMatching (YouTube API) ────────────
+  const CreatorMatching = ({ oppId, opp }) => {
+    const state = ytCreators[oppId] || {};
+    const { loading, error, channels } = state;
+
+    const formatSubs = (n) => {
+      if (!n) return "정보 없음";
+      if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+      if (n >= 1000) return `${Math.round(n / 1000)}K`;
+      return n.toString();
+    };
+
+    const classifyTier = (subs) => {
+      if (!subs) return { label: "?", color: "#9CA3AF" };
+      if (subs >= 100000) return { label: "MACRO", color: "#DC2626" };
+      if (subs >= 10000) return { label: "MICRO", color: "#2563EB" };
+      return { label: "NANO", color: "#8B5CF6" };
+    };
+
+    return (
+      <div style={{
+        background: "#FFFFFF", borderRadius: 14,
+        border: "1px solid #E5E7EB",
+        padding: "18px 20px", marginBottom: 20,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 18 }}>🎥</span>
+            <span style={{ fontSize: 14, fontWeight: 800, color: C.text }}>크리에이터 매칭</span>
+            <span style={{ fontSize: 10, color: C.textSoft, fontWeight: 600 }}>YouTube Shorts 실시간 검색</span>
+          </div>
+          <button
+            onClick={() => {
+              const query = (opp.relatedKeywords?.[0]?.term) || opp.title?.substring(0, 20) || "KB 국민카드";
+              searchYouTubeCreators(oppId, query);
+            }}
+            disabled={loading}
+            style={{
+              padding: "6px 12px", borderRadius: 8,
+              border: "1px solid #E5E7EB", background: "#FFFFFF",
+              color: C.textSoft, fontSize: 11, fontWeight: 700,
+              cursor: loading ? "wait" : "pointer",
+            }}
+          >{loading ? "검색 중..." : "↻ 다시 검색"}</button>
+        </div>
+
+        {loading && !channels && (
+          <div style={{
+            textAlign: "center", padding: 32,
+            background: "#F9FAFB", borderRadius: 10,
+          }}>
+            <div style={{
+              display: "inline-block", width: 24, height: 24,
+              border: "3px solid #E5E7EB", borderTopColor: "#2563EB",
+              borderRadius: "50%", animation: "spin 0.8s linear infinite",
+              marginBottom: 8,
+            }} />
+            <div style={{ fontSize: 11, color: C.textSoft }}>YouTube에서 관련 크리에이터 검색 중...</div>
+          </div>
+        )}
+
+        {error && (
+          <div style={{ padding: "10px 12px", borderRadius: 8, background: "#FEF2F2", border: "1px solid #FECACA", fontSize: 11, color: "#B91C1C" }}>
+            ⚠️ {error}
+          </div>
+        )}
+
+        {channels && channels.length === 0 && !loading && (
+          <div style={{ padding: 16, fontSize: 12, color: C.textSoft, textAlign: "center" }}>
+            관련 크리에이터를 찾지 못했습니다.
+          </div>
+        )}
+
+        {channels && channels.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {channels.map((cr, i) => {
+              const tier = classifyTier(cr.subs);
+              return (
+                <div key={i} style={{
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "10px 12px", borderRadius: 10,
+                  background: "#F9FAFB", border: "1px solid #F3F4F6",
+                  borderLeft: `3px solid ${tier.color}`,
+                }}>
+                  {cr.thumbnail ? (
+                    <img src={cr.thumbnail} alt={cr.name} style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+                  ) : (
+                    <div style={{
+                      width: 36, height: 36, borderRadius: "50%",
+                      background: "#E5E7EB", display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 14, color: "#9CA3AF", flexShrink: 0,
+                    }}>👤</div>
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: C.text }}>{cr.name}</span>
+                      <span style={{
+                        padding: "1px 6px", borderRadius: 4,
+                        background: `${tier.color}15`, color: tier.color,
+                        fontSize: 9, fontWeight: 800,
+                      }}>{tier.label}</span>
+                      <span style={{ fontSize: 10, color: C.textSoft }}>구독자 {formatSubs(cr.subs)}</span>
+                    </div>
+                    {cr.videoTitle && (
+                      <div style={{ fontSize: 10, color: C.textSoft, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        최근: {cr.videoTitle}
+                      </div>
+                    )}
+                  </div>
+                  <a
+                    href={`https://www.youtube.com/channel/${cr.id}`}
+                    target="_blank" rel="noopener noreferrer"
+                    style={{
+                      flexShrink: 0, padding: "5px 10px", borderRadius: 6,
+                      border: "1px solid #E5E7EB", background: "#FFFFFF",
+                      fontSize: 10, fontWeight: 700, color: C.textSoft,
+                      textDecoration: "none",
+                    }}
+                  >방문 →</a>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
@@ -3856,6 +4642,7 @@ export default function Home() {
       {currentView === "category" && renderCategory()}
       {currentView === "analysis" && renderAnalysis()}
       {currentView === "ideas" && renderIdeas()}
+      {currentView === "storyboard" && renderStoryboard()}
 
       <div style={{
         padding: "20px", textAlign: "center",

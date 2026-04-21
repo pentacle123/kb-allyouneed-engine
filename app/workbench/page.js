@@ -126,10 +126,12 @@ export default function WorkbenchPage() {
           }}>
             <div style={{
               width: 36, height: 36, borderRadius: 9,
-              background: "linear-gradient(135deg, #FFD700, #FFA500)",
+              background: "#000000",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 14, fontWeight: 900, color: "#1E293B",
-            }}>KB</div>
+              overflow: "hidden",
+            }}>
+              <img src="/kb-symbol.png" alt="KB" style={{ width: 36, height: 36, objectFit: "contain" }} />
+            </div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 800, color: "#1E293B" }}>
                 KB <span style={{ color: "#F97316" }}>AI Brandformance</span> Engine

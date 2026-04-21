@@ -1638,7 +1638,14 @@ export const allCardData = {
     monthlyRequirement: 400000,
     familyCard: "무료",
     version: "2.0",
-    lastUpdate: "2026-04-20"
+    lastUpdate: "2026-04-20",
+    whyTitle: "실적 피로 없는 '정착의 카드'",
+    whyDescription: "7년간 카드 갈아탄 체리피커도 결국 돌아오는 곳. 매월 실적 체크 스트레스 없이 '한 장으로 365일' 쓸 수 있는 상시 혜택 구조가 ALL 카드의 정체성.",
+    coreValueProps: [
+      { title: "조건 없는 1%", description: "국내 모든 가맹점 · 전월 실적·월 한도 無" },
+      { title: "365일 · 5개 영역", description: "쇼핑멤버십·OTT·통신·해외·일상 필수 5축 커버" },
+      { title: "가족 확장", description: "가족카드 무료 · 최대 5장까지 · 실적 합산 가능" }
+    ]
   },
   usps: ALL_CARD_USPS,
   personas: ALL_CARD_PERSONAS,
