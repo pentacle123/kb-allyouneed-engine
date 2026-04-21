@@ -1436,32 +1436,103 @@ export default function Home() {
   // ──────────── MiniHeatmap ────────────
   const MiniHeatmap = ({ data, color, showValues = true }) => {
     const max = Math.max(...data);
-    const isRawValues = max > 100; // 지수(0-100)인지 실제 검색량인지 구분
+    const min = Math.min(...data);
+    const avg = data.reduce((a, b) => a + b, 0) / data.length;
+    const isRawValues = max > 100;
+    // flat 감지: 최대·최소 차이가 평균의 5% 이하면 flat으로 간주
+    const isFlat = (max - min) / (avg || 1) < 0.05;
+    const peakColor = "#F97316"; // 오렌지 강조색
+
+    const chartH = 68;
+    const fmtVal = (v) => v >= 10000 ? `${(v / 10000).toFixed(1)}만` : v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v;
+
     return (
-      <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: 80 }}>
-        {data.map((v, i) => {
-          const heightPct = max > 0 ? (v / max) * 100 : 0;
-          const isPeak = v >= max * 0.9;
-          return (
-            <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, position: "relative" }}
-              title={isRawValues ? `${i + 1}월: ${v.toLocaleString()}회` : `${i + 1}월: 지수 ${v}`}
-            >
-              {showValues && isRawValues && isPeak && (
-                <span style={{ fontSize: 8, color: color, fontWeight: 700, marginBottom: 1 }}>
-                  {v >= 10000 ? `${(v / 10000).toFixed(1)}만` : v >= 1000 ? `${(v / 1000).toFixed(1)}K` : v}
-                </span>
-              )}
-              <div style={{
-                width: "100%",
-                height: Math.max(4, (heightPct / 100) * 56),
-                borderRadius: "3px 3px 0 0",
-                background: isPeak ? color : v >= max * 0.7 ? `${color}90` : v >= max * 0.4 ? `${color}60` : `${color}30`,
-                transition: "all 0.2s",
-              }} />
-              <span style={{ fontSize: 9, color: isPeak ? color : C.textSoft, fontWeight: isPeak ? 700 : 500 }}>{i + 1}월</span>
-            </div>
-          );
-        })}
+      <div style={{ position: "relative", paddingTop: 14 }}>
+        {/* 평균 점선 (non-flat일 때만) */}
+        {!isFlat && isRawValues && (
+          <div
+            style={{
+              position: "absolute",
+              left: 0, right: 0,
+              // chartH 위에서 avg/max 비율 만큼 위로
+              bottom: 18 + Math.max(4, (avg / max) * chartH),
+              borderTop: `1px dashed ${C.textSoft}`,
+              height: 1,
+              zIndex: 2,
+              pointerEvents: "none",
+            }}
+          >
+            <span style={{
+              position: "absolute",
+              right: 0, top: -14,
+              fontSize: 9, color: C.textSoft,
+              background: "#FFFFFF", padding: "0 4px",
+              fontWeight: 600,
+            }}>
+              평균 {fmtVal(Math.round(avg))}
+            </span>
+          </div>
+        )}
+
+        <div style={{ display: "flex", gap: 4, alignItems: "flex-end", height: chartH + 18, position: "relative" }}>
+          {data.map((v, i) => {
+            // flat: 60-75% 범위로 미세한 변화만
+            // non-flat: 10-100% 풀 스케일
+            const heightPct = isFlat
+              ? 70
+              : Math.max(10, max > 0 ? (v / max) * 100 : 10);
+            const isPeak = !isFlat && v === max;
+            const barColor = isPeak ? peakColor : v >= max * 0.75 ? color : v >= max * 0.5 ? `${color}CC` : `${color}66`;
+
+            return (
+              <div
+                key={i}
+                style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, position: "relative" }}
+                title={isRawValues ? `${i + 1}월: ${v.toLocaleString()}회` : `${i + 1}월: 지수 ${v}`}
+              >
+                {showValues && isRawValues && isPeak && (
+                  <span style={{
+                    position: "absolute",
+                    top: -2, left: "50%",
+                    transform: "translate(-50%, -100%)",
+                    fontSize: 9, color: peakColor, fontWeight: 800,
+                    whiteSpace: "nowrap",
+                  }}>
+                    {fmtVal(v)}
+                  </span>
+                )}
+                <div style={{
+                  width: "100%",
+                  height: Math.max(4, (heightPct / 100) * chartH),
+                  borderRadius: "3px 3px 0 0",
+                  background: barColor,
+                  boxShadow: isPeak ? `0 0 0 2px ${peakColor}40` : "none",
+                  transition: "all 0.25s",
+                }} />
+                <span style={{
+                  fontSize: 9,
+                  color: isPeak ? peakColor : C.textSoft,
+                  fontWeight: isPeak ? 800 : 500,
+                }}>{i + 1}월</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* flat 안내 */}
+        {isFlat && isRawValues && (
+          <div style={{
+            marginTop: 6,
+            padding: "4px 10px",
+            borderRadius: 6,
+            background: "#F9FAFB",
+            border: "1px solid #E5E7EB",
+            fontSize: 10, color: C.textSoft,
+            display: "inline-flex", alignItems: "center", gap: 5,
+          }}>
+            ℹ️ 연중 안정적 분포 — 시즌성 없이 매월 약 {fmtVal(Math.round(avg))} 검색
+          </div>
+        )}
       </div>
     );
   };
