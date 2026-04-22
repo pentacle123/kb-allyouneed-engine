@@ -48,17 +48,35 @@ const SYSTEM_PROMPT = `당신은 KB국민카드의 플랫폼별 숏폼 스토리
     { "icon": "🎬", "label": "씬 구성", "content": "한 줄" }
   ],
   "factSheet": {
-    "benefit_facts": [
-      { "label": "카드명", "value": "..." },
-      { "label": "핵심 USP", "value": "..." },
-      { "label": "실적 조건", "value": "..." }
-    ],
-    "search_facts": [
-      { "label": "메인 키워드", "value": "예: 체리피커 · 연 100,680회" },
-      { "label": "연관 키워드", "value": "..." }
-    ],
-    "shooting_timing": "촬영 최적 타이밍 한 줄",
-    "connection": "KB 카드 연결 방법 한 줄"
+    "card_facts": {
+      "cardName": "정확한 카드명",
+      "items": [
+        { "label": "핵심 USP", "value": "..." },
+        { "label": "실적 조건", "value": "전월 실적 30만원 이상 등" },
+        { "label": "연회비", "value": "국내 1만원 / 해외 1.2만원 등" }
+      ],
+      "sourceLink": "https://card.kbcard.com/..."
+    },
+    "savings_example": {
+      "usage": "월 30만원 사용 가정",
+      "monthly": "월 약 1.2만원 적립",
+      "annual": "연 약 14.4만원 절감",
+      "asOf": "2026-04 기준"
+    },
+    "search_evidence": {
+      "main": [
+        { "term": "메인 키워드", "volume": 100680 }
+      ],
+      "related": [
+        { "term": "연관 키워드", "volume": 12000 }
+      ],
+      "source": "Google Trends · Naver DataLab (2026-04)"
+    },
+    "kb_connection": {
+      "applicationUrl": "https://card.kbcard.com/...",
+      "qrAvailable": true,
+      "issuanceTime": "심사 후 약 3-5영업일"
+    }
   },
   "ad_targeting": [
     "연령·성별 타겟",

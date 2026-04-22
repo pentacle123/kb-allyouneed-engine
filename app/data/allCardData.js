@@ -64,7 +64,7 @@ export const ALL_CARD_PERSONAS = [
     description: "체리피커·상테크 7년 차, 매달 40만 채웠나 계산하는 피로 누적. ALL 카드 국내 1% 무실적·무한도가 종착지.",
     linkedUSP: ["usp-domestic-1pct"],
     annualSearchVolume: 2280000,
-    opportunityCount: 4,
+    opportunityCount: 3,
     color: "#3B82F6",
     demoTags: ["25-45세", "남녀 혼합", "신용카드 2장+", "연 2,500만+ 카드 지출"]
   },
@@ -123,62 +123,7 @@ export const ALL_CARD_PERSONAS = [
 // ============================================================================
 
 export const ALL_CARD_OPPORTUNITIES = [
-  // ========== P1. 실적체크 피로형 (6개) ==========
-  {
-    id: "P1-1",
-    personaId: "P1",
-    icon: "🎯",
-    tier: "MEDIUM",
-    card: "ALL",
-    hookType: "Value-hook",
-    title: "체리피커 7년 차, 결국 정착한 카드",
-    subtitle: "혜택 최적화에 지친 최상위 유저의 종착지",
-    description: "체리피커 연 10만+ 검색. 7년간 카드 갈아타며 혜택 최적화한 최상위 유저도 결국 '조건 없는 1%'에 정착한다. '무엇을 더 깎을까'가 아니라 '무엇을 더 이상 계산 안 할까'가 핵심.",
-    annualVolume: 110000,
-    monthlyVolume: 9170,
-    who: {
-      tags: ["체리피커 7년+", "신용카드 3-5장 보유", "30-40대 남녀"],
-      dataEvidence: "체리피커(100,680) + 체리피킹 카드(444) 중복 검색자"
-    },
-    what: {
-      tags: ["조건 없는 1% 캐시백", "실적·한도 스트레스 제로"],
-      dataEvidence: "ALL 카드 국내 1% 무실적·무한도 = 체리피커 종착지"
-    },
-    when: {
-      tags: ["기존 메인 카드 혜택 축소 시점", "카드 교체 고려기"],
-      dataEvidence: "평균 카드 교체 주기 3-4년, 체리피커는 1-2년"
-    },
-    where: {
-      tags: ["카드고릴라", "뽐뿌·디시 카드갤", "블로그 카드 후기"],
-      dataEvidence: "카드고릴라 월 170만 검색 중 체리피커 유입 비율 약 10%"
-    },
-    why: {
-      tags: ["혜택 계산 피로", "조건 없는 단순함 추구"],
-      dataEvidence: "체리피커 관련 페인포인트 검색 35% 증가"
-    },
-    how: {
-      tags: ["'복잡한 혜택' vs 'ALL의 단순함' 비교 콘텐츠", "체리피커 포기 인터뷰"],
-      dataEvidence: "카드 비교 유튜브 평균 조회수 5만+"
-    },
-    pathFinder: ["체리피커", "신용카드 추천", "카드고릴라 1티어", "무실적 카드", "ALL 카드"],
-    cluster: ["체리피커", "체리슈머", "상테크", "카드 최적화", "체리피킹 카드"],
-    relatedKeywords: [
-      { term: "체리피커", volume: 100680, trend: 0.15 },
-      { term: "체리피킹 카드", volume: 444, trend: 0.08 }
-    ],
-    contentHook: "7년 체리피커가 결국 돌아온 카드",
-    painPoints: ["매달 실적 체크 피로", "카드 혜택 비교 지침", "조건 맞추기 위한 편법 사용 죄책감"],
-    uspConnection: "국내 1% 무실적·무한도",
-    competition: {
-      ranking: [
-        { name: "카드고릴라", type: "카드 비교 플랫폼", share: "1위", volume: 2036100 },
-        { name: "신용카드 추천 (자연 검색)", type: "정보 허브", share: "2위", volume: 587880 },
-        { name: "뽐뿌 카드정보", type: "커뮤니티", share: "3위", volume: 250000 },
-        { name: "KB국민카드 브랜드 검색", type: "카드사", share: "인지도 낮음", volume: 45000 }
-      ],
-      insight: "체리피커 검색 여정 1순위가 카드고릴라. KB는 카드고릴라 '1티어 무실적 카드' 섹션 상위 노출 확보 + 체리피커 졸업 후기 콘텐츠로 검색 여정 종점 확보 가능."
-    }
-  },
+  // ========== P1. 실적체크 피로형 ==========
   {
     id: "P1-2",
     personaId: "P1",

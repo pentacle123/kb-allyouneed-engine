@@ -1224,17 +1224,36 @@ export default function Home() {
     }
   };
 
-  // YouTube 크리에이터 검색
-  const searchYouTubeCreators = async (oppId, query) => {
-    if (!oppId || !query) return;
-    setYtCreators(prev => ({ ...prev, [oppId]: { loading: true, error: null, channels: null } }));
+  // YouTube 크리에이터 검색 (Claude-in-the-loop 3-step)
+  const searchYouTubeCreators = async (oppId, opp, idea) => {
+    if (!oppId || !opp) return;
+    setYtCreators(prev => ({ ...prev, [oppId]: { loading: true, error: null, channels: null, context: null } }));
     try {
-      const res = await fetch(`/api/youtube?q=${encodeURIComponent(query)}&maxResults=6`);
-      const result = await res.json();
+      const cardMeta = {
+        cardName: CARDS[opp.card]?.name || opp.card || "KB국민카드",
+        cardTagline: CARDS[opp.card]?.tagline || "",
+      };
+      const res = await fetch("/api/youtube", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ opportunity: opp, idea: idea || null, cardMeta }),
+      });
+      const text = await res.text();
+      let result;
+      try { result = JSON.parse(text); }
+      catch { throw new Error(`응답 파싱 실패 (${res.status})`); }
       if (!result.success) throw new Error(result.error || "검색 실패");
-      setYtCreators(prev => ({ ...prev, [oppId]: { loading: false, error: null, channels: result.channels || [] } }));
+      setYtCreators(prev => ({
+        ...prev,
+        [oppId]: {
+          loading: false, error: null,
+          channels: result.creators || [],
+          context: result.context || null,
+          source: result.source || null,
+        }
+      }));
     } catch (e) {
-      setYtCreators(prev => ({ ...prev, [oppId]: { loading: false, error: e.message, channels: null } }));
+      setYtCreators(prev => ({ ...prev, [oppId]: { loading: false, error: e.message, channels: null, context: null } }));
     }
   };
 
@@ -4127,13 +4146,12 @@ export default function Home() {
       }
     }
 
-    // YouTube 크리에이터 자동 검색
+    // YouTube 크리에이터 자동 검색 (Claude-in-the-loop)
     const ytState = ytCreators[opp.id] || {};
     if (!ytState.loading && !ytState.channels && !ytState.error && typeof window !== "undefined") {
       if (!ytCreators[opp.id]) {
         setTimeout(() => {
-          const query = (opp.relatedKeywords?.[0]?.term) || opp.title?.substring(0, 20) || "KB 국민카드";
-          searchYouTubeCreators(opp.id, query);
+          searchYouTubeCreators(opp.id, opp, idea);
         }, 0);
       }
     }
@@ -4291,55 +4309,110 @@ export default function Home() {
                   이 아이디어 실제 숏폼 제작에 바로 활용할 검증된 팩트 모음
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 18 }}>
-                  {data.factSheet.benefit_facts && (
+                  {/* Block 1: 카드 팩트 */}
+                  {data.factSheet.card_facts && (
                     <div>
                       <div style={{ fontSize: 12, fontWeight: 800, color: "#78350F", marginBottom: 8, paddingBottom: 6, borderBottom: "1px solid #FDE68A" }}>
-                        💳 {opp.card} 혜택 팩트
+                        💳 {data.factSheet.card_facts.cardName || opp.card} 카드 팩트
                       </div>
-                      {data.factSheet.benefit_facts.map((fact, i) => (
+                      {(data.factSheet.card_facts.items || []).map((fact, i) => (
                         <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, fontSize: 12 }}>
-                          <div style={{ color: C.textSoft, flexShrink: 0, width: 70 }}>{fact.label}</div>
+                          <div style={{ color: C.textSoft, flexShrink: 0, width: 80 }}>{fact.label}</div>
                           <div style={{ color: C.text, fontWeight: 700 }}>{fact.value}</div>
                         </div>
                       ))}
+                      {data.factSheet.card_facts.sourceLink && (
+                        <a href={data.factSheet.card_facts.sourceLink} target="_blank" rel="noopener noreferrer" style={{ fontSize: 10, color: "#0369A1", textDecoration: "underline", display: "inline-block", marginTop: 4 }}>
+                          🔗 KB카드 공식 페이지
+                        </a>
+                      )}
                     </div>
                   )}
-                  {data.factSheet.search_facts && (
+
+                  {/* Block 2: 절감 예시 */}
+                  {data.factSheet.savings_example && (
                     <div>
                       <div style={{ fontSize: 12, fontWeight: 800, color: "#78350F", marginBottom: 8, paddingBottom: 6, borderBottom: "1px solid #FDE68A" }}>
-                        📊 검색 데이터 팩트
+                        💰 절감 예시
                       </div>
-                      {data.factSheet.search_facts.map((fact, i) => (
-                        <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, fontSize: 12 }}>
-                          <div style={{ color: C.textSoft, flexShrink: 0, width: 80 }}>{fact.label}</div>
-                          <div style={{ color: C.text }}>{fact.value}</div>
+                      {data.factSheet.savings_example.usage && (
+                        <div style={{ display: "flex", gap: 10, marginBottom: 8, fontSize: 12 }}>
+                          <div style={{ color: C.textSoft, flexShrink: 0, width: 70 }}>사용 가정</div>
+                          <div style={{ color: C.text }}>{data.factSheet.savings_example.usage}</div>
+                        </div>
+                      )}
+                      {data.factSheet.savings_example.monthly && (
+                        <div style={{ display: "flex", gap: 10, marginBottom: 8, fontSize: 12 }}>
+                          <div style={{ color: C.textSoft, flexShrink: 0, width: 70 }}>월 절감</div>
+                          <div style={{ color: "#047857", fontWeight: 800 }}>{data.factSheet.savings_example.monthly}</div>
+                        </div>
+                      )}
+                      {data.factSheet.savings_example.annual && (
+                        <div style={{ display: "flex", gap: 10, marginBottom: 8, fontSize: 12 }}>
+                          <div style={{ color: C.textSoft, flexShrink: 0, width: 70 }}>연 절감</div>
+                          <div style={{ color: "#047857", fontWeight: 800, fontSize: 14 }}>{data.factSheet.savings_example.annual}</div>
+                        </div>
+                      )}
+                      {data.factSheet.savings_example.asOf && (
+                        <div style={{ fontSize: 10, color: C.textSoft, marginTop: 4 }}>{data.factSheet.savings_example.asOf}</div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Block 3: 검색 근거 */}
+                  {data.factSheet.search_evidence && (
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 800, color: "#78350F", marginBottom: 8, paddingBottom: 6, borderBottom: "1px solid #FDE68A" }}>
+                        📊 검색 근거
+                      </div>
+                      {(data.factSheet.search_evidence.main || []).map((kw, i) => (
+                        <div key={`m-${i}`} style={{ display: "flex", gap: 10, marginBottom: 6, fontSize: 12 }}>
+                          <div style={{ color: C.textSoft, flexShrink: 0, width: 60 }}>메인</div>
+                          <div style={{ color: C.text, fontWeight: 700 }}>{kw.term} <span style={{ color: "#047857" }}>· {(kw.volume||0).toLocaleString()}회</span></div>
                         </div>
                       ))}
-                      {opp.annualVolume > 0 && (
-                        <div style={{ display: "flex", gap: 10, marginTop: 10, paddingTop: 8, borderTop: "1px solid #FDE68A", fontSize: 12 }}>
-                          <div style={{ color: C.textSoft, flexShrink: 0, width: 80 }}>연 검색량</div>
-                          <div style={{ color: "#047857", fontWeight: 800, fontSize: 14 }}>{opp.annualVolume.toLocaleString()}회</div>
+                      {(data.factSheet.search_evidence.related || []).map((kw, i) => (
+                        <div key={`r-${i}`} style={{ display: "flex", gap: 10, marginBottom: 6, fontSize: 12 }}>
+                          <div style={{ color: C.textSoft, flexShrink: 0, width: 60 }}>연관</div>
+                          <div style={{ color: C.text }}>{kw.term} <span style={{ color: C.textSoft }}>· {(kw.volume||0).toLocaleString()}회</span></div>
+                        </div>
+                      ))}
+                      {data.factSheet.search_evidence.source && (
+                        <div style={{ fontSize: 10, color: C.textSoft, marginTop: 6, fontStyle: "italic" }}>출처: {data.factSheet.search_evidence.source}</div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Block 4: KB 카드 연결 */}
+                  {data.factSheet.kb_connection && (
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 800, color: "#78350F", marginBottom: 8, paddingBottom: 6, borderBottom: "1px solid #FDE68A" }}>
+                        🔗 KB 카드 연결
+                      </div>
+                      {data.factSheet.kb_connection.applicationUrl && (
+                        <div style={{ marginBottom: 8 }}>
+                          <a href={data.factSheet.kb_connection.applicationUrl} target="_blank" rel="noopener noreferrer" style={{
+                            display: "inline-block", padding: "6px 12px", borderRadius: 6,
+                            background: "#FFB71B", color: "#1a1a1a", fontSize: 11, fontWeight: 800,
+                            textDecoration: "none",
+                          }}>📲 카드 신청 바로가기</a>
+                        </div>
+                      )}
+                      {data.factSheet.kb_connection.qrAvailable && (
+                        <div style={{ display: "flex", gap: 10, marginBottom: 6, fontSize: 12 }}>
+                          <div style={{ color: C.textSoft, flexShrink: 0, width: 70 }}>QR 코드</div>
+                          <div style={{ color: C.text }}>✓ 영상 종료 화면 노출 가능</div>
+                        </div>
+                      )}
+                      {data.factSheet.kb_connection.issuanceTime && (
+                        <div style={{ display: "flex", gap: 10, marginBottom: 6, fontSize: 12 }}>
+                          <div style={{ color: C.textSoft, flexShrink: 0, width: 70 }}>발급 시간</div>
+                          <div style={{ color: C.text }}>{data.factSheet.kb_connection.issuanceTime}</div>
                         </div>
                       )}
                     </div>
                   )}
                 </div>
-                {(data.factSheet.shooting_timing || data.factSheet.connection) && (
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 18, marginTop: 16, paddingTop: 14, borderTop: "1px solid #FDE68A" }}>
-                    {data.factSheet.shooting_timing && (
-                      <div>
-                        <div style={{ fontSize: 11, fontWeight: 800, color: "#78350F", marginBottom: 4 }}>📅 촬영 타이밍</div>
-                        <div style={{ fontSize: 12, color: C.text, lineHeight: 1.5 }}>{data.factSheet.shooting_timing}</div>
-                      </div>
-                    )}
-                    {data.factSheet.connection && (
-                      <div>
-                        <div style={{ fontSize: 11, fontWeight: 800, color: "#78350F", marginBottom: 4 }}>🔗 KB 연결</div>
-                        <div style={{ fontSize: 12, color: C.text, lineHeight: 1.5 }}>{data.factSheet.connection}</div>
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             )}
 
@@ -4351,7 +4424,7 @@ export default function Home() {
         )}
 
         {/* 크리에이터 매칭 (YouTube API) */}
-        <CreatorMatching oppId={opp.id} opp={opp} />
+        <CreatorMatching oppId={opp.id} opp={opp} idea={idea} />
 
         {/* 하단 CTA */}
         <button
@@ -4492,10 +4565,10 @@ export default function Home() {
     );
   };
 
-  // ──────────── CreatorMatching (YouTube API) ────────────
-  const CreatorMatching = ({ oppId, opp }) => {
+  // ──────────── CreatorMatching (Claude-in-the-loop YouTube API) ────────────
+  const CreatorMatching = ({ oppId, opp, idea }) => {
     const state = ytCreators[oppId] || {};
-    const { loading, error, channels } = state;
+    const { loading, error, channels, context, source } = state;
 
     const formatSubs = (n) => {
       if (!n) return "정보 없음";
@@ -4511,6 +4584,13 @@ export default function Home() {
       return { label: "NANO", color: "#8B5CF6" };
     };
 
+    const scoreColor = (s) => {
+      if (s >= 90) return "#16A34A";
+      if (s >= 80) return "#2563EB";
+      if (s >= 70) return "#CA8A04";
+      return "#9CA3AF";
+    };
+
     return (
       <div style={{
         background: "#FFFFFF", borderRadius: 14,
@@ -4521,13 +4601,13 @@ export default function Home() {
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{ fontSize: 18 }}>🎥</span>
             <span style={{ fontSize: 14, fontWeight: 800, color: C.text }}>크리에이터 매칭</span>
-            <span style={{ fontSize: 10, color: C.textSoft, fontWeight: 600 }}>YouTube Shorts 실시간 검색</span>
+            <span style={{ fontSize: 10, color: C.textSoft, fontWeight: 600 }}>Claude AI 3단계 검증</span>
+            {source === "fallback" && (
+              <span style={{ fontSize: 9, color: "#CA8A04", background: "#FEF3C7", padding: "2px 6px", borderRadius: 4, fontWeight: 700 }}>FALLBACK</span>
+            )}
           </div>
           <button
-            onClick={() => {
-              const query = (opp.relatedKeywords?.[0]?.term) || opp.title?.substring(0, 20) || "KB 국민카드";
-              searchYouTubeCreators(oppId, query);
-            }}
+            onClick={() => searchYouTubeCreators(oppId, opp, idea)}
             disabled={loading}
             style={{
               padding: "6px 12px", borderRadius: 8,
@@ -4537,6 +4617,25 @@ export default function Home() {
             }}
           >{loading ? "검색 중..." : "↻ 다시 검색"}</button>
         </div>
+
+        {/* Context badge */}
+        {context && (
+          <div style={{
+            background: "#F0F9FF", border: "1px solid #BAE6FD",
+            borderRadius: 10, padding: "10px 12px", marginBottom: 12,
+          }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 6 }}>
+              {context.domain && <span style={{ fontSize: 10, fontWeight: 800, color: "#0369A1", background: "#E0F2FE", padding: "2px 8px", borderRadius: 4 }}>도메인: {context.domain}</span>}
+              {context.genre && <span style={{ fontSize: 10, fontWeight: 800, color: "#0369A1", background: "#E0F2FE", padding: "2px 8px", borderRadius: 4 }}>장르: {context.genre}</span>}
+              {context.creator_profile && <span style={{ fontSize: 10, fontWeight: 700, color: "#0C4A6E", background: "#FFFFFF", padding: "2px 8px", borderRadius: 4, border: "1px solid #BAE6FD" }}>👤 {context.creator_profile}</span>}
+            </div>
+            {context.rationale && (
+              <div style={{ fontSize: 11, color: "#075985", lineHeight: 1.5 }}>
+                💡 {context.rationale}
+              </div>
+            )}
+          </div>
+        )}
 
         {loading && !channels && (
           <div style={{
@@ -4549,7 +4648,7 @@ export default function Home() {
               borderRadius: "50%", animation: "spin 0.8s linear infinite",
               marginBottom: 8,
             }} />
-            <div style={{ fontSize: 11, color: C.textSoft }}>YouTube에서 관련 크리에이터 검색 중...</div>
+            <div style={{ fontSize: 11, color: C.textSoft }}>Claude AI가 컨텍스트 분석 → YouTube 검색 → 검증 중...</div>
           </div>
         )}
 
@@ -4566,51 +4665,78 @@ export default function Home() {
         )}
 
         {channels && channels.length > 0 && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {channels.map((cr, i) => {
               const tier = classifyTier(cr.subs);
+              const sc = cr.matchScore || 0;
+              const sCol = scoreColor(sc);
               return (
                 <div key={i} style={{
-                  display: "flex", alignItems: "center", gap: 12,
-                  padding: "10px 12px", borderRadius: 10,
+                  padding: "12px 14px", borderRadius: 10,
                   background: "#F9FAFB", border: "1px solid #F3F4F6",
                   borderLeft: `3px solid ${tier.color}`,
                 }}>
-                  {cr.thumbnail ? (
-                    <img src={cr.thumbnail} alt={cr.name} style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
-                  ) : (
-                    <div style={{
-                      width: 36, height: 36, borderRadius: "50%",
-                      background: "#E5E7EB", display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 14, color: "#9CA3AF", flexShrink: 0,
-                    }}>👤</div>
-                  )}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2, flexWrap: "wrap" }}>
-                      <span style={{ fontSize: 12, fontWeight: 800, color: C.text }}>{cr.name}</span>
-                      <span style={{
-                        padding: "1px 6px", borderRadius: 4,
-                        background: `${tier.color}15`, color: tier.color,
-                        fontSize: 9, fontWeight: 800,
-                      }}>{tier.label}</span>
-                      <span style={{ fontSize: 10, color: C.textSoft }}>구독자 {formatSubs(cr.subs)}</span>
-                    </div>
-                    {cr.videoTitle && (
-                      <div style={{ fontSize: 10, color: C.textSoft, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        최근: {cr.videoTitle}
-                      </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    {cr.thumbnail ? (
+                      <img src={cr.thumbnail} alt={cr.name} style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+                    ) : (
+                      <div style={{
+                        width: 40, height: 40, borderRadius: "50%",
+                        background: "#E5E7EB", display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 14, color: "#9CA3AF", flexShrink: 0,
+                      }}>👤</div>
                     )}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2, flexWrap: "wrap" }}>
+                        <span style={{ fontSize: 13, fontWeight: 800, color: C.text }}>{cr.name}</span>
+                        <span style={{
+                          padding: "1px 6px", borderRadius: 4,
+                          background: `${tier.color}15`, color: tier.color,
+                          fontSize: 9, fontWeight: 800,
+                        }}>{tier.label}</span>
+                        {sc > 0 && (
+                          <span style={{
+                            padding: "1px 7px", borderRadius: 4,
+                            background: `${sCol}15`, color: sCol,
+                            fontSize: 10, fontWeight: 800,
+                          }}>매치 {sc}점</span>
+                        )}
+                        <span style={{ fontSize: 10, color: C.textSoft }}>구독자 {formatSubs(cr.subs)}</span>
+                      </div>
+                      {cr.videoTitle && (
+                        <div style={{ fontSize: 10, color: C.textSoft, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          최근: {cr.videoTitle}
+                        </div>
+                      )}
+                    </div>
+                    <a
+                      href={`https://www.youtube.com/channel/${cr.id}`}
+                      target="_blank" rel="noopener noreferrer"
+                      style={{
+                        flexShrink: 0, padding: "5px 10px", borderRadius: 6,
+                        border: "1px solid #E5E7EB", background: "#FFFFFF",
+                        fontSize: 10, fontWeight: 700, color: C.textSoft,
+                        textDecoration: "none",
+                      }}
+                    >방문 →</a>
                   </div>
-                  <a
-                    href={`https://www.youtube.com/channel/${cr.id}`}
-                    target="_blank" rel="noopener noreferrer"
-                    style={{
-                      flexShrink: 0, padding: "5px 10px", borderRadius: 6,
-                      border: "1px solid #E5E7EB", background: "#FFFFFF",
-                      fontSize: 10, fontWeight: 700, color: C.textSoft,
-                      textDecoration: "none",
-                    }}
-                  >방문 →</a>
+
+                  {cr.matchReason && (
+                    <div style={{
+                      marginTop: 8, padding: "8px 10px", borderRadius: 6,
+                      background: "#F0FDF4", border: "1px solid #BBF7D0",
+                      fontSize: 11, color: "#166534", lineHeight: 1.5,
+                    }}>
+                      ✓ <b>적합 이유:</b> {cr.matchReason}
+                    </div>
+                  )}
+                  {cr.collaborationAngle && (
+                    <div style={{
+                      marginTop: 6, fontSize: 11, color: C.textSoft, fontStyle: "italic", lineHeight: 1.5,
+                    }}>
+                      💡 <b>협업 앵글:</b> {cr.collaborationAngle}
+                    </div>
+                  )}
                 </div>
               );
             })}
