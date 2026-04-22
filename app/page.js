@@ -3662,9 +3662,13 @@ export default function Home() {
           <MiniHeatmap data={opp.peakMonths} color={cardColor} />
         </div>
 
-        {/* 6-Axis Grid — 1280 레이아웃에서 3열 확장 */}
+        {/* 6-Axis Grid — 항상 3열 × 2행 (반응형에서만 좁아짐) */}
         {opp.context && (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12, marginBottom: 18 }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+            gap: 12, marginBottom: 18,
+          }}>
             {AXIS_CFG.map(ax => {
               const d = opp.context[ax.key];
               if (!d) return null;
