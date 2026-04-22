@@ -1184,6 +1184,18 @@ export default function Home() {
   const activeStep = VIEW_STEP[currentView] ?? 0;
   const showStepIndicator = currentView !== "hub";
 
+  // Phase 12-6+: maxStep 추적 — 한 번이라도 방문한 단계는 클릭 네비 가능
+  const [maxStepReached, setMaxStepReached] = useState(0);
+  React.useEffect(() => {
+    if (activeStep > maxStepReached) setMaxStepReached(activeStep);
+    // opp를 바꾸면 이후 단계(ideas/storyboard)의 컨텍스트가 다르므로 재방문 허용 축소
+  }, [activeStep, maxStepReached]);
+  // opp 바뀌면 maxStep 리셋
+  React.useEffect(() => {
+    setMaxStepReached(VIEW_STEP[currentView] ?? 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedOpp?.id]);
+
   const goToCategory  = (cat) => { setCurrentCategory(cat); setNeedSubCard(null); setYouSubCard(null); setCurrentView("category"); };
   const goToAnalysis  = (opp) => { setSelectedOpp(opp); setCurrentView("analysis"); };
   const goToIdeas     = () => {
@@ -1532,25 +1544,23 @@ export default function Home() {
   };
 
   // ──────────── Step Indicator ────────────
-  // Phase 12-6: Step Indicator 클릭 이동 활성화 (완료된 단계 클릭 가능)
+  // Phase 12-6+: 한 번이라도 방문한 단계는 양방향 클릭 네비 가능
   const goToStep = (stepIdx) => {
     // stepIdx: 0=category, 1=analysis, 2=ideas, 3=storyboard
-    if (stepIdx > activeStep) return; // 미도달 단계는 이동 불가
-    if (stepIdx === activeStep) return; // 현재 단계
+    if (stepIdx === activeStep) return;
+    if (stepIdx > maxStepReached) return; // 아직 안 가본 단계
     if (stepIdx === 0) {
-      // 기회 발견: Hub (랜딩) 또는 Category
       if (currentCategory) {
         setCurrentView("category");
-        setSelectedOpp(null);
       } else {
         goHome();
       }
     } else if (stepIdx === 1) {
-      // 기회 분석 (Analysis)
       if (selectedOpp) setCurrentView("analysis");
     } else if (stepIdx === 2) {
-      // AI 아이디어
       if (selectedOpp) setCurrentView("ideas");
+    } else if (stepIdx === 3) {
+      if (selectedOpp && selectedIdea) setCurrentView("storyboard");
     }
   };
 
@@ -1559,44 +1569,44 @@ export default function Home() {
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "14px 24px", display: "flex", alignItems: "center" }}>
         {STEPS_LABEL.map((s, i) => {
           const isCurrent = i === activeStep;
-          const isCompleted = i < activeStep;
-          const isClickable = (isCompleted || (i === 0 && currentView !== "hub")) && !isCurrent;
+          const isVisited = i <= maxStepReached;
+          const isClickable = isVisited && !isCurrent;
           return (
             <React.Fragment key={i}>
               {i > 0 && (
                 <div style={{
                   flex: 1, height: 2,
-                  background: i <= activeStep ? "#2563EB" : "#CBD5E1",
+                  background: i <= maxStepReached ? "#2563EB" : "#CBD5E1",
                   margin: "0 6px",
+                  transition: "background 0.3s",
                 }} />
               )}
               <div
                 onClick={() => isClickable && goToStep(i)}
                 style={{
                   display: "flex", alignItems: "center", gap: 6,
-                  opacity: i <= activeStep ? 1 : 0.4,
+                  opacity: isVisited ? 1 : 0.4,
                   cursor: isClickable ? "pointer" : (isCurrent ? "default" : "not-allowed"),
                   transition: "transform 0.15s",
                 }}
                 onMouseEnter={(e) => { if (isClickable) e.currentTarget.style.transform = "translateY(-1px)"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
-                title={isClickable ? `${s}으로 돌아가기` : (isCurrent ? "현재 단계" : "미도달")}
+                title={isClickable ? `${s}(으)로 이동` : (isCurrent ? "현재 단계" : "미도달 — 진행 후 이동 가능")}
               >
                 <div style={{
                   width: 24, height: 24, borderRadius: 12,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  background: isCurrent ? "#2563EB" : isCompleted ? C.accent : "#CBD5E1",
-                  color: i <= activeStep ? "#fff" : C.textSoft,
+                  background: isCurrent ? "#2563EB" : isVisited ? C.accent : "#CBD5E1",
+                  color: isVisited ? "#fff" : C.textSoft,
                   fontSize: 11, fontWeight: 800,
                   boxShadow: isCurrent ? "0 2px 6px rgba(37, 99, 235, 0.35)" : "none",
                   transform: isCurrent ? "scale(1.1)" : "scale(1)",
                   transition: "all 0.2s",
                 }}>{i + 1}</div>
                 <span style={{
-                  color: i <= activeStep ? C.text : C.textSoft,
+                  color: isVisited ? C.text : C.textSoft,
                   fontSize: 11, fontWeight: isCurrent ? 800 : 600,
                   whiteSpace: "nowrap",
-                  textDecoration: isClickable ? "none" : "none",
                 }}>{s}</span>
               </div>
             </React.Fragment>
