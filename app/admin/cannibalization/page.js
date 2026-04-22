@@ -65,14 +65,14 @@ export default function CannibalizationDashboard() {
         }}>
           <a href="/" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}>
             <div style={{
-              width: 40, height: 40,
-              display: "flex", alignItems: "center", justifyContent: "center",
+              width: 38, height: 38,
               background: "#FFFFFF", overflow: "hidden",
+              position: "relative", flexShrink: 0,
             }}>
               <img
                 src="/kb-symbol.png"
                 alt="KB"
-                style={{ height: 36, width: "auto", objectFit: "none", objectPosition: "left center", transform: "translateX(3px)" }}
+                style={{ position: "absolute", left: -4, top: "50%", transform: "translateY(-50%)", height: 50, width: "auto", maxWidth: "none" }}
               />
             </div>
             <div>

@@ -1313,23 +1313,25 @@ export default function Home() {
           background: "#FFFFFF", borderRadius: 12,
           border: "1px solid #E5E7EB",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {/* KB *b 심볼만 표시 — 가로 로고 이미지에서 왼쪽 영역만 크롭 */}
             <div style={{
-              width: 44, height: 44,
-              display: "flex", alignItems: "center", justifyContent: "center",
+              width: 42, height: 42,
               background: "#FFFFFF",
               overflow: "hidden",
+              position: "relative",
+              flexShrink: 0,
             }}>
-              {/* kb-symbol.png는 KB국민카드 가로 로고 — 왼쪽 *b 심볼만 보이도록 크롭 */}
               <img
                 src="/kb-symbol.png"
                 alt="KB"
                 style={{
-                  height: 40,
+                  position: "absolute",
+                  left: -4, top: "50%",
+                  transform: "translateY(-50%)",
+                  height: 56,
                   width: "auto",
-                  objectFit: "none",
-                  objectPosition: "left center",
-                  transform: "translateX(4px)",
+                  maxWidth: "none",
                 }}
               />
             </div>
