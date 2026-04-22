@@ -1415,28 +1415,16 @@ export default function Home() {
           background: "#FFFFFF", borderRadius: 12,
           border: "1px solid #E5E7EB",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {/* KB *b 심볼만 표시 — 가로 로고 이미지에서 왼쪽 영역만 크롭 */}
-            <div style={{
-              width: 42, height: 42,
-              background: "#FFFFFF",
-              overflow: "hidden",
-              position: "relative",
-              flexShrink: 0,
-            }}>
-              <img
-                src="/kb-symbol.png"
-                alt="KB"
-                style={{
-                  position: "absolute",
-                  left: -4, top: "50%",
-                  transform: "translateY(-50%)",
-                  height: 56,
-                  width: "auto",
-                  maxWidth: "none",
-                }}
-              />
-            </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {/* KB *b 심볼 — 깔끔하게 크롭된 별도 이미지 */}
+            <img
+              src="/kb-mark.png"
+              alt="KB"
+              style={{
+                height: 38, width: "auto",
+                display: "block", flexShrink: 0,
+              }}
+            />
             <div>
               <div style={{ fontSize: 15, fontWeight: 800, color: C.text, lineHeight: 1.2 }}>
                 KB <span style={{ color: "#FFB71B" }}>AI Brandformance</span> Engine
