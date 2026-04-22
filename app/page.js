@@ -1318,8 +1318,20 @@ export default function Home() {
               width: 44, height: 44,
               display: "flex", alignItems: "center", justifyContent: "center",
               background: "#FFFFFF",
+              overflow: "hidden",
             }}>
-              <img src="/kb-symbol.png" alt="KB" style={{ width: 40, height: 40, objectFit: "contain" }} />
+              {/* kb-symbol.png는 KB국민카드 가로 로고 — 왼쪽 *b 심볼만 보이도록 크롭 */}
+              <img
+                src="/kb-symbol.png"
+                alt="KB"
+                style={{
+                  height: 40,
+                  width: "auto",
+                  objectFit: "none",
+                  objectPosition: "left center",
+                  transform: "translateX(4px)",
+                }}
+              />
             </div>
             <div>
               <div style={{ fontSize: 15, fontWeight: 800, color: C.text, lineHeight: 1.2 }}>

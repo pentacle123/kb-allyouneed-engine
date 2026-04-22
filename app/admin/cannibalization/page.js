@@ -67,9 +67,13 @@ export default function CannibalizationDashboard() {
             <div style={{
               width: 40, height: 40,
               display: "flex", alignItems: "center", justifyContent: "center",
-              background: "#FFFFFF",
+              background: "#FFFFFF", overflow: "hidden",
             }}>
-              <img src="/kb-symbol.png" alt="KB" style={{ width: 36, height: 36, objectFit: "contain" }} />
+              <img
+                src="/kb-symbol.png"
+                alt="KB"
+                style={{ height: 36, width: "auto", objectFit: "none", objectPosition: "left center", transform: "translateX(3px)" }}
+              />
             </div>
             <div>
               <div style={{ fontSize: 14, fontWeight: 800, color: "#1E293B" }}>
