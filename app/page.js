@@ -4665,11 +4665,26 @@ export default function Home() {
             borderRadius: 10, padding: "10px 12px", marginBottom: 12,
           }}>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 6 }}>
-              {context.domain && <span style={{ fontSize: 10, fontWeight: 800, color: "#0369A1", background: "#E0F2FE", padding: "2px 8px", borderRadius: 4 }}>도메인: {context.domain}</span>}
-              {context.genre && <span style={{ fontSize: 10, fontWeight: 800, color: "#0369A1", background: "#E0F2FE", padding: "2px 8px", borderRadius: 4 }}>장르: {context.genre}</span>}
-              {context.creator_profile && <span style={{ fontSize: 10, fontWeight: 700, color: "#0C4A6E", background: "#FFFFFF", padding: "2px 8px", borderRadius: 4, border: "1px solid #BAE6FD" }}>👤 {context.creator_profile}</span>}
+              {(() => {
+                // creator_profile이 객체로 올 수 있음 (age_range, content_style, subscriber_tier 등)
+                const cp = context.creator_profile;
+                const cpText = typeof cp === "string"
+                  ? cp
+                  : cp && typeof cp === "object"
+                    ? Object.values(cp).filter(Boolean).join(" · ")
+                    : null;
+                const domainText = typeof context.domain === "string" ? context.domain : null;
+                const genreText = typeof context.genre === "string" ? context.genre : null;
+                return (
+                  <>
+                    {domainText && <span style={{ fontSize: 10, fontWeight: 800, color: "#0369A1", background: "#E0F2FE", padding: "2px 8px", borderRadius: 4 }}>도메인: {domainText}</span>}
+                    {genreText && <span style={{ fontSize: 10, fontWeight: 800, color: "#0369A1", background: "#E0F2FE", padding: "2px 8px", borderRadius: 4 }}>장르: {genreText}</span>}
+                    {cpText && <span style={{ fontSize: 10, fontWeight: 700, color: "#0C4A6E", background: "#FFFFFF", padding: "2px 8px", borderRadius: 4, border: "1px solid #BAE6FD" }}>👤 {cpText}</span>}
+                  </>
+                );
+              })()}
             </div>
-            {context.rationale && (
+            {typeof context.rationale === "string" && context.rationale && (
               <div style={{ fontSize: 11, color: "#075985", lineHeight: 1.5 }}>
                 💡 {context.rationale}
               </div>
