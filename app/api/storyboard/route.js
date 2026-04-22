@@ -129,7 +129,7 @@ export async function POST(request) {
 
     const message = await client.messages.create({
       model: "claude-sonnet-4-5-20250929",
-      max_tokens: 4500,
+      max_tokens: 6500,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userPrompt }],
     });
@@ -152,7 +152,23 @@ export async function POST(request) {
       );
     }
 
-    const parsed = JSON.parse(jsonMatch[0]);
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonMatch[0]);
+    } catch (parseErr) {
+      // 토큰 제한으로 JSON이 잘렸을 가능성 → 중괄호 복구 시도
+      let attempt = jsonMatch[0];
+      const opens = (attempt.match(/\{/g) || []).length;
+      const closes = (attempt.match(/\}/g) || []).length;
+      if (opens > closes) attempt = attempt + "}".repeat(opens - closes);
+      try { parsed = JSON.parse(attempt); }
+      catch {
+        return NextResponse.json(
+          { success: false, error: `AI 응답 JSON 파싱 실패 (토큰 잘림 가능): ${parseErr.message}`, raw: cleaned.substring(0, 400) },
+          { status: 500 }
+        );
+      }
+    }
     return NextResponse.json({ success: true, data: parsed });
   } catch (error) {
     console.error("[/api/storyboard] error:", error);

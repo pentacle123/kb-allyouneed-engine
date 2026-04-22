@@ -1305,17 +1305,7 @@ export default function Home() {
       if (!result.success) throw new Error(result.error || "생성 실패");
       const ideas = result.data.ideas || [];
       setAiIdeas(prev => ({ ...prev, [key]: { loading: false, error: null, ideas } }));
-
-      // Phase 12-17 (분할 전략): auto 탭에서 아이디어 도착 후 스토리보드 3개를 백그라운드 병렬 생성
-      // 각 API 호출은 독립적 60s 예산을 가짐 → 타임아웃 회피
-      if (perspective === "auto" && ideas.length > 0) {
-        ideas.forEach(idea => {
-          const sbKey = `${opp.id}::${idea.id}`;
-          if (!storyboards[sbKey]?.data && !storyboards[sbKey]?.loading) {
-            setTimeout(() => generateStoryboard(opp, idea), 0);
-          }
-        });
-      }
+      // 스토리보드는 사용자가 카드를 클릭한 시점에 개별 생성 (Anthropic rate limit + 안정성)
     } catch (e) {
       setAiIdeas(prev => ({ ...prev, [key]: { loading: false, error: e.message, ideas: null } }));
     }
