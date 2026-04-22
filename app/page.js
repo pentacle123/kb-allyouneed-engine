@@ -4803,11 +4803,13 @@ export default function Home() {
 
       {showStepIndicator && <StepIndicator />}
 
-      {currentView === "hub" && renderHub()}
-      {currentView === "category" && renderCategory()}
-      {currentView === "analysis" && renderAnalysis()}
-      {currentView === "ideas" && renderIdeas()}
-      {currentView === "storyboard" && renderStoryboard()}
+      <SectionErrorBoundary label={`${currentView} 뷰`}>
+        {currentView === "hub" && renderHub()}
+        {currentView === "category" && renderCategory()}
+        {currentView === "analysis" && renderAnalysis()}
+        {currentView === "ideas" && renderIdeas()}
+        {currentView === "storyboard" && renderStoryboard()}
+      </SectionErrorBoundary>
 
       <div style={{
         padding: "20px", textAlign: "center",

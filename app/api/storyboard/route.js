@@ -3,90 +3,14 @@ import { NextResponse } from "next/server";
 
 export const maxDuration = 60;
 
-const SYSTEM_PROMPT = `당신은 KB국민카드의 플랫폼별 숏폼 스토리보드 전문가입니다.
+const SYSTEM_PROMPT = `KB국민카드 숏폼 스토리보드 전문가. 아이디어를 YT Shorts + IG Reels 각색 + 팩트시트 + 광고 타겟팅 JSON으로 생성.
 
-주어진 "AI 생성 아이디어" 1개를 **YouTube Shorts**와 **Instagram Reels** 각 플랫폼 특성에 맞게 각색한 스토리보드 2개 + 콘텐츠 팩트시트 + 광고 타겟팅을 생성합니다.
+규칙: 과장·차별 금지, USP 범위만, 금융민감영역 회피. 씬 4개, 해시태그 3개.
 
-## 플랫폼 특성
-- **YouTube Shorts**: 최대 60초 · 9:16 · 강한 훅 + 정보성 밀도 · 완청률 중요 · 검색 유입
-- **Instagram Reels**: 최대 90초 · 9:16 · 감성·브이로그 톤 · 공유율 중요 · 팔로우 유입
+JSON만:
+{"youtube_shorts":{"title":"","hook":"","scenes":[{"seq":1,"time":"0-3s","visual":"","copy":""}],"proof":"","cta":"","hashtags":["#..."],"bestTimeToPost":"","targetDemo":""},"instagram_reels":{"title":"","hook":"","scenes":[{"seq":1,"time":"","visual":"","copy":""}],"proof":"","cta":"","hashtags":["#..."],"bestTimeToPost":"","targetDemo":""},"miniFacts":[{"icon":"🎯","label":"타깃","content":""},{"icon":"📸","label":"크리에이티브","content":""},{"icon":"📊","label":"데이터","content":""},{"icon":"🎬","label":"씬","content":""}],"factSheet":{"card_facts":{"cardName":"","items":[{"label":"핵심 USP","value":""},{"label":"실적 조건","value":""},{"label":"연회비","value":""}],"sourceLink":"https://card.kbcard.com/"},"savings_example":{"usage":"","monthly":"","annual":"","asOf":"2026-04 기준"},"search_evidence":{"main":[{"term":"","volume":0}],"related":[{"term":"","volume":0}],"source":"Google Trends · Naver DataLab"},"kb_connection":{"applicationUrl":"https://card.kbcard.com/","qrAvailable":true,"issuanceTime":"심사 후 3-5영업일"}},"ad_targeting":["","","",""]}
 
-## 금융 카드 브랜드 가드레일
-- 과장 표현 금지 (100% 환급, 무조건 등)
-- 차별·비하 표현 금지
-- 구체 수치는 제공된 USP 범위 내
-- 금융 민감 영역 회피 (금리·신용·대출·연체)
-
-## 출력 형식 (반드시 JSON만)
-{
-  "youtube_shorts": {
-    "title": "YouTube Shorts용 제목",
-    "hook": "첫 3초 훅 문장",
-    "scenes": [
-      { "seq": 1, "time": "0-3s", "visual": "영상 설명", "copy": "화면 카피" }
-    ],
-    "proof": "데이터 근거 한 문장",
-    "cta": "종료 CTA",
-    "hashtags": ["#...", "#..."],
-    "bestTimeToPost": "업로드 최적 시간",
-    "targetDemo": "타겟 인구통계"
-  },
-  "instagram_reels": {
-    "title": "Instagram Reels용 제목",
-    "hook": "첫 3초 훅",
-    "scenes": [ ... ],
-    "proof": "...",
-    "cta": "...",
-    "hashtags": [ ... ],
-    "bestTimeToPost": "...",
-    "targetDemo": "..."
-  },
-  "miniFacts": [
-    { "icon": "🎯", "label": "타깃", "content": "한 줄 요약" },
-    { "icon": "📸", "label": "크리에이티브", "content": "한 줄" },
-    { "icon": "📊", "label": "데이터→그래픽", "content": "한 줄" },
-    { "icon": "🎬", "label": "씬 구성", "content": "한 줄" }
-  ],
-  "factSheet": {
-    "card_facts": {
-      "cardName": "정확한 카드명",
-      "items": [
-        { "label": "핵심 USP", "value": "..." },
-        { "label": "실적 조건", "value": "전월 실적 30만원 이상 등" },
-        { "label": "연회비", "value": "국내 1만원 / 해외 1.2만원 등" }
-      ],
-      "sourceLink": "https://card.kbcard.com/..."
-    },
-    "savings_example": {
-      "usage": "월 30만원 사용 가정",
-      "monthly": "월 약 1.2만원 적립",
-      "annual": "연 약 14.4만원 절감",
-      "asOf": "2026-04 기준"
-    },
-    "search_evidence": {
-      "main": [
-        { "term": "메인 키워드", "volume": 100680 }
-      ],
-      "related": [
-        { "term": "연관 키워드", "volume": 12000 }
-      ],
-      "source": "Google Trends · Naver DataLab (2026-04)"
-    },
-    "kb_connection": {
-      "applicationUrl": "https://card.kbcard.com/...",
-      "qrAvailable": true,
-      "issuanceTime": "심사 후 약 3-5영업일"
-    }
-  },
-  "ad_targeting": [
-    "연령·성별 타겟",
-    "관심사",
-    "시간대",
-    "시즌"
-  ]
-}
-
-JSON만 출력. 설명 금지.`;
+JSON만.`;
 
 export async function POST(request) {
   try {
@@ -129,7 +53,7 @@ export async function POST(request) {
 
     const message = await client.messages.create({
       model: "claude-sonnet-4-5-20250929",
-      max_tokens: 6500,
+      max_tokens: 4000,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userPrompt }],
     });
