@@ -8,6 +8,8 @@
  * - OPPORTUNITIES: 9개 기회 카드 (COVER 4 + ACCENT 5)
  */
 
+import { enrichWithMonthlyTrend } from '@/lib/generateMonthlyTrend';
+
 // ============================================================================
 // USP 자산 (NEED Pay 핵심 혜택)
 // ============================================================================
@@ -122,7 +124,7 @@ export const NEED_PAY_PERSONAS = [
 // 기회 9개 (COVER 4 + ACCENT 5)
 // ============================================================================
 
-export const NEED_PAY_OPPORTUNITIES = [
+const _RAW_NEED_PAY_OPPORTUNITIES = [
   // ========== 🔵 COVER 페르소나 기회 4개 ==========
   {
     id: "PAY-COVER-P1-1",
@@ -616,6 +618,8 @@ export const NEED_PAY_OPPORTUNITIES = [
     uspConnection: "디지털콘텐츠·멤버십 30% (배달·새벽배송 멤버십 포함)"
   }
 ];
+
+export const NEED_PAY_OPPORTUNITIES = enrichWithMonthlyTrend(_RAW_NEED_PAY_OPPORTUNITIES);
 
 // ============================================================================
 // 교차 인사이트

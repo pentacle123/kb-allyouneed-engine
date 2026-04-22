@@ -8,6 +8,8 @@
  * - OPPORTUNITIES: 9개 기회 카드 (COVER 4 + ACCENT 5)
  */
 
+import { enrichWithMonthlyTrend } from '@/lib/generateMonthlyTrend';
+
 // ============================================================================
 // USP 자산 (NEED AutoSlim 핵심 혜택)
 // ============================================================================
@@ -110,7 +112,7 @@ export const NEED_AUTOSLIM_PERSONAS = [
 // 기회 9개 (COVER 4 + ACCENT 5)
 // ============================================================================
 
-export const NEED_AUTOSLIM_OPPORTUNITIES = [
+const _RAW_NEED_AUTOSLIM_OPPORTUNITIES = [
   // ========== 🔵 COVER 페르소나 기회 4개 ==========
   {
     id: "AUTOSLIM-COVER-A1-1",
@@ -541,6 +543,8 @@ export const NEED_AUTOSLIM_OPPORTUNITIES = [
     uspConnection: "SK스피드메이트 직도입 타이어 30% 할인 (실적 조건 無)"
   }
 ];
+
+export const NEED_AUTOSLIM_OPPORTUNITIES = enrichWithMonthlyTrend(_RAW_NEED_AUTOSLIM_OPPORTUNITIES);
 
 // ============================================================================
 // 교차 인사이트

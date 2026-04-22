@@ -11,6 +11,8 @@
  * - OPPORTUNITIES: 7개 기회 (COVER 4 + ACCENT 3)
  */
 
+import { enrichWithMonthlyTrend } from '@/lib/generateMonthlyTrend';
+
 // ============================================================================
 // USP 자산 (YOU Prime 일상팩 — 6개 영역)
 // ============================================================================
@@ -143,7 +145,7 @@ export const YOU_PRIME_DAILY_PERSONAS = [
 // 기회 7개 (COVER 4 + ACCENT 3)
 // ============================================================================
 
-export const YOU_PRIME_DAILY_OPPORTUNITIES = [
+const _RAW_YOU_PRIME_DAILY_OPPORTUNITIES = [
   // ========== 🔵 COVER 페르소나 기회 4개 ==========
   {
     id: "DAILY-COVER-1-1",
@@ -530,6 +532,8 @@ export const YOU_PRIME_DAILY_OPPORTUNITIES = [
     uspConnection: "배달 10% + 취미·자기관리 5% (이중 혜택, COVER 2 크로스)"
   }
 ];
+
+export const YOU_PRIME_DAILY_OPPORTUNITIES = enrichWithMonthlyTrend(_RAW_YOU_PRIME_DAILY_OPPORTUNITIES);
 
 // ============================================================================
 // 교차 인사이트

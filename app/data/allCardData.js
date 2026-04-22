@@ -8,6 +8,8 @@
  * - OPPORTUNITIES: 28개 기회 카드 (Trip.com 상세 페이지용)
  */
 
+import { enrichWithMonthlyTrend } from '@/lib/generateMonthlyTrend';
+
 // ============================================================================
 // USP 자산 (카드 핵심 혜택 4종)
 // ============================================================================
@@ -122,7 +124,7 @@ export const ALL_CARD_PERSONAS = [
 // 기회 28개
 // ============================================================================
 
-export const ALL_CARD_OPPORTUNITIES = [
+const _RAW_ALL_CARD_OPPORTUNITIES = [
   // ========== P1. 실적체크 피로형 ==========
   {
     id: "P1-2",
@@ -1256,6 +1258,8 @@ export const ALL_CARD_OPPORTUNITIES = [
     uspConnection: "가족카드 무료·무제한 + 국내 1% 풀 결합"
   }
 ];
+
+export const ALL_CARD_OPPORTUNITIES = enrichWithMonthlyTrend(_RAW_ALL_CARD_OPPORTUNITIES);
 
 // ============================================================================
 // 교차 인사이트 (랜딩 페이지·섹션 하단 표시용)

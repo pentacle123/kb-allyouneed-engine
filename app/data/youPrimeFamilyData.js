@@ -11,6 +11,8 @@
  * - OPPORTUNITIES: 9개 기회 (COVER 4 + ACCENT 5)
  */
 
+import { enrichWithMonthlyTrend } from '@/lib/generateMonthlyTrend';
+
 // ============================================================================
 // USP 자산 (YOU Prime 가족팩 — 6개 영역)
 // ============================================================================
@@ -155,7 +157,7 @@ export const YOU_PRIME_FAMILY_PERSONAS = [
 // 기회 9개 (COVER 4 + ACCENT 5)
 // ============================================================================
 
-export const YOU_PRIME_FAMILY_OPPORTUNITIES = [
+const _RAW_YOU_PRIME_FAMILY_OPPORTUNITIES = [
   // ========== 🔵 COVER 페르소나 기회 4개 ==========
   {
     id: "FAMILY-COVER-1-1",
@@ -671,6 +673,8 @@ export const YOU_PRIME_FAMILY_OPPORTUNITIES = [
     uspConnection: "일상케어 10%"
   }
 ];
+
+export const YOU_PRIME_FAMILY_OPPORTUNITIES = enrichWithMonthlyTrend(_RAW_YOU_PRIME_FAMILY_OPPORTUNITIES);
 
 // ============================================================================
 // 교차 인사이트

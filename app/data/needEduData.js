@@ -10,6 +10,8 @@
  * - OPPORTUNITIES: 10개 기회 카드 (COVER 6 + ACCENT 4)
  */
 
+import { enrichWithMonthlyTrend } from '@/lib/generateMonthlyTrend';
+
 // ============================================================================
 // USP 자산 (NEED Edu 핵심 혜택)
 // ============================================================================
@@ -129,7 +131,7 @@ export const NEED_EDU_PERSONAS = [
 // 기회 10개 (COVER 6 + ACCENT 4)
 // ============================================================================
 
-export const NEED_EDU_OPPORTUNITIES = [
+const _RAW_NEED_EDU_OPPORTUNITIES = [
   // ========== 🔵 COVER 자녀 교육 축 (3개) ==========
   {
     id: "EDU-COVER-K1-1",
@@ -605,6 +607,8 @@ export const NEED_EDU_OPPORTUNITIES = [
     uspConnection: "온라인 강의 10% (화상영어 플랫폼 포함)"
   }
 ];
+
+export const NEED_EDU_OPPORTUNITIES = enrichWithMonthlyTrend(_RAW_NEED_EDU_OPPORTUNITIES);
 
 // ============================================================================
 // 교차 인사이트
