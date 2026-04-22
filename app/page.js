@@ -21,6 +21,32 @@ import { generateMonthlyTrend } from "../lib/generateMonthlyTrend";
 import { enrichContentHook } from "../lib/enrichContentHook";
 import { detectCannibalization } from "../lib/cannibalization";
 
+// ──────────── Error Boundary ────────────
+class SectionErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { err: null }; }
+  static getDerivedStateFromError(err) { return { err }; }
+  componentDidCatch(err, info) { console.error("[SectionErrorBoundary]", err, info); }
+  render() {
+    if (this.state.err) {
+      return (
+        <div style={{
+          padding: 16, borderRadius: 10, marginBottom: 16,
+          background: "#FEF2F2", border: "1px solid #FECACA",
+          fontSize: 12, color: "#B91C1C",
+        }}>
+          <div style={{ fontWeight: 800, marginBottom: 4 }}>⚠️ {this.props.label || "섹션"} 렌더 오류</div>
+          <div style={{ fontSize: 11, color: "#7F1D1D", marginBottom: 8 }}>{String(this.state.err?.message || this.state.err)}</div>
+          <button
+            onClick={() => this.setState({ err: null })}
+            style={{ padding: "4px 10px", borderRadius: 6, border: "none", background: "#DC2626", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer" }}
+          >다시 렌더</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 // ══════════════════════════════════════════════════════════════
 // KB ALL·YOU·NEED AI Brandformance Engine v3.0
 // 5-stage Navigation: Hub → Category → Analysis → Ideas → Storyboard
@@ -4274,7 +4300,7 @@ export default function Home() {
 
         {/* 플랫폼 2열 */}
         {data && (
-          <>
+          <SectionErrorBoundary label="스토리보드">
             <div style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
@@ -4432,11 +4458,13 @@ export default function Home() {
             {data.ad_targeting && data.ad_targeting.length > 0 && (
               <AdTargetingBlock rows={data.ad_targeting} />
             )}
-          </>
+          </SectionErrorBoundary>
         )}
 
         {/* 크리에이터 매칭 (YouTube API) */}
-        <CreatorMatching oppId={opp.id} opp={opp} idea={idea} />
+        <SectionErrorBoundary label="크리에이터 매칭">
+          <CreatorMatching oppId={opp.id} opp={opp} idea={idea} />
+        </SectionErrorBoundary>
 
         {/* 하단 CTA */}
         <button

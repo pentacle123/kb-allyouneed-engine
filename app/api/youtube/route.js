@@ -62,7 +62,33 @@ const FALLBACK_BY_DOMAIN = {
 
 function pickFallback(domain, reason) {
   const list = FALLBACK_BY_DOMAIN[domain] || FALLBACK_BY_DOMAIN.general;
-  return list.map(c => ({ ...c, matchScore: 75, matchReason: reason || `${domain} 도메인 샘플` }));
+  // 클라이언트 스키마로 정규화: name, subs, id, thumbnail
+  return list.map((c, i) => ({
+    id: `fallback-${domain}-${i}`,
+    name: c.channelTitle,
+    subs: c.subscriberCount,
+    thumbnail: null,
+    videoTitle: c.description,
+    tier: c.tier,
+    matchScore: 75,
+    matchReason: reason || `${domain} 도메인 샘플`,
+    collaborationAngle: null,
+  }));
+}
+
+// 검증된 후보를 클라이언트 스키마로 정규화
+function normalizeCreator(c) {
+  return {
+    id: c.channelId || c.id || null,
+    name: c.channelTitle || c.name || "",
+    subs: c.subscriberCount ?? c.subs ?? 0,
+    thumbnail: c.thumbnail || null,
+    videoTitle: c.videoTitle || c.description || null,
+    tier: c.tier,
+    matchScore: c.matchScore ?? 0,
+    matchReason: c.matchReason || null,
+    collaborationAngle: c.collaborationAngle || null,
+  };
 }
 
 // 1단계: 콘텐츠 맥락 분석 (Claude)
@@ -279,7 +305,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       success: true,
-      creators: matched,
+      creators: matched.map(normalizeCreator),
       context,
       source: "youtube-api-verified",
       totalCandidates: candidates.length,
