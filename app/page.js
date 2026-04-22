@@ -1190,92 +1190,12 @@ export default function Home() {
     setCurrentView("ideas");
     const key = selectedOpp ? `${selectedOpp.id}::auto` : null;
     if (selectedOpp && !aiIdeas[key]?.ideas && !aiIdeas[key]?.loading) {
-      // Phase 12-17: auto 탭 진입 시 사전 일괄 생성(아이디어+스토리보드)
-      generateIdeasWithStoryboards(selectedOpp);
+      generateIdeas(selectedOpp, "auto");
     }
   };
 
-  // Phase 12-17: 사전 일괄 생성 (아이디어 3개 + 스토리보드 3개 병렬)
-  const [prefetchProgress, setPrefetchProgress] = useState({}); // { [oppId]: { step, total, label } }
-  const PREFETCH_STEPS = [
-    "기회 컨텍스트 분석",
-    "페르소나 매칭",
-    "아이디어 3개 생성",
-    "YouTube Shorts 각색",
-    "Instagram Reels 각색",
-    "팩트시트 + 광고 타겟팅",
-  ];
-  const generateIdeasWithStoryboards = async (opp) => {
-    if (!opp || !opp.id) return;
-    const key = `${opp.id}::auto`;
-
-    // sessionStorage 캐시 확인
-    if (typeof window !== "undefined") {
-      try {
-        const cached = sessionStorage.getItem(`prefetch::${opp.id}`);
-        if (cached) {
-          const obj = JSON.parse(cached);
-          setAiIdeas(prev => ({ ...prev, [key]: { loading: false, error: null, ideas: obj.ideas } }));
-          Object.entries(obj.storyboards || {}).forEach(([ideaId, sb]) => {
-            const sbKey = `${opp.id}::${ideaId}`;
-            if (!sb.error) setStoryboards(prev => ({ ...prev, [sbKey]: { loading: false, error: null, data: sb } }));
-          });
-          return;
-        }
-      } catch {}
-    }
-
-    setAiIdeas(prev => ({ ...prev, [key]: { loading: true, error: null, ideas: null } }));
-    setPrefetchProgress(prev => ({ ...prev, [opp.id]: { step: 0, total: PREFETCH_STEPS.length, label: PREFETCH_STEPS[0] } }));
-
-    // 가짜 진행 시뮬레이션 — ~8s 간격
-    const progressTimer = setInterval(() => {
-      setPrefetchProgress(prev => {
-        const cur = prev[opp.id] || { step: 0 };
-        const next = Math.min(cur.step + 1, PREFETCH_STEPS.length - 1);
-        return { ...prev, [opp.id]: { step: next, total: PREFETCH_STEPS.length, label: PREFETCH_STEPS[next] } };
-      });
-    }, 8000);
-
-    try {
-      const res = await fetch("/api/generate-with-storyboards", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          opportunity: opp,
-          cardMeta: { cardName: CARDS[opp.card]?.name || opp.card, cardTagline: CARDS[opp.card]?.tagline || "" },
-          persona: opp._persona || {},
-        }),
-      });
-      const text = await res.text();
-      let result;
-      try { result = JSON.parse(text); }
-      catch {
-        if (res.status === 504 || /timeout|timed out/i.test(text)) throw new Error("생성 시간 초과 (Vercel 60초 제한). 다시 시도해주세요.");
-        throw new Error(`응답 파싱 실패 (${res.status})`);
-      }
-      if (!result.success) throw new Error(result.error || "사전 생성 실패");
-
-      const ideas = result.data?.ideas || [];
-      const sbMap = result.data?.storyboards || {};
-
-      setAiIdeas(prev => ({ ...prev, [key]: { loading: false, error: null, ideas } }));
-      Object.entries(sbMap).forEach(([ideaId, sb]) => {
-        const sbKey = `${opp.id}::${ideaId}`;
-        if (!sb.error) setStoryboards(prev => ({ ...prev, [sbKey]: { loading: false, error: null, data: sb } }));
-      });
-
-      // sessionStorage 캐시
-      if (typeof window !== "undefined") {
-        try { sessionStorage.setItem(`prefetch::${opp.id}`, JSON.stringify({ ideas, storyboards: sbMap, ts: Date.now() })); } catch {}
-      }
-    } catch (e) {
-      setAiIdeas(prev => ({ ...prev, [key]: { loading: false, error: e.message, ideas: null } }));
-    } finally {
-      clearInterval(progressTimer);
-      setPrefetchProgress(prev => { const n = { ...prev }; delete n[opp.id]; return n; });
-    }
-  };
+  // Phase 12-17: prefetch 진행 상태 (현재는 사용 안 함 — 60s 제약으로 클라이언트 분할)
+  const [prefetchProgress, setPrefetchProgress] = useState({});
 
   // Phase 12-8: 스토리보드 생성
   const generateStoryboard = async (opp, idea) => {
@@ -1371,7 +1291,19 @@ export default function Home() {
         throw new Error(`응답 파싱 실패: ${text.substring(0, 120)}`);
       }
       if (!result.success) throw new Error(result.error || "생성 실패");
-      setAiIdeas(prev => ({ ...prev, [key]: { loading: false, error: null, ideas: result.data.ideas || [] } }));
+      const ideas = result.data.ideas || [];
+      setAiIdeas(prev => ({ ...prev, [key]: { loading: false, error: null, ideas } }));
+
+      // Phase 12-17 (분할 전략): auto 탭에서 아이디어 도착 후 스토리보드 3개를 백그라운드 병렬 생성
+      // 각 API 호출은 독립적 60s 예산을 가짐 → 타임아웃 회피
+      if (perspective === "auto" && ideas.length > 0) {
+        ideas.forEach(idea => {
+          const sbKey = `${opp.id}::${idea.id}`;
+          if (!storyboards[sbKey]?.data && !storyboards[sbKey]?.loading) {
+            setTimeout(() => generateStoryboard(opp, idea), 0);
+          }
+        });
+      }
     } catch (e) {
       setAiIdeas(prev => ({ ...prev, [key]: { loading: false, error: e.message, ideas: null } }));
     }
@@ -4102,50 +4034,32 @@ export default function Home() {
         </div>
 
         {/* 로딩 */}
-        {loading && (() => {
-          const prefetch = prefetchProgress[opp.id];
-          const isPrefetch = !!prefetch && ideasTab === "auto";
-          const pct = isPrefetch ? Math.round(((prefetch.step + 1) / prefetch.total) * 100) : 0;
-          return (
+        {loading && (
+          <div style={{
+            padding: "60px 24px", borderRadius: 16,
+            background: `linear-gradient(135deg, ${activeTabMeta?.color}08, ${activeTabMeta?.color}14)`,
+            border: `2px solid ${activeTabMeta?.color}30`,
+            textAlign: "center",
+          }}>
             <div style={{
-              padding: "60px 24px", borderRadius: 16,
-              background: `linear-gradient(135deg, ${activeTabMeta?.color}08, ${activeTabMeta?.color}14)`,
-              border: `2px solid ${activeTabMeta?.color}30`,
-              textAlign: "center",
-            }}>
-              <div style={{
-                display: "inline-block", width: 40, height: 40,
-                border: "4px solid #E5E7EB", borderTopColor: activeTabMeta?.color,
-                borderRadius: "50%", animation: "spin 0.8s linear infinite",
-                marginBottom: 16,
-              }} />
-              <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>
-                {isPrefetch ? "AI 사전 일괄 생성 중..." : `${activeTabMeta?.label} 관점으로 생성 중...`}
-              </div>
-              <div style={{ fontSize: 11, color: C.textSoft, marginBottom: isPrefetch ? 16 : 0 }}>
-                {isPrefetch
-                  ? `${prefetch.step + 1}/${prefetch.total} · ${prefetch.label}`
-                  : "약 20-40초 소요 · Claude Sonnet 4.5 · 3개 아이디어 동시 생성"}
-              </div>
-              {isPrefetch && (
-                <div style={{ maxWidth: 460, margin: "0 auto" }}>
-                  <div style={{
-                    height: 8, borderRadius: 4, background: "#E5E7EB", overflow: "hidden",
-                  }}>
-                    <div style={{
-                      width: `${pct}%`, height: "100%",
-                      background: activeTabMeta?.color,
-                      transition: "width 0.6s ease",
-                    }} />
-                  </div>
-                  <div style={{ fontSize: 10, color: C.textSoft, marginTop: 8, fontStyle: "italic" }}>
-                    💡 아이디어 + 스토리보드 3개를 한 번에 사전 생성합니다 (~50초)
-                  </div>
-                </div>
-              )}
+              display: "inline-block", width: 40, height: 40,
+              border: "4px solid #E5E7EB", borderTopColor: activeTabMeta?.color,
+              borderRadius: "50%", animation: "spin 0.8s linear infinite",
+              marginBottom: 16,
+            }} />
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.text, marginBottom: 4 }}>
+              {activeTabMeta?.label} 관점으로 생성 중...
             </div>
-          );
-        })()}
+            <div style={{ fontSize: 11, color: C.textSoft }}>
+              약 20-30초 소요 · Claude Sonnet 4.5 · 3개 아이디어 동시 생성
+            </div>
+            {ideasTab === "auto" && (
+              <div style={{ fontSize: 10, color: C.textSoft, marginTop: 10, fontStyle: "italic" }}>
+                💡 완료 후 스토리보드 3개도 백그라운드에서 자동 사전 생성됩니다
+              </div>
+            )}
+          </div>
+        )}
 
         {/* 에러 */}
         {error && !loading && (
