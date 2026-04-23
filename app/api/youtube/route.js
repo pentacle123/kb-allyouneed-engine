@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
+import { getYoutubeQueries } from "@/lib/youtubeSearchQueries";
 
 export const maxDuration = 60;
 
@@ -273,8 +274,12 @@ export async function POST(request) {
       });
     }
 
-    // 2단계: 검색
-    const candidates = await searchCandidates(youtubeKey, context.search_queries);
+    // 2단계: 검색 — 하드코딩된 큐레이션 쿼리(lib/youtubeSearchQueries.js) 우선 사용
+    const hardcodedQueries = getYoutubeQueries(opportunity.id);
+    const searchQueries = hardcodedQueries.length > 0
+      ? hardcodedQueries
+      : (context.search_queries || []);
+    const candidates = await searchCandidates(youtubeKey, searchQueries);
     if (candidates.length === 0) {
       return NextResponse.json({
         success: true,
