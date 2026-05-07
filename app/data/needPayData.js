@@ -68,7 +68,8 @@ export const NEED_PAY_PERSONAS = [
     annualSearchVolume: 12450000,
     opportunityCount: 1,
     color: "#10B981",
-    demoTags: ["30-50대 남녀", "네이버플러스 멤버", "네이버쇼핑 월 3회+", "할인 조합 고수"]
+    demoTags: ["30-50대 남녀", "네이버플러스 멤버", "네이버쇼핑 월 3회+", "할인 조합 고수"],
+    demoOrder: 1
   },
   {
     id: "PAY-COVER-P2",
@@ -80,7 +81,8 @@ export const NEED_PAY_PERSONAS = [
     annualSearchVolume: 140000000,
     opportunityCount: 1,
     color: "#EC4899",
-    demoTags: ["20-40대", "OTT 3개+ 구독", "월 구독료 5만+", "구독 다이어트 실행"]
+    demoTags: ["20-40대", "OTT 3개+ 구독", "월 구독료 5만+", "구독 다이어트 실행"],
+    demoOrder: 999
   },
   {
     id: "PAY-COVER-P3",
@@ -92,7 +94,8 @@ export const NEED_PAY_PERSONAS = [
     annualSearchVolume: 57770000,
     opportunityCount: 1,
     color: "#F97316",
-    demoTags: ["20-30대 MZ", "여성 65%+", "패션몰 월 2-3회 쇼핑", "MZ 트렌드 민감"]
+    demoTags: ["20-30대 MZ", "여성 65%+", "패션몰 월 2-3회 쇼핑", "MZ 트렌드 민감"],
+    demoOrder: 999
   },
   {
     id: "PAY-COVER-P4",
@@ -104,7 +107,8 @@ export const NEED_PAY_PERSONAS = [
     annualSearchVolume: 21430000,
     opportunityCount: 1,
     color: "#8B5CF6",
-    demoTags: ["30-50대", "페이 3개+ 보유", "오프라인·온라인 혼용", "페이 택1 피로층"]
+    demoTags: ["30-50대", "페이 3개+ 보유", "오프라인·온라인 혼용", "페이 택1 피로층"],
+    demoOrder: 999
   },
   {
     id: "PAY-COVER-P5",
@@ -116,7 +120,8 @@ export const NEED_PAY_PERSONAS = [
     annualSearchVolume: 2850200,
     opportunityCount: 1,
     color: "#3B82F6",
-    demoTags: ["해외여행 연 2회+", "직구 월 1회+", "글로벌 OTT·AI 구독", "환율 민감 세그먼트"]
+    demoTags: ["해외여행 연 2회+", "직구 월 1회+", "글로벌 OTT·AI 구독", "환율 민감 세그먼트"],
+    demoOrder: 999
   }
 ];
 
@@ -129,6 +134,8 @@ const _RAW_NEED_PAY_OPPORTUNITIES = [
   {
     id: "PAY-COVER-P1-1",
     personaId: "PAY-COVER-P1",
+    featured: true,
+    featuredOrder: 1,
     icon: "🟢",
     tier: "MEGA",
     card: "NEED Pay",
@@ -668,7 +675,8 @@ export const needPayData = {
     monthlyRequirement: 400000,
     familyCard: "무료",
     version: "2.0",
-    lastUpdate: "2026-04-20"
+    lastUpdate: "2026-04-20",
+    sortOrder: 1
   },
   usps: NEED_PAY_USPS,
   personas: NEED_PAY_PERSONAS,

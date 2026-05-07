@@ -68,7 +68,8 @@ export const NEED_AUTOSLIM_PERSONAS = [
     annualSearchVolume: 5130000,
     opportunityCount: 1,
     color: "#3B82F6",
-    demoTags: ["30-40대", "첫 차·업그레이드", "월 지출 160만+", "스포티지·쏘렌토·카니발·G80 검색자"]
+    demoTags: ["30-40대", "첫 차·업그레이드", "월 지출 160만+", "스포티지·쏘렌토·카니발·G80 검색자"],
+    demoOrder: 999
   },
   {
     id: "AUTOSLIM-COVER-A2",
@@ -80,7 +81,8 @@ export const NEED_AUTOSLIM_PERSONAS = [
     annualSearchVolume: 7100000,
     opportunityCount: 1,
     color: "#F59E0B",
-    demoTags: ["40-50대", "자차 5년+", "주유 월 2회+", "보험 갱신 민감"]
+    demoTags: ["40-50대", "자차 5년+", "주유 월 2회+", "보험 갱신 민감"],
+    demoOrder: 999
   },
   {
     id: "AUTOSLIM-COVER-A3",
@@ -92,7 +94,8 @@ export const NEED_AUTOSLIM_PERSONAS = [
     annualSearchVolume: 1530000,
     opportunityCount: 1,
     color: "#EF4444",
-    demoTags: ["30-50대", "자차 관리 민감", "보배드림·오토갤", "예방 정비 중시"]
+    demoTags: ["30-50대", "자차 관리 민감", "보배드림·오토갤", "예방 정비 중시"],
+    demoOrder: 999
   },
   {
     id: "AUTOSLIM-COVER-A4",
@@ -104,7 +107,8 @@ export const NEED_AUTOSLIM_PERSONAS = [
     annualSearchVolume: 838000,
     opportunityCount: 1,
     color: "#06B6D4",
-    demoTags: ["LPG 차주 186만대", "택시·영업·상용·장애인", "경제성 민감", "경쟁자 전무"]
+    demoTags: ["LPG 차주 186만대", "택시·영업·상용·장애인", "경제성 민감", "경쟁자 전무"],
+    demoOrder: 999
   }
 ];
 
@@ -593,7 +597,8 @@ export const needAutoSlimData = {
     monthlyRequirement: 400000,
     familyCard: "무료",
     version: "2.0",
-    lastUpdate: "2026-04-20"
+    lastUpdate: "2026-04-20",
+    sortOrder: 3
   },
   usps: NEED_AUTOSLIM_USPS,
   personas: NEED_AUTOSLIM_PERSONAS,

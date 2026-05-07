@@ -68,7 +68,8 @@ export const ALL_CARD_PERSONAS = [
     annualSearchVolume: 2280000,
     opportunityCount: 3,
     color: "#3B82F6",
-    demoTags: ["25-45세", "남녀 혼합", "신용카드 2장+", "연 2,500만+ 카드 지출"]
+    demoTags: ["25-45세", "남녀 혼합", "신용카드 2장+", "연 2,500만+ 카드 지출"],
+    demoOrder: 999
   },
   {
     id: "P2",
@@ -80,7 +81,8 @@ export const ALL_CARD_PERSONAS = [
     annualSearchVolume: 3205000,
     opportunityCount: 5,
     color: "#F97316",
-    demoTags: ["30-50대", "여성 60%", "맞벌이·1인가구", "월 쇼핑 30만+"]
+    demoTags: ["30-50대", "여성 60%", "맞벌이·1인가구", "월 쇼핑 30만+"],
+    demoOrder: 999
   },
   {
     id: "P3",
@@ -92,7 +94,8 @@ export const ALL_CARD_PERSONAS = [
     annualSearchVolume: 5780000,
     opportunityCount: 7,
     color: "#EC4899",
-    demoTags: ["20-40대", "여성 55%", "OTT 2-4개 구독", "월 구독료 5만+"]
+    demoTags: ["20-40대", "여성 55%", "OTT 2-4개 구독", "월 구독료 5만+"],
+    demoOrder: 1
   },
   {
     id: "P4",
@@ -104,7 +107,8 @@ export const ALL_CARD_PERSONAS = [
     annualSearchVolume: 1647000,
     opportunityCount: 5,
     color: "#10B981",
-    demoTags: ["20-40대", "남성 60%", "직구·AI 유저", "월 해외결제 20만+"]
+    demoTags: ["20-40대", "남성 60%", "직구·AI 유저", "월 해외결제 20만+"],
+    demoOrder: 2
   },
   {
     id: "P5",
@@ -116,7 +120,8 @@ export const ALL_CARD_PERSONAS = [
     annualSearchVolume: 86000,
     opportunityCount: 3,
     color: "#8B5CF6",
-    demoTags: ["35-55세", "남녀 혼합", "기혼·자녀 있음", "가족카드 기발급"]
+    demoTags: ["35-55세", "남녀 혼합", "기혼·자녀 있음", "가족카드 기발급"],
+    demoOrder: 999
   }
 ];
 
@@ -508,6 +513,8 @@ const _RAW_ALL_CARD_OPPORTUNITIES = [
   {
     id: "P3-1",
     personaId: "P3",
+    featured: true,
+    featuredOrder: 1,
     icon: "📺",
     tier: "MEGA",
     card: "ALL",
@@ -601,6 +608,8 @@ const _RAW_ALL_CARD_OPPORTUNITIES = [
   {
     id: "P3-3",
     personaId: "P3",
+    featured: true,
+    featuredOrder: 2,
     icon: "📈",
     tier: "NICHE",
     card: "ALL",
@@ -843,6 +852,8 @@ const _RAW_ALL_CARD_OPPORTUNITIES = [
   {
     id: "P4-1",
     personaId: "P4",
+    featured: true,
+    featuredOrder: 1,
     icon: "🤖",
     tier: "MEDIUM",
     card: "ALL",
@@ -891,6 +902,8 @@ const _RAW_ALL_CARD_OPPORTUNITIES = [
   {
     id: "P4-2",
     personaId: "P4",
+    featured: true,
+    featuredOrder: 2,
     icon: "🚀",
     tier: "MEDIUM",
     card: "ALL",

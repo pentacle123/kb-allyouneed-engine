@@ -89,7 +89,8 @@ export const YOU_PRIME_DAILY_PERSONAS = [
     annualSearchVolume: 1000000,
     opportunityCount: 1,
     color: "#F59E0B",
-    demoTags: ["20후~40대 싱글", "경차·소형SUV·중고차", "주말 차박·드라이브", "자취·원룸 거주"]
+    demoTags: ["20후~40대 싱글", "경차·소형SUV·중고차", "주말 차박·드라이브", "자취·원룸 거주"],
+    demoOrder: 999
   },
   {
     id: "DAILY-COVER-2",
@@ -101,7 +102,8 @@ export const YOU_PRIME_DAILY_PERSONAS = [
     annualSearchVolume: 18000000,
     opportunityCount: 1,
     color: "#EC4899",
-    demoTags: ["20후~30대 여성 중심", "주 2-3회 필라테스", "홈트·다이어트", "자기투자 라이프"]
+    demoTags: ["20후~30대 여성 중심", "주 2-3회 필라테스", "홈트·다이어트", "자기투자 라이프"],
+    demoOrder: 2
   },
   {
     id: "DAILY-COVER-3",
@@ -113,7 +115,8 @@ export const YOU_PRIME_DAILY_PERSONAS = [
     annualSearchVolume: 170000,
     opportunityCount: 1,
     color: "#3B82F6",
-    demoTags: ["30대 IT 전문직", "풀재택·리모트", "홈오피스 구축", "집=비즈니스 인프라"]
+    demoTags: ["30대 IT 전문직", "풀재택·리모트", "홈오피스 구축", "집=비즈니스 인프라"],
+    demoOrder: 1
   },
   {
     id: "DAILY-COVER-4",
@@ -125,7 +128,8 @@ export const YOU_PRIME_DAILY_PERSONAS = [
     annualSearchVolume: 500000,
     opportunityCount: 1,
     color: "#10B981",
-    demoTags: ["20후~40 1인 가구", "반려견·반려묘 동거", "반려동물 월 지출 20-30%", "펫보험 대상"]
+    demoTags: ["20후~40 1인 가구", "반려견·반려묘 동거", "반려동물 월 지출 20-30%", "펫보험 대상"],
+    demoOrder: 999
   },
   {
     id: "DAILY-COVER-5",
@@ -137,7 +141,8 @@ export const YOU_PRIME_DAILY_PERSONAS = [
     annualSearchVolume: 2030000,
     opportunityCount: 1,
     color: "#06B6D4",
-    demoTags: ["20-30대 싱글·직장인", "동네 단골 중심 소비", "반경 500m 생활권", "이동 피로 회피"]
+    demoTags: ["20-30대 싱글·직장인", "동네 단골 중심 소비", "반경 500m 생활권", "이동 피로 회피"],
+    demoOrder: 999
   }
 ];
 
@@ -197,6 +202,8 @@ const _RAW_YOU_PRIME_DAILY_OPPORTUNITIES = [
   {
     id: "DAILY-COVER-2-1",
     personaId: "DAILY-COVER-2",
+    featured: true,
+    featuredOrder: 1,
     icon: "🧘",
     tier: "MEGA",
     card: "YOU Prime 일상팩",
@@ -244,6 +251,8 @@ const _RAW_YOU_PRIME_DAILY_OPPORTUNITIES = [
   {
     id: "DAILY-COVER-3-1",
     personaId: "DAILY-COVER-3",
+    featured: true,
+    featuredOrder: 1,
     icon: "💻",
     tier: "MEDIUM",
     card: "YOU Prime 일상팩",

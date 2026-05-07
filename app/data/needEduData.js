@@ -62,7 +62,8 @@ export const NEED_EDU_PERSONAS = [
     annualSearchVolume: 1420000,
     opportunityCount: 1,
     color: "#EC4899",
-    demoTags: ["30대 후반 엄마", "0-6세 자녀", "영어유치원 관심", "월 교육비 200만+"]
+    demoTags: ["30대 후반 엄마", "0-6세 자녀", "영어유치원 관심", "월 교육비 200만+"],
+    demoOrder: 999
   },
   {
     id: "EDU-COVER-K2",
@@ -74,7 +75,8 @@ export const NEED_EDU_PERSONAS = [
     annualSearchVolume: 1920000,
     opportunityCount: 1,
     color: "#F59E0B",
-    demoTags: ["30-40대 부모", "초등 자녀 1-2명", "예체능 2개+ 병행", "교육비 민감도 중"]
+    demoTags: ["30-40대 부모", "초등 자녀 1-2명", "예체능 2개+ 병행", "교육비 민감도 중"],
+    demoOrder: 1
   },
   {
     id: "EDU-COVER-K3",
@@ -86,7 +88,8 @@ export const NEED_EDU_PERSONAS = [
     annualSearchVolume: 450000,
     opportunityCount: 1,
     color: "#EF4444",
-    demoTags: ["40-50대 부모", "재수생 자녀", "월 고정비 300만+", "11-12월 집중"]
+    demoTags: ["40-50대 부모", "재수생 자녀", "월 고정비 300만+", "11-12월 집중"],
+    demoOrder: 999
   },
   // 🟩 성인 자기계발 축 (3)
   {
@@ -99,7 +102,8 @@ export const NEED_EDU_PERSONAS = [
     annualSearchVolume: 11980000,
     opportunityCount: 1,
     color: "#3B82F6",
-    demoTags: ["20-30대 직장인", "이직·승진 준비", "온라인 강의 + 오프라인", "월 교육비 10-20만"]
+    demoTags: ["20-30대 직장인", "이직·승진 준비", "온라인 강의 + 오프라인", "월 교육비 10-20만"],
+    demoOrder: 999
   },
   {
     id: "EDU-COVER-A2",
@@ -111,7 +115,8 @@ export const NEED_EDU_PERSONAS = [
     annualSearchVolume: 2110000,
     opportunityCount: 1,
     color: "#10B981",
-    demoTags: ["30-40대 전문직", "AI 툴 학습", "인프런·패스트캠퍼스", "커리어 전환 고민"]
+    demoTags: ["30-40대 전문직", "AI 툴 학습", "인프런·패스트캠퍼스", "커리어 전환 고민"],
+    demoOrder: 999
   },
   {
     id: "EDU-COVER-A3",
@@ -123,7 +128,8 @@ export const NEED_EDU_PERSONAS = [
     annualSearchVolume: 3800000,
     opportunityCount: 1,
     color: "#8B5CF6",
-    demoTags: ["20-40대", "자격증·공시 준비", "독서실 이용자", "월 수험비 20-50만"]
+    demoTags: ["20-40대", "자격증·공시 준비", "독서실 이용자", "월 수험비 20-50만"],
+    demoOrder: 999
   }
 ];
 
@@ -184,6 +190,8 @@ const _RAW_NEED_EDU_OPPORTUNITIES = [
   {
     id: "EDU-COVER-K2-1",
     personaId: "EDU-COVER-K2",
+    featured: true,
+    featuredOrder: 1,
     icon: "🎨",
     tier: "MEGA",
     card: "NEED Edu",
@@ -657,7 +665,8 @@ export const needEduData = {
     monthlyRequirement: 400000,
     familyCard: "무료",
     version: "2.0",
-    lastUpdate: "2026-04-20"
+    lastUpdate: "2026-04-20",
+    sortOrder: 2
   },
   usps: NEED_EDU_USPS,
   personas: NEED_EDU_PERSONAS,

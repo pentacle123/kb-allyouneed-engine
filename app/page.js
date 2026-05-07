@@ -21,6 +21,28 @@ import { generateMonthlyTrend } from "../lib/generateMonthlyTrend";
 import { enrichContentHook } from "../lib/enrichContentHook";
 import { detectCannibalization } from "../lib/cannibalization";
 
+// ──────────── Demo Mode Helpers (Phase 12-24) ────────────
+const sortPersonas = (list = []) =>
+  [...list].sort((a, b) => (a?.demoOrder ?? 999) - (b?.demoOrder ?? 999));
+
+const sortOpportunities = (list = []) =>
+  [...list].sort((a, b) => {
+    if (a?.featured && !b?.featured) return -1;
+    if (!a?.featured && b?.featured) return 1;
+    if (a?.featured && b?.featured) {
+      return (a.featuredOrder ?? 99) - (b.featuredOrder ?? 99);
+    }
+    return 0;
+  });
+
+const isOppDisabled = (opp) => opp?.featured !== true;
+
+const disabledOppStyle = {
+  opacity: 0.4,
+  filter: "grayscale(0.5)",
+  cursor: "not-allowed",
+};
+
 // ──────────── Error Boundary ────────────
 class SectionErrorBoundary extends React.Component {
   constructor(props) { super(props); this.state = { err: null }; }
@@ -2227,20 +2249,23 @@ export default function Home() {
       tagline: "자동차 집중 혜택",
       desc: "신차 할부 + 주유 5% + 보험 2만원 + 스피드메이트 · 연 최대 41만원",
       ready: true,
+      sortOrder: autoslim.needAutoSlimData?.meta?.sortOrder ?? 99,
     },
     {
       id: "pay", label: "NEED Pay", icon: "📱", color: "#059669",
       tagline: "간편결제 집중 혜택",
       desc: "간편결제 15%/10% + 디지털콘텐츠 30% + 온라인패션몰 5%",
       ready: true,
+      sortOrder: needpay.needPayData?.meta?.sortOrder ?? 99,
     },
     {
       id: "edu", label: "NEED Edu", icon: "📚", color: "#DC2626",
       tagline: "교육 집중 혜택",
       desc: "교육업종 5~10% + 생활영역 5% (자녀 교육·평생 학습자)",
       ready: true,
+      sortOrder: neededu.needEduData?.meta?.sortOrder ?? 99,
     },
-  ];
+  ].sort((a, b) => (a.sortOrder ?? 99) - (b.sortOrder ?? 99));
 
   const renderNeedCategory = () => {
     // 하위카드 선택 안 됨 → 선택 페이지
@@ -2338,9 +2363,9 @@ export default function Home() {
   // ──────────── NEED AutoSlim — COVER 4 + ACCENT 5 + 교차 인사이트 ────────────
   const renderAutoslimCategory = () => {
     const color = "#D97706";
-    const cover = autoslim.getCoverOpportunities();
-    const accent = autoslim.getAccentOpportunities();
-    const personas = autoslim.NEED_AUTOSLIM_PERSONAS;
+    const cover = sortOpportunities(autoslim.getCoverOpportunities());
+    const accent = sortOpportunities(autoslim.getAccentOpportunities());
+    const personas = sortPersonas(autoslim.NEED_AUTOSLIM_PERSONAS);
     const crossIns = autoslim.NEED_AUTOSLIM_CROSS_INSIGHTS;
     const totalAnnual = autoslim.getTotalAnnualVolume();
     const oppCount = autoslim.getOpportunityCount();
@@ -2374,18 +2399,20 @@ export default function Home() {
           {cover.map(opp => {
             const persona = personas.find(p => p.id === opp.personaId);
             const pColor = persona?.color || color;
+            const disabled = isOppDisabled(opp);
             return (
               <div
                 key={opp.id}
-                onClick={() => goToAnalysis({ ...opp, _isAllV2: true, _persona: persona })}
+                onClick={(e) => { if (disabled) { e.stopPropagation(); return; } goToAnalysis({ ...opp, _isAllV2: true, _persona: persona }); }}
                 style={{
                   background: "#FFFFFF", borderRadius: 12,
                   border: "1px solid #E5E7EB",
                   borderLeft: `3px solid ${pColor}`,
                   padding: "14px 16px",
-                  cursor: "pointer",
+                  cursor: disabled ? "not-allowed" : "pointer",
                   display: "flex", alignItems: "center", gap: 12,
                   transition: "all 0.2s",
+                  ...(disabled ? disabledOppStyle : {}),
                 }}
               >
                 <div style={{ fontSize: 24, flexShrink: 0 }}>{opp.icon}</div>
@@ -2419,18 +2446,21 @@ export default function Home() {
         {/* ACCENT 기회 섹션 */}
         <SectionDivider label="🟠 ACCENT 기회" color={color} count={accent.length} />
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
-          {accent.map(opp => (
+          {accent.map(opp => {
+            const disabled = isOppDisabled(opp);
+            return (
             <div
               key={opp.id}
-              onClick={() => goToAnalysis({ ...opp, _isAllV2: true })}
+              onClick={(e) => { if (disabled) { e.stopPropagation(); return; } goToAnalysis({ ...opp, _isAllV2: true }); }}
               style={{
                 background: "#FFFFFF", borderRadius: 12,
                 border: "1px solid #E5E7EB",
                 borderLeft: `3px solid ${color}`,
                 padding: "14px 16px",
-                cursor: "pointer",
+                cursor: disabled ? "not-allowed" : "pointer",
                 display: "flex", alignItems: "center", gap: 12,
                 transition: "all 0.2s",
+                ...(disabled ? disabledOppStyle : {}),
               }}
             >
               <div style={{ fontSize: 24, flexShrink: 0 }}>{opp.icon}</div>
@@ -2456,7 +2486,8 @@ export default function Home() {
                 <div style={{ color: color, fontSize: 14, marginTop: 2 }}>→</div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* 교차 인사이트 섹션 제거됨 (Phase 12-15) */}
@@ -2467,9 +2498,9 @@ export default function Home() {
   // ──────────── NEED Pay — COVER + ACCENT + 교차 인사이트 ────────────
   const renderPayCategory = () => {
     const color = "#059669";
-    const cover = needpay.getCoverOpportunities();
-    const accent = needpay.getAccentOpportunities();
-    const personas = needpay.NEED_PAY_PERSONAS;
+    const cover = sortOpportunities(needpay.getCoverOpportunities());
+    const accent = sortOpportunities(needpay.getAccentOpportunities());
+    const personas = sortPersonas(needpay.NEED_PAY_PERSONAS);
     const crossIns = needpay.NEED_PAY_CROSS_INSIGHTS;
     const totalAnnual = needpay.getTotalAnnualVolume();
     const oppCount = needpay.getOpportunityCount();
@@ -2503,18 +2534,20 @@ export default function Home() {
           {cover.map(opp => {
             const persona = personas.find(p => p.id === opp.personaId);
             const pColor = persona?.color || color;
+            const disabled = isOppDisabled(opp);
             return (
               <div
                 key={opp.id}
-                onClick={() => goToAnalysis({ ...opp, _isAllV2: true, _persona: persona })}
+                onClick={(e) => { if (disabled) { e.stopPropagation(); return; } goToAnalysis({ ...opp, _isAllV2: true, _persona: persona }); }}
                 style={{
                   background: "#FFFFFF", borderRadius: 12,
                   border: "1px solid #E5E7EB",
                   borderLeft: `3px solid ${pColor}`,
                   padding: "14px 16px",
-                  cursor: "pointer",
+                  cursor: disabled ? "not-allowed" : "pointer",
                   display: "flex", alignItems: "center", gap: 12,
                   transition: "all 0.2s",
+                  ...(disabled ? disabledOppStyle : {}),
                 }}
               >
                 <div style={{ fontSize: 24, flexShrink: 0 }}>{opp.icon}</div>
@@ -2548,18 +2581,21 @@ export default function Home() {
         {/* ACCENT 기회 섹션 */}
         <SectionDivider label="🟠 ACCENT 기회" color={color} count={accent.length} />
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
-          {accent.map(opp => (
+          {accent.map(opp => {
+            const disabled = isOppDisabled(opp);
+            return (
             <div
               key={opp.id}
-              onClick={() => goToAnalysis({ ...opp, _isAllV2: true })}
+              onClick={(e) => { if (disabled) { e.stopPropagation(); return; } goToAnalysis({ ...opp, _isAllV2: true }); }}
               style={{
                 background: "#FFFFFF", borderRadius: 12,
                 border: "1px solid #E5E7EB",
                 borderLeft: `3px solid ${color}`,
                 padding: "14px 16px",
-                cursor: "pointer",
+                cursor: disabled ? "not-allowed" : "pointer",
                 display: "flex", alignItems: "center", gap: 12,
                 transition: "all 0.2s",
+                ...(disabled ? disabledOppStyle : {}),
               }}
             >
               <div style={{ fontSize: 24, flexShrink: 0 }}>{opp.icon}</div>
@@ -2585,7 +2621,8 @@ export default function Home() {
                 <div style={{ color: color, fontSize: 14, marginTop: 2 }}>→</div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* 교차 인사이트 섹션 제거됨 (Phase 12-15) */}
@@ -2596,9 +2633,9 @@ export default function Home() {
   // ──────────── NEED Edu — COVER + ACCENT + 교차 인사이트 ────────────
   const renderEduCategory = () => {
     const color = "#DC2626";
-    const cover = neededu.getCoverOpportunities ? neededu.getCoverOpportunities() : neededu.NEED_EDU_OPPORTUNITIES.filter(o => o.hookType === "COVER");
-    const accent = neededu.getAccentOpportunities ? neededu.getAccentOpportunities() : neededu.NEED_EDU_OPPORTUNITIES.filter(o => o.hookType === "ACCENT");
-    const personas = neededu.NEED_EDU_PERSONAS;
+    const cover = sortOpportunities(neededu.getCoverOpportunities ? neededu.getCoverOpportunities() : neededu.NEED_EDU_OPPORTUNITIES.filter(o => o.hookType === "COVER"));
+    const accent = sortOpportunities(neededu.getAccentOpportunities ? neededu.getAccentOpportunities() : neededu.NEED_EDU_OPPORTUNITIES.filter(o => o.hookType === "ACCENT"));
+    const personas = sortPersonas(neededu.NEED_EDU_PERSONAS);
     const crossIns = neededu.NEED_EDU_CROSS_INSIGHTS;
     const totalAnnual = neededu.getTotalAnnualVolume();
     const oppCount = neededu.getOpportunityCount();
@@ -2632,18 +2669,20 @@ export default function Home() {
           {cover.map(opp => {
             const persona = personas.find(p => p.id === opp.personaId);
             const pColor = persona?.color || color;
+            const disabled = isOppDisabled(opp);
             return (
               <div
                 key={opp.id}
-                onClick={() => goToAnalysis({ ...opp, _isAllV2: true, _persona: persona })}
+                onClick={(e) => { if (disabled) { e.stopPropagation(); return; } goToAnalysis({ ...opp, _isAllV2: true, _persona: persona }); }}
                 style={{
                   background: "#FFFFFF", borderRadius: 12,
                   border: "1px solid #E5E7EB",
                   borderLeft: `3px solid ${pColor}`,
                   padding: "14px 16px",
-                  cursor: "pointer",
+                  cursor: disabled ? "not-allowed" : "pointer",
                   display: "flex", alignItems: "center", gap: 12,
                   transition: "all 0.2s",
+                  ...(disabled ? disabledOppStyle : {}),
                 }}
               >
                 <div style={{ fontSize: 24, flexShrink: 0 }}>{opp.icon}</div>
@@ -2677,18 +2716,21 @@ export default function Home() {
         {/* ACCENT 기회 섹션 */}
         <SectionDivider label="🟠 ACCENT 기회" color={color} count={accent.length} />
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
-          {accent.map(opp => (
+          {accent.map(opp => {
+            const disabled = isOppDisabled(opp);
+            return (
             <div
               key={opp.id}
-              onClick={() => goToAnalysis({ ...opp, _isAllV2: true })}
+              onClick={(e) => { if (disabled) { e.stopPropagation(); return; } goToAnalysis({ ...opp, _isAllV2: true }); }}
               style={{
                 background: "#FFFFFF", borderRadius: 12,
                 border: "1px solid #E5E7EB",
                 borderLeft: `3px solid ${color}`,
                 padding: "14px 16px",
-                cursor: "pointer",
+                cursor: disabled ? "not-allowed" : "pointer",
                 display: "flex", alignItems: "center", gap: 12,
                 transition: "all 0.2s",
+                ...(disabled ? disabledOppStyle : {}),
               }}
             >
               <div style={{ fontSize: 24, flexShrink: 0 }}>{opp.icon}</div>
@@ -2714,7 +2756,8 @@ export default function Home() {
                 <div style={{ color: color, fontSize: 14, marginTop: 2 }}>→</div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* 교차 인사이트 섹션 제거됨 (Phase 12-15) */}
@@ -2832,9 +2875,9 @@ export default function Home() {
   const renderYouFamilyCategory = () => {
     const color = "#7C3AED";
     const allOpps = youfamily.YOU_PRIME_FAMILY_OPPORTUNITIES;
-    const cover = allOpps.filter(o => o.hookType === "COVER");
-    const accent = allOpps.filter(o => o.hookType === "ACCENT");
-    const personas = youfamily.YOU_PRIME_FAMILY_PERSONAS;
+    const cover = sortOpportunities(allOpps.filter(o => o.hookType === "COVER"));
+    const accent = sortOpportunities(allOpps.filter(o => o.hookType === "ACCENT"));
+    const personas = sortPersonas(youfamily.YOU_PRIME_FAMILY_PERSONAS);
     const crossIns = youfamily.YOU_PRIME_FAMILY_CROSS_INSIGHTS;
     const totalAnnual = youfamily.getTotalAnnualVolume
       ? youfamily.getTotalAnnualVolume()
@@ -2872,18 +2915,20 @@ export default function Home() {
           {cover.map(opp => {
             const persona = personas.find(p => p.id === opp.personaId);
             const pColor = persona?.color || color;
+            const disabled = isOppDisabled(opp);
             return (
               <div
                 key={opp.id}
-                onClick={() => goToAnalysis({ ...opp, _isAllV2: true, _persona: persona })}
+                onClick={(e) => { if (disabled) { e.stopPropagation(); return; } goToAnalysis({ ...opp, _isAllV2: true, _persona: persona }); }}
                 style={{
                   background: "#FFFFFF", borderRadius: 12,
                   border: "1px solid #E5E7EB",
                   borderLeft: `3px solid ${pColor}`,
                   padding: "14px 16px",
-                  cursor: "pointer",
+                  cursor: disabled ? "not-allowed" : "pointer",
                   display: "flex", alignItems: "center", gap: 12,
                   transition: "all 0.2s",
+                  ...(disabled ? disabledOppStyle : {}),
                 }}
               >
                 <div style={{ fontSize: 24, flexShrink: 0 }}>{opp.icon}</div>
@@ -2917,18 +2962,21 @@ export default function Home() {
         {/* ACCENT */}
         <SectionDivider label="🟠 ACCENT 기회" color={color} count={accent.length} />
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
-          {accent.map(opp => (
+          {accent.map(opp => {
+            const disabled = isOppDisabled(opp);
+            return (
             <div
               key={opp.id}
-              onClick={() => goToAnalysis({ ...opp, _isAllV2: true })}
+              onClick={(e) => { if (disabled) { e.stopPropagation(); return; } goToAnalysis({ ...opp, _isAllV2: true }); }}
               style={{
                 background: "#FFFFFF", borderRadius: 12,
                 border: "1px solid #E5E7EB",
                 borderLeft: `3px solid ${color}`,
                 padding: "14px 16px",
-                cursor: "pointer",
+                cursor: disabled ? "not-allowed" : "pointer",
                 display: "flex", alignItems: "center", gap: 12,
                 transition: "all 0.2s",
+                ...(disabled ? disabledOppStyle : {}),
               }}
             >
               <div style={{ fontSize: 24, flexShrink: 0 }}>{opp.icon}</div>
@@ -2954,7 +3002,8 @@ export default function Home() {
                 <div style={{ color: color, fontSize: 14, marginTop: 2 }}>→</div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* 교차 인사이트 섹션 제거됨 (Phase 12-15) */}
@@ -2966,9 +3015,9 @@ export default function Home() {
   const renderYouDailyCategory = () => {
     const color = "#A78BFA";
     const allOpps = youdaily.YOU_PRIME_DAILY_OPPORTUNITIES;
-    const cover = allOpps.filter(o => o.hookType === "COVER");
-    const accent = allOpps.filter(o => o.hookType === "ACCENT");
-    const personas = youdaily.YOU_PRIME_DAILY_PERSONAS;
+    const cover = sortOpportunities(allOpps.filter(o => o.hookType === "COVER"));
+    const accent = sortOpportunities(allOpps.filter(o => o.hookType === "ACCENT"));
+    const personas = sortPersonas(youdaily.YOU_PRIME_DAILY_PERSONAS);
     const crossIns = youdaily.YOU_PRIME_DAILY_CROSS_INSIGHTS;
     const totalAnnual = youdaily.getTotalAnnualVolume
       ? youdaily.getTotalAnnualVolume()
@@ -3006,18 +3055,20 @@ export default function Home() {
           {cover.map(opp => {
             const persona = personas.find(p => p.id === opp.personaId);
             const pColor = persona?.color || color;
+            const disabled = isOppDisabled(opp);
             return (
               <div
                 key={opp.id}
-                onClick={() => goToAnalysis({ ...opp, _isAllV2: true, _persona: persona })}
+                onClick={(e) => { if (disabled) { e.stopPropagation(); return; } goToAnalysis({ ...opp, _isAllV2: true, _persona: persona }); }}
                 style={{
                   background: "#FFFFFF", borderRadius: 12,
                   border: "1px solid #E5E7EB",
                   borderLeft: `3px solid ${pColor}`,
                   padding: "14px 16px",
-                  cursor: "pointer",
+                  cursor: disabled ? "not-allowed" : "pointer",
                   display: "flex", alignItems: "center", gap: 12,
                   transition: "all 0.2s",
+                  ...(disabled ? disabledOppStyle : {}),
                 }}
               >
                 <div style={{ fontSize: 24, flexShrink: 0 }}>{opp.icon}</div>
@@ -3051,18 +3102,21 @@ export default function Home() {
         {/* ACCENT */}
         <SectionDivider label="🟠 ACCENT 기회" color={color} count={accent.length} />
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
-          {accent.map(opp => (
+          {accent.map(opp => {
+            const disabled = isOppDisabled(opp);
+            return (
             <div
               key={opp.id}
-              onClick={() => goToAnalysis({ ...opp, _isAllV2: true })}
+              onClick={(e) => { if (disabled) { e.stopPropagation(); return; } goToAnalysis({ ...opp, _isAllV2: true }); }}
               style={{
                 background: "#FFFFFF", borderRadius: 12,
                 border: "1px solid #E5E7EB",
                 borderLeft: `3px solid ${color}`,
                 padding: "14px 16px",
-                cursor: "pointer",
+                cursor: disabled ? "not-allowed" : "pointer",
                 display: "flex", alignItems: "center", gap: 12,
                 transition: "all 0.2s",
+                ...(disabled ? disabledOppStyle : {}),
               }}
             >
               <div style={{ fontSize: 24, flexShrink: 0 }}>{opp.icon}</div>
@@ -3088,7 +3142,8 @@ export default function Home() {
                 <div style={{ color: color, fontSize: 14, marginTop: 2 }}>→</div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* 교차 인사이트 섹션 제거됨 (Phase 12-15) */}
@@ -3182,7 +3237,7 @@ export default function Home() {
             gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
             gap: 10,
           }}>
-            {ALL_CARD_PERSONAS.map(persona => {
+            {sortPersonas(ALL_CARD_PERSONAS).map(persona => {
               const opps = getOpportunitiesByPersona(persona.id);
               const isActive = openPersona === persona.id;
               return (
@@ -3268,8 +3323,8 @@ export default function Home() {
           <span>페르소나를 클릭하면 해당 기회들이 펼쳐집니다. 한 번에 하나씩.</span>
         </div>
 
-        {ALL_CARD_PERSONAS.map(persona => {
-          const opps = getOpportunitiesByPersona(persona.id);
+        {sortPersonas(ALL_CARD_PERSONAS).map(persona => {
+          const opps = sortOpportunities(getOpportunitiesByPersona(persona.id));
           const isOpen = openPersona === persona.id;
           const totalVolume = opps.reduce((s, o) => s + (o.annualVolume || 0), 0);
           return (
@@ -3367,18 +3422,25 @@ export default function Home() {
 
                   {/* 기회 카드 */}
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    {opps.map(opp => (
+                    {opps.map(opp => {
+                      const disabled = isOppDisabled(opp);
+                      return (
                       <div
                         key={opp.id}
-                        onClick={(e) => { e.stopPropagation(); goToAnalysis({ ...opp, _isAllV2: true, _persona: persona }); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (disabled) return;
+                          goToAnalysis({ ...opp, _isAllV2: true, _persona: persona });
+                        }}
                         style={{
                           background: "#FFFFFF", borderRadius: 10,
                           border: "1px solid #E5E7EB",
                           borderLeft: `3px solid ${persona.color}`,
                           padding: "12px 14px",
-                          cursor: "pointer",
+                          cursor: disabled ? "not-allowed" : "pointer",
                           display: "flex", alignItems: "center", gap: 12,
                           transition: "all 0.15s",
+                          ...(disabled ? disabledOppStyle : {}),
                         }}
                       >
                         <div style={{ fontSize: 20, flexShrink: 0 }}>{opp.icon}</div>
@@ -3414,7 +3476,8 @@ export default function Home() {
                           <div style={{ color: persona.color, fontSize: 13, marginTop: 2 }}>→</div>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}

@@ -89,7 +89,8 @@ export const YOU_PRIME_FAMILY_PERSONAS = [
     annualSearchVolume: 6290000,
     opportunityCount: 1,
     color: "#EC4899",
-    demoTags: ["30-40대 맞벌이", "자녀 1-2명", "외주 서비스 이용자", "시간 > 돈 가치관"]
+    demoTags: ["30-40대 맞벌이", "자녀 1-2명", "외주 서비스 이용자", "시간 > 돈 가치관"],
+    demoOrder: 999
   },
   {
     id: "FAMILY-COVER-2",
@@ -101,7 +102,8 @@ export const YOU_PRIME_FAMILY_PERSONAS = [
     annualSearchVolume: 5390000,
     opportunityCount: 1,
     color: "#F59E0B",
-    demoTags: ["30-40대 엄마 주도", "아파트 거주", "가계부 앱 사용", "고정비 통합"]
+    demoTags: ["30-40대 엄마 주도", "아파트 거주", "가계부 앱 사용", "고정비 통합"],
+    demoOrder: 999
   },
   {
     id: "FAMILY-COVER-3",
@@ -113,7 +115,8 @@ export const YOU_PRIME_FAMILY_PERSONAS = [
     annualSearchVolume: 3600000,
     opportunityCount: 1,
     color: "#8B5CF6",
-    demoTags: ["30-50대 부모", "초등~중등 자녀", "학원 2개+ 병행", "주말 카페 외출"]
+    demoTags: ["30-50대 부모", "초등~중등 자녀", "학원 2개+ 병행", "주말 카페 외출"],
+    demoOrder: 999
   },
   {
     id: "FAMILY-COVER-4",
@@ -125,7 +128,8 @@ export const YOU_PRIME_FAMILY_PERSONAS = [
     annualSearchVolume: 20000000,
     opportunityCount: 1,
     color: "#10B981",
-    demoTags: ["30-40대 가족", "온라인 장보기 전환", "주간 정기 결제", "편의성 민감"]
+    demoTags: ["30-40대 가족", "온라인 장보기 전환", "주간 정기 결제", "편의성 민감"],
+    demoOrder: 2
   },
   {
     id: "FAMILY-COVER-5",
@@ -137,7 +141,8 @@ export const YOU_PRIME_FAMILY_PERSONAS = [
     annualSearchVolume: 534000,
     opportunityCount: 1,
     color: "#10B981",
-    demoTags: ["30-40대 기혼·싱글", "반려동물 동거", "월 지출 20-30만", "펫보험 대상"]
+    demoTags: ["30-40대 기혼·싱글", "반려동물 동거", "월 지출 20-30만", "펫보험 대상"],
+    demoOrder: 1
   },
   {
     id: "FAMILY-COVER-6",
@@ -149,7 +154,8 @@ export const YOU_PRIME_FAMILY_PERSONAS = [
     annualSearchVolume: 882580,
     opportunityCount: 1,
     color: "#8B5CF6",
-    demoTags: ["맞벌이 30-40대 부모", "유치원·초등 자녀", "매일 루틴 압축 니즈", "시간 > 돈"]
+    demoTags: ["맞벌이 30-40대 부모", "유치원·초등 자녀", "매일 루틴 압축 니즈", "시간 > 돈"],
+    demoOrder: 999
   }
 ];
 
@@ -303,6 +309,8 @@ const _RAW_YOU_PRIME_FAMILY_OPPORTUNITIES = [
   {
     id: "FAMILY-COVER-4-1",
     personaId: "FAMILY-COVER-4",
+    featured: true,
+    featuredOrder: 1,
     icon: "🛒",
     tier: "MEGA",
     card: "YOU Prime 가족팩",
@@ -350,6 +358,8 @@ const _RAW_YOU_PRIME_FAMILY_OPPORTUNITIES = [
   {
     id: "FAMILY-COVER-5",
     personaId: "FAMILY-COVER-5",
+    featured: true,
+    featuredOrder: 1,
     icon: "🐕",
     tier: "LARGE",
     card: "YOU Prime 가족팩",
